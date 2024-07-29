@@ -1,4 +1,4 @@
-baseURL = "https://infinitegwei.github.io/tech-blog"
+baseURL = "https://infinitegwei.github.io/tech-blog/"
 title = "Gokarna"
 theme = "gokarna"
 languageCode = "en"
