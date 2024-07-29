@@ -1,5 +1,5 @@
-baseURL = "https://infinitegwei.github.io/tech-blog/"
-title = "Gokarna"
+baseURL = "https://niks3089.com"
+title = "nikhil's Website"
 theme = "gokarna"
 languageCode = "en"
 defaultContentLanguage = "en"
@@ -37,13 +37,10 @@ pygmentsStyle = "monokai"
     </script>
   """
   socialIcons = [
-    {name = "twitter", url = "https://example.com"},
-    {name = "linkedin", url = "https://example.com"},
-    {name = "stackoverflow", url = "https://example.com"},
-    {name = "dribbble", url = "https://example.com"},
-    {name = "instagram", url = "https://example.com"},
-    {name = "twitch", url = "https://example.com"},
-    {name = "email", url = "mailto:example@example.com"}
+    {name = "twitter", url = "https://x.com/niks3089"},
+    {name = "linkedin", url = "https://www.linkedin.com/in/nikhil-acharya-prakash-24a84719/"},
+    {name = "github", url = "https://github.com/niks3089"},
+    {name = "email", url = "mailto:niks3089@gmail.com"}
   ]
   metaKeywords = ["blog", "gokarna", "hugo"]
 
@@ -75,13 +72,13 @@ pygmentsStyle = "monokai"
   [[menu.main]]
     identifier = "github"
     pre = "<span data-feather='github'></span>"
-    url = "https://github.com/526avijitgupta/gokarna"
+    url = "https://github.com/niks3089"
     weight = 5
 
   [[menu.main]]
     identifier = "buymeacoffee"
     pre = "<span data-feather='coffee'></span>"
-    url = "https://www.buymeacoffee.com/avijitgupta"
+    url = "https://www.buymeacoffee.com/niks3089"
     weight = 6
 
   [[menu.main]]
