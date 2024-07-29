@@ -1,4 +1,4 @@
-baseURL = "https://gokarna-hugo.netlify.app"
+baseURL = "https://infinitegwei.github.io/tech-blog/"
 title = "Gokarna"
 theme = "gokarna"
 languageCode = "en"
