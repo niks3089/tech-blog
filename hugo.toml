@@ -1,5 +1,5 @@
 baseURL = "https://niks3089.com"
-title = "nikhil's Website"
+title = "nikhil's website"
 theme = "gokarna"
 languageCode = "en"
 defaultContentLanguage = "en"
@@ -58,9 +58,9 @@ pygmentsStyle = "monokai"
     weight = 2
 
   [[menu.main]]
-    name = "Projects"
+    name = "About me"
     pre = "<span data-feather='code'></span>"
-    url = "/projects/"
+    url = "/about/"
     weight = 3
 
   [[menu.main]]
@@ -68,12 +68,6 @@ pygmentsStyle = "monokai"
     pre = "<span data-feather='tag'></span>"
     url = "/tags/"
     weight = 4
-
-  [[menu.main]]
-    identifier = "github"
-    pre = "<span data-feather='github'></span>"
-    url = "https://github.com/niks3089"
-    weight = 5
 
   [[menu.main]]
     identifier = "buymeacoffee"
