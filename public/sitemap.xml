@@ -2,35 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/posts/markdown-syntax/</loc>
-    <lastmod>2019-06-19T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/posts/staking-sol-in-india/</loc>
-    <lastmod>2020-10-01T17:55:28+08:00</lastmod>
+    <lastmod>2024-07-30T17:55:28+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/india/</loc>
-    <lastmod>2020-10-01T17:55:28+08:00</lastmod>
+    <lastmod>2024-07-30T17:55:28+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2020-10-01T17:55:28+08:00</lastmod>
+    <lastmod>2024-07-30T17:55:28+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2020-10-01T17:55:28+08:00</lastmod>
+    <lastmod>2024-07-30T17:55:28+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/solana/</loc>
-    <lastmod>2020-10-01T17:55:28+08:00</lastmod>
+    <lastmod>2024-07-30T17:55:28+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/</loc>
-    <lastmod>2020-10-01T17:55:28+08:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/css/</loc>
-    <lastmod>2019-06-19T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/html/</loc>
-    <lastmod>2019-06-19T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/markdown/</loc>
-    <lastmod>2019-06-19T00:00:00+00:00</lastmod>
+    <lastmod>2024-07-30T17:55:28+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/about/bludhaven/</loc>
   </url><url>
