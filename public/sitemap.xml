@@ -2,22 +2,25 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>http://localhost:1313/posts/token-history-problem-statement/</loc>
+    <lastmod>2024-08-10T17:55:28+08:00</lastmod>
+  </url><url>
     <loc>http://localhost:1313/posts/staking-sol-in-india/</loc>
     <lastmod>2024-07-30T17:55:28+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/india/</loc>
-    <lastmod>2024-07-30T17:55:28+08:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2024-07-30T17:55:28+08:00</lastmod>
+    <lastmod>2024-08-10T17:55:28+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2024-07-30T17:55:28+08:00</lastmod>
+    <lastmod>2024-08-10T17:55:28+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/solana/</loc>
-    <lastmod>2024-07-30T17:55:28+08:00</lastmod>
+    <lastmod>2024-08-10T17:55:28+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2024-08-10T17:55:28+08:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/india/</loc>
     <lastmod>2024-07-30T17:55:28+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/about/bludhaven/</loc>

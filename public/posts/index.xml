@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on nikhil&#39;s website</title>
+    <title>Posts on nikhil acharya</title>
     <link>http://localhost:1313/posts/</link>
-    <description>Recent content in Posts on nikhil&#39;s website</description>
+    <description>Recent content in Posts on nikhil acharya</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 30 Jul 2024 17:55:28 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 10 Aug 2024 17:55:28 +0800</lastBuildDate>
     <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Solana Token History Indexer: Problem Statement</title>
+      <link>http://localhost:1313/posts/token-history-problem-statement/</link>
+      <pubDate>Sat, 10 Aug 2024 17:55:28 +0800</pubDate>
+      <guid>http://localhost:1313/posts/token-history-problem-statement/</guid>
+      <description>Problem Statement: Token Transfer History Indexer for Wallets Background Retrieving transaction history for a specific wallet on the Solana blockchain, especially for token transfers, currently requires multiple RPC calls. This process is slow and inefficient, making it challenging to quickly access and filter token transfer data. There is a clear need for a streamlined and optimized method to retrieve token transfer history.&#xA;Here&amp;rsquo;s an example of how to fetch token transfer history specifically between two wallets</description>
+    </item>
     <item>
       <title>Staking SOL on Solana in India: A Guide</title>
       <link>http://localhost:1313/posts/staking-sol-in-india/</link>

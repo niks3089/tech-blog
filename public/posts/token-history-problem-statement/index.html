@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        :root {
+            --accent-color: #FF4D4D;
+        }
+    </style>
+
+    
+    
+    
+    
+    
+    
+
+    
+    <title>Solana Token History Indexer: Problem Statement</title>
+    <meta name="description" content="A requirement for token history indexer">
+    <meta name="keywords" content='blog, gokarna, hugo, solana'>
+
+    <meta property="og:url" content="http://localhost:1313/posts/token-history-problem-statement/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Solana Token History Indexer: Problem Statement">
+    <meta property="og:description" content="A requirement for token history indexer">
+    <meta property="og:image" content="http://localhost:1313/images/avatar.webp">
+    <meta property="og:image:secure_url" content="http://localhost:1313/images/avatar.webp">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Solana Token History Indexer: Problem Statement">
+    <meta name="twitter:description" content="A requirement for token history indexer">
+    <meta property="twitter:domain" content="http://localhost:1313/posts/token-history-problem-statement/">
+    <meta property="twitter:url" content="http://localhost:1313/posts/token-history-problem-statement/">
+    <meta name="twitter:image" content="http://localhost:1313/images/avatar.webp">
+
+    
+    <link rel="canonical" href="http://localhost:1313/posts/token-history-problem-statement/">
+
+    
+    <link rel="stylesheet" type="text/css" href="/css/normalize.min.css" media="print">
+
+    
+    <link rel="stylesheet" type="text/css" href="/css/main.min.css">
+
+    
+    <link id="dark-theme" rel="stylesheet" href="/css/dark.min.css">
+
+    
+    <script src="/js/bundle.min.9a920d7dabdbad8363b6a0a94e29a9dfebdb7ee64cfcb193a0145e512ef2bdab.js" integrity="sha256-mpINfavbrYNjtqCpTimp3&#43;vbfuZM/LGToBReUS7yvas="></script>
+
+    
+    
+        <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css" integrity="sha384-Xi8rHCmBmhbuyyhbI88391ZKP2dmfnOl4rT9ZfRI7mLTdk1wblIUnrIq35nqwEvC" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js" integrity="sha384-X/XCfMm41VSsqRNQgDerQczD69XqmjOOOwYQvr/uuC+j4OPoNhVgjdGFwhvN02Ja" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          // customised options
+          // • auto-render specific keys, e.g.:
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+          ],
+          // • rendering keys, e.g.:
+          throwOnError : false
+        });
+      });
+    </script>
+  
+    
+</head>
+<body>
+        <script>
+            
+            setThemeByUserPref();
+        </script><header class="header">
+    <nav class="header-nav">
+
+        
+        <div class="avatar">
+            <a href="http://localhost:1313/">
+                <img src='/images/avatar.webp' alt="avatar">
+            </a>
+        </div>
+        
+
+        <div class="nav-title">
+            <a class="nav-brand" href="http://localhost:1313/">nikhil acharya</a>
+        </div>
+
+        <div class="nav-links">
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/"><span data-feather='home'></span> Home </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/posts/"><span data-feather='book'></span> Posts </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/about/"><span data-feather='code'></span> About me </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/tags/"><span data-feather='tag'></span> Tags </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="https://www.buymeacoffee.com/niks3089"><span data-feather='coffee'></span>  </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/index.xml"><span data-feather='rss'></span>  </a>
+            </div>
+            
+
+            <span class="nav-icons-divider"></span>
+            <div class="nav-link dark-theme-toggle">
+                <span class="sr-only dark-theme-toggle-screen-reader-target"></span>
+                <a>
+                    <span class="theme-toggle-icon" data-feather="moon"></span>
+                </a>
+            </div>
+
+            <div class="nav-link" id="hamburger-menu-toggle">
+                <span class="sr-only hamburger-menu-toggle-screen-reader-target">menu</span>
+                <a>
+                    <span data-feather="menu"></span>
+                </a>
+            </div>
+
+            
+            <ul class="nav-hamburger-list visibility-hidden">
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/"><span data-feather='home'></span> Home </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/posts/"><span data-feather='book'></span> Posts </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/about/"><span data-feather='code'></span> About me </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/tags/"><span data-feather='tag'></span> Tags </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="https://www.buymeacoffee.com/niks3089"><span data-feather='coffee'></span>  </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/index.xml"><span data-feather='rss'></span>  </a>
+                </li>
+                
+                <li class="nav-item dark-theme-toggle">
+                    <span class="sr-only dark-theme-toggle-screen-reader-target">theme</span>
+                    <a>
+                        <span class="theme-toggle-icon" data-feather="moon"></span>
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+</header>
+<main id="content">
+    <div class="post container">
+    <div class="post-header-section">
+        <h1>Solana Token History Indexer: Problem Statement</h1>
+        <small role="doc-subtitle">A requirement for token history indexer</small>
+        <p class="post-date">August 10, 2024
+        
+        </p>
+
+        <ul class="post-tags">
+        
+            <li class="post-tag"><a href="http://localhost:1313/tags/solana">solana</a></li>
+        
+        </ul>
+    </div>
+
+    <div class="post-content">
+        <h1 id="problem-statement-token-transfer-history-indexer-for-wallets">Problem Statement: Token Transfer History Indexer for Wallets</h1>
+<h3 id="background">Background</h3>
+<p>Retrieving transaction history for a specific wallet on the Solana blockchain, especially for token transfers, currently requires multiple RPC calls. This process is slow and inefficient, making it challenging to quickly access and filter token transfer data. There is a clear need for a streamlined and optimized method to retrieve token transfer history.</p>
+<p>Here&rsquo;s an example of how to fetch token transfer history specifically between two wallets</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> solana_client::rpc_client::RpcClient;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> solana_sdk::signature::Signature;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> solana_transaction_status::{EncodedTransaction, UiTransactionEncoding};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() -&gt; Result<span style="color:#f92672">&lt;</span>(), Box<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">dyn</span> std::error::Error<span style="color:#f92672">&gt;&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Set up the RPC client
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> rpc_url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://api.mainnet-beta.solana.com&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> client <span style="color:#f92672">=</span> RpcClient::new(rpc_url);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Specify the source and destination wallet addresses
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> source_wallet <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SourceWalletAddress&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> destination_wallet <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;DestinationWalletAddress&#34;</span>;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Fetch the transaction signatures for the source wallet address
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> signatures <span style="color:#f92672">=</span> client.get_signatures_for_address_with_config(
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&amp;</span>source_wallet.parse()<span style="color:#f92672">?</span>,
+</span></span><span style="display:flex;"><span>        solana_client::rpc_request::RpcSignaturesForAddressConfig {
+</span></span><span style="display:flex;"><span>            limit: Some(<span style="color:#ae81ff">1000</span>),
+</span></span><span style="display:flex;"><span>            before: None,
+</span></span><span style="display:flex;"><span>            until: None,
+</span></span><span style="display:flex;"><span>            commitment: None,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    )<span style="color:#f92672">?</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Iterate over the transaction signatures and fetch the details
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span> signature <span style="color:#66d9ef">in</span> signatures {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> transaction_signature <span style="color:#f92672">=</span> Signature::from_str(<span style="color:#f92672">&amp;</span>signature.signature)<span style="color:#f92672">?</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> transaction <span style="color:#f92672">=</span> client.get_transaction_with_config(
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;</span>transaction_signature,
+</span></span><span style="display:flex;"><span>            solana_transaction_status::UiTransactionEncoding::JsonParsed,
+</span></span><span style="display:flex;"><span>        )<span style="color:#f92672">?</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Parse the transaction instructions to identify token transfers
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> Some(meta) <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>transaction.transaction.meta {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> instruction <span style="color:#66d9ef">in</span> <span style="color:#f92672">&amp;</span>meta.inner_instructions {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> ui_instruction <span style="color:#66d9ef">in</span> <span style="color:#f92672">&amp;</span>instruction.instructions {
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e">// Filter for token transfer instructions by program ID
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                    <span style="color:#66d9ef">if</span> ui_instruction.program_id <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA&#34;</span> {
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> solana_transaction_status::UiInstruction::Parsed(parsed_instruction) <span style="color:#f92672">=</span> ui_instruction {
+</span></span><span style="display:flex;"><span>                            <span style="color:#75715e">// Check if this is a transfer instruction
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                            <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> Some(parsed) <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>parsed_instruction.parsed {
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> solana_transaction_status::UiInstructionParsed::Transfer { source, destination, amount } <span style="color:#f92672">=</span> parsed {
+</span></span><span style="display:flex;"><span>                                    <span style="color:#75715e">// Only print if the transfer is between the specified wallets
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                                    <span style="color:#66d9ef">if</span> source <span style="color:#f92672">==</span> source_wallet <span style="color:#f92672">&amp;&amp;</span> destination <span style="color:#f92672">==</span> destination_wallet {
+</span></span><span style="display:flex;"><span>                                        println!(
+</span></span><span style="display:flex;"><span>                                            <span style="color:#e6db74">&#34;Transfer: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74"> SOL from </span><span style="color:#e6db74">{}</span><span style="color:#e6db74"> to </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>,
+</span></span><span style="display:flex;"><span>                                            amount, source, destination
+</span></span><span style="display:flex;"><span>                                        );
+</span></span><span style="display:flex;"><span>                                    }
+</span></span><span style="display:flex;"><span>                                }
+</span></span><span style="display:flex;"><span>                            }
+</span></span><span style="display:flex;"><span>                        }
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    Ok(())
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="objective">Objective</h3>
+<p>Develop an indexer that efficiently captures and stores token transfer histories for specific wallets across various token types (e.g., token extensions, SPL tokens, Metaplex tokens). This indexer will enable quick and efficient querying of token transfer histories, reducing the dependency on multiple RPC calls.</p>
+<h3 id="requirements">Requirements</h3>
+<h4 id="data-retention">Data Retention</h4>
+<ul>
+<li>Support at least 30 days of token transfer history, starting from a specified launch date (e.g., October 1st).</li>
+<li>Plan for potential extensions of retention periods to 60-90 days.</li>
+</ul>
+<h4 id="token-compatibility">Token Compatibility</h4>
+<ul>
+<li>Ensure compatibility with all uncompressed token types, including token extensions, regular tokens, and Metaplex tokens.</li>
+</ul>
+<h4 id="performance">Performance</h4>
+<ul>
+<li>Optimize the indexer for speed and filtering capabilities.</li>
+<li>Minimize the need for multiple RPC calls to retrieve token transfer histories.</li>
+</ul>
+<h4 id="storage-solution">Storage Solution</h4>
+<ul>
+<li>Utilize TimescaleDB for efficient time-series data management.</li>
+<li>Design the database schema to handle high volumes of token transfer data efficiently.</li>
+</ul>
+<h4 id="api-development">API Development</h4>
+<ul>
+<li>Develop an API to provide access to the indexed token transfer history.</li>
+<li>Support querying token transfers to/from a specific wallet.</li>
+<li>Implement filtering options such as date ranges and specific token types.</li>
+</ul>
+<h3 id="scope">Scope</h3>
+<h4 id="indexer-development">Indexer Development</h4>
+<ul>
+<li>Create a robust indexer to monitor and record token transfers from the blockchain.</li>
+<li>Ensure the indexer starts recording data from a specified date (e.g., October 1st).</li>
+</ul>
+<h4 id="database-schema-design">Database Schema Design</h4>
+<ul>
+<li>Design a schema in TimescaleDB to store token transfer data efficiently.</li>
+<li>Implement partitions or hypertables for optimized querying and retention management.</li>
+</ul>
+<h4 id="api-implementation">API Implementation</h4>
+<ul>
+<li>Develop JSON RPC endpoints to query token transfer history.</li>
+<li>Endpoints should support filtering by wallet address, token type, and date range.</li>
+</ul>
+<h4 id="monitoring-and-maintenance">Monitoring and Maintenance</h4>
+<ul>
+<li>Implement monitoring to ensure the indexer is capturing data correctly.</li>
+<li>Develop maintenance scripts to manage data retention policies.</li>
+</ul>
+<h3 id="deliverables">Deliverables</h3>
+<h4 id="indexer">Indexer</h4>
+<ul>
+<li>A fully functional indexer that captures token transfer data from the blockchain.</li>
+</ul>
+<h4 id="database-schema">Database Schema</h4>
+<ul>
+<li>A TimescaleDB schema designed for efficient storage and querying of token transfer data.</li>
+</ul>
+<h4 id="api">API</h4>
+<ul>
+<li>A set of JSON RPC API endpoints to access token transfer history.</li>
+<li>Documentation for API usage and querying capabilities.</li>
+</ul>
+<h4 id="monitoring-and-maintenance-tools">Monitoring and Maintenance Tools</h4>
+<ul>
+<li>Scripts and tools for monitoring the indexer&rsquo;s performance and maintaining data retention policies.</li>
+</ul>
+<h3 id="expected-challenges">Expected Challenges</h3>
+<h4 id="data-volume">Data Volume</h4>
+<ul>
+<li>Handling high volumes of token transfer data while ensuring the indexer remains performant.</li>
+</ul>
+<h4 id="compatibility">Compatibility</h4>
+<ul>
+<li>Ensuring compatibility with various token standards and types.</li>
+</ul>
+<h4 id="retention-management">Retention Management</h4>
+<ul>
+<li>Efficiently managing data retention to comply with the specified retention period.</li>
+</ul>
+<h3 id="conclusion">Conclusion</h3>
+<p>By developing an efficient indexer and API for token transfer history, we aim to significantly improve the speed and ease of retrieving and filtering token transfer data. This solution will enhance the user experience and provide a scalable method for managing and querying blockchain transaction data.</p>
+
+        
+    </div>
+
+    <div class="prev-next">
+        
+    </div>
+
+    
+    
+    <svg id="btt-button" class="arrow-logo" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512" onclick="scrollToTop()" title="Go to top">
+        
+        <path d="M177 159.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 255.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 329.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1z"/>
+    </svg>
+    <script>
+        let backToTopButton = document.getElementById("btt-button");
+
+        window.onscroll = function() {
+            scrollFunction()
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                backToTopButton.style.display = "block";
+            } else {
+                backToTopButton.style.display = "none";
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo(0, 0);
+        }
+    </script>
+    
+    
+</div>
+
+<aside class="post-toc">
+    <nav id="toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#problem-statement-token-transfer-history-indexer-for-wallets">Problem Statement: Token Transfer History Indexer for Wallets</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#background">Background</a></li>
+            <li><a href="#objective">Objective</a></li>
+            <li><a href="#requirements">Requirements</a>
+              <ul>
+                <li><a href="#data-retention">Data Retention</a></li>
+                <li><a href="#token-compatibility">Token Compatibility</a></li>
+                <li><a href="#performance">Performance</a></li>
+                <li><a href="#storage-solution">Storage Solution</a></li>
+                <li><a href="#api-development">API Development</a></li>
+              </ul>
+            </li>
+            <li><a href="#scope">Scope</a>
+              <ul>
+                <li><a href="#indexer-development">Indexer Development</a></li>
+                <li><a href="#database-schema-design">Database Schema Design</a></li>
+                <li><a href="#api-implementation">API Implementation</a></li>
+                <li><a href="#monitoring-and-maintenance">Monitoring and Maintenance</a></li>
+              </ul>
+            </li>
+            <li><a href="#deliverables">Deliverables</a>
+              <ul>
+                <li><a href="#indexer">Indexer</a></li>
+                <li><a href="#database-schema">Database Schema</a></li>
+                <li><a href="#api">API</a></li>
+                <li><a href="#monitoring-and-maintenance-tools">Monitoring and Maintenance Tools</a></li>
+              </ul>
+            </li>
+            <li><a href="#expected-challenges">Expected Challenges</a>
+              <ul>
+                <li><a href="#data-volume">Data Volume</a></li>
+                <li><a href="#compatibility">Compatibility</a></li>
+                <li><a href="#retention-management">Retention Management</a></li>
+              </ul>
+            </li>
+            <li><a href="#conclusion">Conclusion</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </nav>
+</aside>
+
+
+
+    
+
+        </main><footer class="footer">
+    
+    
+</footer></body>
+</html>

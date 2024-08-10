@@ -1,5 +1,5 @@
 baseURL = "https://niks3089.com"
-title = "nikhil's website"
+title = "nikhil acharya"
 theme = "gokarna"
 languageCode = "en"
 defaultContentLanguage = "en"
@@ -11,7 +11,7 @@ pygmentsStyle = "monokai"
 
 [params]
   footer = "The Marauders"
-  description = "Sky above, sand below and peace within"
+  description = "Code in hand, innovation ahead, and success within"
   avatarURL = "/images/avatar.webp"
   AvatarAltText = "avatar"
   avatarSize = "size-m"
