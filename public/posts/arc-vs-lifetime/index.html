@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        :root {
+            --accent-color: #FF4D4D;
+        }
+    </style>
+
+    
+    
+    
+    
+    
+    
+
+    
+    <title>Lifetime vs Arc in Rust</title>
+    <meta name="description" content="Understanding the difference and knowing when to use what">
+    <meta name="keywords" content='blog, gokarna, hugo, rust'>
+
+    <meta property="og:url" content="http://localhost:1313/posts/arc-vs-lifetime/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Lifetime vs Arc in Rust">
+    <meta property="og:description" content="Understanding the difference and knowing when to use what">
+    <meta property="og:image" content="http://localhost:1313/images/avatar.webp">
+    <meta property="og:image:secure_url" content="http://localhost:1313/images/avatar.webp">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Lifetime vs Arc in Rust">
+    <meta name="twitter:description" content="Understanding the difference and knowing when to use what">
+    <meta property="twitter:domain" content="http://localhost:1313/posts/arc-vs-lifetime/">
+    <meta property="twitter:url" content="http://localhost:1313/posts/arc-vs-lifetime/">
+    <meta name="twitter:image" content="http://localhost:1313/images/avatar.webp">
+
+    
+    <link rel="canonical" href="http://localhost:1313/posts/arc-vs-lifetime/">
+
+    
+    <link rel="stylesheet" type="text/css" href="/css/normalize.min.css" media="print">
+
+    
+    <link rel="stylesheet" type="text/css" href="/css/main.min.css">
+
+    
+    <link id="dark-theme" rel="stylesheet" href="/css/dark.min.css">
+
+    
+    <script src="/js/bundle.min.9a920d7dabdbad8363b6a0a94e29a9dfebdb7ee64cfcb193a0145e512ef2bdab.js" integrity="sha256-mpINfavbrYNjtqCpTimp3&#43;vbfuZM/LGToBReUS7yvas="></script>
+
+    
+    
+        <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css" integrity="sha384-Xi8rHCmBmhbuyyhbI88391ZKP2dmfnOl4rT9ZfRI7mLTdk1wblIUnrIq35nqwEvC" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js" integrity="sha384-X/XCfMm41VSsqRNQgDerQczD69XqmjOOOwYQvr/uuC+j4OPoNhVgjdGFwhvN02Ja" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          // customised options
+          // • auto-render specific keys, e.g.:
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+          ],
+          // • rendering keys, e.g.:
+          throwOnError : false
+        });
+      });
+    </script>
+  
+    
+</head>
+<body>
+        <script>
+            
+            setThemeByUserPref();
+        </script><header class="header">
+    <nav class="header-nav">
+
+        
+        <div class="avatar">
+            <a href="http://localhost:1313/">
+                <img src='/images/avatar.webp' alt="avatar">
+            </a>
+        </div>
+        
+
+        <div class="nav-title">
+            <a class="nav-brand" href="http://localhost:1313/">nikhil acharya</a>
+        </div>
+
+        <div class="nav-links">
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/"><span data-feather='home'></span> Home </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/posts/"><span data-feather='book'></span> Posts </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/about/"><span data-feather='code'></span> About me </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/tags/"><span data-feather='tag'></span> Tags </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="https://www.buymeacoffee.com/niks3089"><span data-feather='coffee'></span>  </a>
+            </div>
+            
+
+            <span class="nav-icons-divider"></span>
+            <div class="nav-link dark-theme-toggle">
+                <span class="sr-only dark-theme-toggle-screen-reader-target"></span>
+                <a>
+                    <span class="theme-toggle-icon" data-feather="moon"></span>
+                </a>
+            </div>
+
+            <div class="nav-link" id="hamburger-menu-toggle">
+                <span class="sr-only hamburger-menu-toggle-screen-reader-target">menu</span>
+                <a>
+                    <span data-feather="menu"></span>
+                </a>
+            </div>
+
+            
+            <ul class="nav-hamburger-list visibility-hidden">
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/"><span data-feather='home'></span> Home </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/posts/"><span data-feather='book'></span> Posts </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/about/"><span data-feather='code'></span> About me </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/tags/"><span data-feather='tag'></span> Tags </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="https://www.buymeacoffee.com/niks3089"><span data-feather='coffee'></span>  </a>
+                </li>
+                
+                <li class="nav-item dark-theme-toggle">
+                    <span class="sr-only dark-theme-toggle-screen-reader-target">theme</span>
+                    <a>
+                        <span class="theme-toggle-icon" data-feather="moon"></span>
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+</header>
+<main id="content">
+    <div class="post container">
+    <div class="post-header-section">
+        <h1>Lifetime vs Arc in Rust</h1>
+        <small role="doc-subtitle">Understanding the difference and knowing when to use what</small>
+        <p class="post-date">August 11, 2024
+        
+        </p>
+
+        <ul class="post-tags">
+        
+            <li class="post-tag"><a href="http://localhost:1313/tags/rust">rust</a></li>
+        
+        </ul>
+    </div>
+
+    <div class="post-content">
+        <h1 id="understanding-arc-vs-lifetimes-in-rust">Understanding Arc vs Lifetimes in Rust</h1>
+<p>In Rust, both <code>Arc</code> and lifetimes are tools used to manage how data is shared or accessed across different parts of a program, but they serve different purposes and are used in different contexts.</p>
+<h2 id="1-lifetimes">1. Lifetimes</h2>
+<p>Lifetimes in Rust are a way to ensure that references are always valid. They help the Rust compiler understand how long references to data should be valid to prevent dangling references, which could lead to undefined behavior.</p>
+<h3 id="when-to-use-lifetimes">When to Use Lifetimes:</h3>
+<ul>
+<li><strong>Borrowing:</strong> When you have references (<code>&amp;T</code> or <code>&amp;mut T</code>) to some data, and you want to ensure that these references are valid for as long as they&rsquo;re needed.</li>
+<li><strong>Function Arguments and Returns:</strong> When passing references into and out of functions, you often need to specify lifetimes to ensure the borrowed data is valid as expected.</li>
+<li><strong>Avoiding Cloning:</strong> Lifetimes allow you to share data without needing to clone it, which can be more efficient.</li>
+<li><strong>Compile-Time Construct:</strong> Lifetimes are a compile-time construct that enforces memory safety. They allow the Rust compiler to catch potential issues related to reference validity before the code even runs, eliminating entire classes of runtime errors related to memory management.</li>
+</ul>
+<h3 id="example">Example:</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Data</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    name: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">str</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">print_name</span>(data: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">Data</span>) {
+</span></span><span style="display:flex;"><span>    println!(<span style="color:#e6db74">&#34;Name: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, data.name);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> s <span style="color:#f92672">=</span> String::from(<span style="color:#e6db74">&#34;Hello, world!&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> data <span style="color:#f92672">=</span> Data { name: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">s</span> };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print_name(<span style="color:#f92672">&amp;</span>data); <span style="color:#75715e">// This works because `s` lives long enough.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>In this example, the lifetime <code>'a</code> ensures that the reference <code>&amp;s</code> used in Data is valid for as long as Data exists. The lifetime ensures that <code>s</code> doesn&rsquo;t go out of scope while Data still references it.</p>
+<h2 id="2-arc-atomic-reference-counting">2. Arc (Atomic Reference Counting)</h2>
+<p><code>Arc</code> (short for Atomic Reference Counter) is a smart pointer that enables safe, concurrent, shared ownership of data. Unlike <code>Rc</code>, which is not thread-safe, <code>Arc</code> can be safely shared across multiple threads.</p>
+<h3 id="when-to-use-arc">When to Use <code>Arc</code>:</h3>
+<ul>
+<li><strong>Multi-threading:</strong> When you need to share data between multiple threads and want to ensure that the data is kept alive as long as there are references to it.</li>
+<li><strong>Shared Ownership:</strong> When multiple parts of your program need ownership of the same data, and you don&rsquo;t want to clone it, but rather share it.</li>
+</ul>
+<h3 id="example-1">Example:</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::Arc;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::thread;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> data <span style="color:#f92672">=</span> Arc::new(String::from(<span style="color:#e6db74">&#34;Hello, Arc!&#34;</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> handles <span style="color:#f92672">=</span> vec![];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> _ <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">..</span><span style="color:#ae81ff">5</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> data_clone <span style="color:#f92672">=</span> Arc::clone(<span style="color:#f92672">&amp;</span>data);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> handle <span style="color:#f92672">=</span> thread::spawn(<span style="color:#66d9ef">move</span> <span style="color:#f92672">||</span> {
+</span></span><span style="display:flex;"><span>            println!(<span style="color:#e6db74">&#34;Thread says: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, data_clone);
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>        handles.push(handle);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> handle <span style="color:#66d9ef">in</span> handles {
+</span></span><span style="display:flex;"><span>        handle.join().unwrap();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In this example, <code>Arc</code> allows the <code>String</code> data to be safely shared across multiple threads. Each thread gets its own <code>Arc</code> reference to the data, and the data is only deallocated once the last <code>Arc</code> is dropped.</p>
+<h2 id="when-to-use-lifetimes-vs-arc">When to Use Lifetimes vs Arc</h2>
+<h3 id="use-lifetimes-when">Use <code>Lifetimes</code> when:</h3>
+<ul>
+<li>You have a single-threaded context.</li>
+<li>You want to share references without ownership transfer.</li>
+<li>You aim to avoid unnecessary allocations or cloning.</li>
+<li>You want to enforce strict borrowing rules that ensure data validity without runtime overhead.</li>
+</ul>
+<h3 id="use-arc-when">Use <code>Arc</code> when:</h3>
+<ul>
+<li>You need to share data across multiple threads.</li>
+<li>You need shared ownership, where multiple parts of the code require ownership of the same data.</li>
+<li>You can&rsquo;t use lifetimes because you need the data to live beyond a particular scope or across threads.</li>
+</ul>
+<h2 id="comparison-and-scenarios">Comparison and Scenarios</h2>
+<h3 id="single-threaded-sharing">Single-threaded Sharing:</h3>
+<ul>
+<li><strong>Lifetimes:</strong> Use when you can manage the data&rsquo;s scope and lifetime manually, and you don&rsquo;t need shared ownership.</li>
+<li><strong>Arc:</strong> Not needed in single-threaded contexts unless you specifically need shared ownership with runtime reference counting.</li>
+</ul>
+<h3 id="multi-threaded-sharing">Multi-threaded Sharing:</h3>
+<ul>
+<li><strong>Lifetimes:</strong> Not applicable, as lifetimes can&rsquo;t ensure safety across threads.</li>
+<li><strong>Arc:</strong> Use when you need to share data between threads safely.</li>
+</ul>
+<h3 id="performance-considerations">Performance Considerations:</h3>
+<ul>
+<li><strong>Lifetimes:</strong> No runtime overhead since it&rsquo;s purely compile-time checked.</li>
+<li><strong>Arc:</strong> Introduces some overhead due to atomic reference counting, but is necessary for thread-safe shared ownership.</li>
+</ul>
+<h2 id="real-world-example-managing-global-state-with-lifetimes-and-arc-in-rust">Real-World Example: Managing Global State with Lifetimes and <code>Arc</code> in Rust</h2>
+<p>In a real-world Rust application, you might have a global state that needs to be accessed and shared across multiple services. These services may have their own state and might need to share some of this state with each other while also accessing the global state. This scenario can be managed using both lifetimes and <code>Arc</code>.</p>
+<h2 id="scenario-overview">Scenario Overview</h2>
+<ol>
+<li><strong>Global State:</strong> A configuration or state shared across the entire application.</li>
+<li><strong>Service 1:</strong> A service that has its own state and needs to access the global state.</li>
+<li><strong>Service 2:</strong> A service that has its own state and needs to access the global state.</li>
+</ol>
+<h3 id="struct-definitions">Struct Definitions</h3>
+<ul>
+<li><strong>GlobalState:</strong> The global configuration/state.</li>
+<li><strong>Service1State:</strong> The state specific to Service 1.</li>
+<li><strong>Service2State:</strong> The state specific to Service 2.</li>
+</ul>
+<h3 id="managing-global-state-with-lifetimes">Managing Global State with Lifetimes</h3>
+<p>Using lifetimes, you can ensure that the references to the global state remain valid across different services.</p>
+<h4 id="example-2">Example:</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">GlobalState</span> {
+</span></span><span style="display:flex;"><span>    config: String,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Service1State</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    global: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#a6e22e">GlobalState</span>,
+</span></span><span style="display:flex;"><span>    service_data: String,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Service2State</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    global: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#a6e22e">GlobalState</span>,
+</span></span><span style="display:flex;"><span>    service_data: String,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span> Service1State<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">new</span>(global: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#a6e22e">GlobalState</span>, data: String) -&gt; <span style="color:#a6e22e">Self</span> {
+</span></span><span style="display:flex;"><span>        Self {
+</span></span><span style="display:flex;"><span>            global,
+</span></span><span style="display:flex;"><span>            service_data: <span style="color:#a6e22e">data</span>,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">access_global</span>(<span style="color:#f92672">&amp;</span>self) {
+</span></span><span style="display:flex;"><span>        println!(<span style="color:#e6db74">&#34;Service 1 accessing global config: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, self.global.config);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span> Service2State<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">new</span>(global: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#a6e22e">GlobalState</span>, data: String) -&gt; <span style="color:#a6e22e">Self</span> {
+</span></span><span style="display:flex;"><span>        Self {
+</span></span><span style="display:flex;"><span>            global,
+</span></span><span style="display:flex;"><span>            service_data: <span style="color:#a6e22e">data</span>,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">access_global</span>(<span style="color:#f92672">&amp;</span>self) {
+</span></span><span style="display:flex;"><span>        println!(<span style="color:#e6db74">&#34;Service 2 accessing global config: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, self.global.config);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> global_state <span style="color:#f92672">=</span> GlobalState {
+</span></span><span style="display:flex;"><span>        config: String::from(<span style="color:#e6db74">&#34;Global Configuration&#34;</span>),
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> service1 <span style="color:#f92672">=</span> Service1State::new(<span style="color:#f92672">&amp;</span>global_state, String::from(<span style="color:#e6db74">&#34;Service 1 Data&#34;</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> service2 <span style="color:#f92672">=</span> Service2State::new(<span style="color:#f92672">&amp;</span>global_state, String::from(<span style="color:#e6db74">&#34;Service 2 Data&#34;</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    service1.access_global();
+</span></span><span style="display:flex;"><span>    service2.access_global();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In this example, <code>Service1State</code> and <code>Service2State</code> both hold references to the <code>GlobalState</code>. The lifetimes <code>'a</code> ensure that these references remain valid as long as <code>GlobalState</code> exists.</p>
+<h3 id="sharing-state-between-services-with-arc">Sharing State Between Services with <code>Arc</code></h3>
+<p>When you need to share state between services and across threads, using <code>Arc</code> is a better approach. <code>Arc</code> allows multiple ownership and safe sharing of data between threads.</p>
+<h4 id="example-3">Example:</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::Arc;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::thread;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">GlobalState</span> {
+</span></span><span style="display:flex;"><span>    config: String,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Service1State</span> {
+</span></span><span style="display:flex;"><span>    global: <span style="color:#a6e22e">Arc</span><span style="color:#f92672">&lt;</span>GlobalState<span style="color:#f92672">&gt;</span>,
+</span></span><span style="display:flex;"><span>    service_data: String,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Service2State</span> {
+</span></span><span style="display:flex;"><span>    global: <span style="color:#a6e22e">Arc</span><span style="color:#f92672">&lt;</span>GlobalState<span style="color:#f92672">&gt;</span>,
+</span></span><span style="display:flex;"><span>    service_data: String,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span> Service1State {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">new</span>(global: <span style="color:#a6e22e">Arc</span><span style="color:#f92672">&lt;</span>GlobalState<span style="color:#f92672">&gt;</span>, data: String) -&gt; <span style="color:#a6e22e">Self</span> {
+</span></span><span style="display:flex;"><span>        Self {
+</span></span><span style="display:flex;"><span>            global,
+</span></span><span style="display:flex;"><span>            service_data: <span style="color:#a6e22e">data</span>,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">access_global</span>(<span style="color:#f92672">&amp;</span>self) {
+</span></span><span style="display:flex;"><span>        println!(<span style="color:#e6db74">&#34;Service 1 accessing global config: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, self.global.config);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span> Service2State {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">new</span>(global: <span style="color:#a6e22e">Arc</span><span style="color:#f92672">&lt;</span>GlobalState<span style="color:#f92672">&gt;</span>, data: String) -&gt; <span style="color:#a6e22e">Self</span> {
+</span></span><span style="display:flex;"><span>        Self {
+</span></span><span style="display:flex;"><span>            global,
+</span></span><span style="display:flex;"><span>            service_data: <span style="color:#a6e22e">data</span>,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">access_global</span>(<span style="color:#f92672">&amp;</span>self) {
+</span></span><span style="display:flex;"><span>        println!(<span style="color:#e6db74">&#34;Service 2 accessing global config: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, self.global.config);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> global_state <span style="color:#f92672">=</span> Arc::new(GlobalState {
+</span></span><span style="display:flex;"><span>        config: String::from(<span style="color:#e6db74">&#34;Global Configuration&#34;</span>),
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> service1 <span style="color:#f92672">=</span> Service1State::new(Arc::clone(<span style="color:#f92672">&amp;</span>global_state), String::from(<span style="color:#e6db74">&#34;Service 1 Data&#34;</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> service2 <span style="color:#f92672">=</span> Service2State::new(Arc::clone(<span style="color:#f92672">&amp;</span>global_state), String::from(<span style="color:#e6db74">&#34;Service 2 Data&#34;</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> service1_thread <span style="color:#f92672">=</span> thread::spawn(<span style="color:#66d9ef">move</span> <span style="color:#f92672">||</span> {
+</span></span><span style="display:flex;"><span>        service1.access_global();
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> service2_thread <span style="color:#f92672">=</span> thread::spawn(<span style="color:#66d9ef">move</span> <span style="color:#f92672">||</span> {
+</span></span><span style="display:flex;"><span>        service2.access_global();
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    service1_thread.join().unwrap();
+</span></span><span style="display:flex;"><span>    service2_thread.join().unwrap();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="why-not-just-use-arc-all-the-time">Why not just use Arc all the time?</h3>
+<p>Given the above 2 examples, you might be wondering why not use <code>Arc</code> or <code>Rc</code> both the times. Sure, this is possible but keep in mind of the overhead due to atomic operations that manage reference counting, which is only needed for thread-safe, shared ownership across multiple threads. In single-threaded contexts or when shared ownership isn&rsquo;t required, simple references with lifetimes (&amp;T) are more efficient and straightforward. Lifetimes provide compile-time safety without any runtime cost, ensuring that references are valid without the need for complex ownership semantics. Therefore, while Arc is essential for multi-threaded scenarios, in many cases, using lifetimes or other simpler constructs is more performant and appropriate.</p>
+<h2 id="c-tangent">C++ Tangent</h2>
+<p>I like C++ (17 and above only) and often make comparisons between C++ features and Rust to understand systems better. While Rust&rsquo;s <code>Arc</code> and lifetimes have parallels in C++, there&rsquo;s no direct equivalent to Rust&rsquo;s lifetimes, and this is partly due to how C++ handles memory management.</p>
+<h3 id="arc-in-rust-vs-stdshared_ptr-in-c"><code>Arc</code> in Rust vs. <code>std::shared_ptr</code> in C++</h3>
+<p>The closest equivalent in C++ is <code>std::shared_ptr</code>, which also allows multiple ownership of dynamically allocated memory. Both <code>Arc</code> and <code>std::shared_ptr</code> use reference counting to manage the lifetime of the object they own, deallocating it only when the last reference is dropped.</p>
+<h3 id="example-in-c">Example in C++:</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;memory&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;thread&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;vector&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">print_shared</span>(std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>string<span style="color:#f92672">&gt;</span> data) {
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Thread says: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#f92672">*</span>data <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">auto</span> data <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>make_shared<span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>string<span style="color:#f92672">&gt;</span>(<span style="color:#e6db74">&#34;Hello, std::shared_ptr!&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>vector<span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span><span style="color:#66d9ef">thread</span><span style="color:#f92672">&gt;</span> threads;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">5</span>; <span style="color:#f92672">++</span>i) {
+</span></span><span style="display:flex;"><span>        threads.emplace_back(print_shared, data);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">auto</span><span style="color:#f92672">&amp;</span> t : threads) {
+</span></span><span style="display:flex;"><span>        t.join();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="lifetimes-in-rust-vs-c">Lifetimes in Rust vs C++</h3>
+<p>Lifetimes in Rust ensures references are always valid, preventing dangling pointers and other memory safety issues at <strong>compile time</strong>. However, there is no direct equivalent to Rust&rsquo;s lifetimes in C++. C++ relies on manual memory management or smart pointers like <code>std::unique_ptr</code> and <code>std::shared_ptr</code> to manage lifetimes, but these do not provide the same compile-time guarantees as Rust.</p>
+<p>I&rsquo;ve spent a considerable amount of time debugging invalid references in C/C++, which I no longer need to worry about in Rust</p>
+<h2 id="summary">Summary</h2>
+<p>Lifetimes are about ensuring references are valid and avoiding ownership issues within a single thread or scope. <code>Arc</code> is about safely sharing data with shared ownership across threads, ensuring that the data lives as long as it&rsquo;s needed, even in a multi-threaded context.</p>
+<p>Oh and also learn Rust.</p>
+
+        
+    </div>
+
+    <div class="prev-next">
+        
+    </div>
+
+    
+    
+    <svg id="btt-button" class="arrow-logo" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512" onclick="scrollToTop()" title="Go to top">
+        
+        <path d="M177 159.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 255.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 329.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1z"/>
+    </svg>
+    <script>
+        let backToTopButton = document.getElementById("btt-button");
+
+        window.onscroll = function() {
+            scrollFunction()
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                backToTopButton.style.display = "block";
+            } else {
+                backToTopButton.style.display = "none";
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo(0, 0);
+        }
+    </script>
+    
+    
+</div>
+
+<aside class="post-toc">
+    <nav id="toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#understanding-arc-vs-lifetimes-in-rust">Understanding Arc vs Lifetimes in Rust</a>
+      <ul>
+        <li><a href="#1-lifetimes">1. Lifetimes</a>
+          <ul>
+            <li><a href="#when-to-use-lifetimes">When to Use Lifetimes:</a></li>
+            <li><a href="#example">Example:</a></li>
+          </ul>
+        </li>
+        <li><a href="#2-arc-atomic-reference-counting">2. Arc (Atomic Reference Counting)</a>
+          <ul>
+            <li><a href="#when-to-use-arc">When to Use <code>Arc</code>:</a></li>
+            <li><a href="#example-1">Example:</a></li>
+          </ul>
+        </li>
+        <li><a href="#when-to-use-lifetimes-vs-arc">When to Use Lifetimes vs Arc</a>
+          <ul>
+            <li><a href="#use-lifetimes-when">Use <code>Lifetimes</code> when:</a></li>
+            <li><a href="#use-arc-when">Use <code>Arc</code> when:</a></li>
+          </ul>
+        </li>
+        <li><a href="#comparison-and-scenarios">Comparison and Scenarios</a>
+          <ul>
+            <li><a href="#single-threaded-sharing">Single-threaded Sharing:</a></li>
+            <li><a href="#multi-threaded-sharing">Multi-threaded Sharing:</a></li>
+            <li><a href="#performance-considerations">Performance Considerations:</a></li>
+          </ul>
+        </li>
+        <li><a href="#real-world-example-managing-global-state-with-lifetimes-and-arc-in-rust">Real-World Example: Managing Global State with Lifetimes and <code>Arc</code> in Rust</a></li>
+        <li><a href="#scenario-overview">Scenario Overview</a>
+          <ul>
+            <li><a href="#struct-definitions">Struct Definitions</a></li>
+            <li><a href="#managing-global-state-with-lifetimes">Managing Global State with Lifetimes</a>
+              <ul>
+                <li><a href="#example-2">Example:</a></li>
+              </ul>
+            </li>
+            <li><a href="#sharing-state-between-services-with-arc">Sharing State Between Services with <code>Arc</code></a>
+              <ul>
+                <li><a href="#example-3">Example:</a></li>
+              </ul>
+            </li>
+            <li><a href="#why-not-just-use-arc-all-the-time">Why not just use Arc all the time?</a></li>
+          </ul>
+        </li>
+        <li><a href="#c-tangent">C++ Tangent</a>
+          <ul>
+            <li><a href="#arc-in-rust-vs-stdshared_ptr-in-c"><code>Arc</code> in Rust vs. <code>std::shared_ptr</code> in C++</a></li>
+            <li><a href="#example-in-c">Example in C++:</a></li>
+            <li><a href="#lifetimes-in-rust-vs-c">Lifetimes in Rust vs C++</a></li>
+          </ul>
+        </li>
+        <li><a href="#summary">Summary</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </nav>
+</aside>
+
+
+
+    
+
+        </main><footer class="footer">
+    
+    
+</footer></body>
+</html>

@@ -1,8 +1,8 @@
 ---
 title: "Solana Token History Indexer: Problem Statement"
-date: 2024-08-10T17:55:28+08:00
+date: 2024-08-11T17:55:28+08:00
 description: "A requirement for token history indexer"
-tags: ["solana"]
+tags: ["solana", "rust"]
 type: post
 weight: 25
 showTableOfContents: true
@@ -11,9 +11,10 @@ showTableOfContents: true
 # Problem Statement: Token Transfer History Indexer for Wallets
 
 ### Background
-Retrieving transaction history for a specific wallet on the Solana blockchain, especially for token transfers, currently requires multiple RPC calls. This process is slow and inefficient, making it challenging to quickly access and filter token transfer data. There is a clear need for a streamlined and optimized method to retrieve token transfer history.
+Retrieving transaction history for a specific wallet or multiple wallets on the Solana blockchain, especially for token transfers, currently requires multiple RPC calls and complicated filtering. This process is slow and inefficient, making it challenging to quickly access and filter token transfer data. There is a clear need for a streamlined and optimized method to retrieve token transfer history.
 
-Here's an example of how to fetch token transfer history specifically between two wallets
+
+Here's an example of how we fetch token transfer history specifically between two wallets today
 
 ```rust
 use solana_client::rpc_client::RpcClient;
@@ -73,14 +74,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     }
-
     Ok(())
 }
-
 ```
+As you can see, its not straight-forward. 
 
 ### Objective
-Develop an indexer that efficiently captures and stores token transfer histories for specific wallets across various token types (e.g., token extensions, SPL tokens, Metaplex tokens). This indexer will enable quick and efficient querying of token transfer histories, reducing the dependency on multiple RPC calls.
+Develop an indexer that efficiently captures and stores token transfer histories for specific wallets across various token types (e.g., SPL tokens, Token Extensions and Metaplex tokens). This indexer will enable quick and efficient querying of token transfer histories, reducing the dependency on multiple RPC calls.
 
 ### Requirements
 
@@ -100,19 +100,19 @@ Develop an indexer that efficiently captures and stores token transfer histories
 - Design the database schema to handle high volumes of token transfer data efficiently.
 
 #### API Development
-- Develop an API to provide access to the indexed token transfer history.
+- Develop multiple APIs to provide access to the indexed token transfer history.
 - Support querying token transfers to/from a specific wallet.
 - Implement filtering options such as date ranges and specific token types.
 
 ### Scope
 
 #### Indexer Development
-- Create a robust indexer to monitor and record token transfers from the blockchain.
-- Ensure the indexer starts recording data from a specified date (e.g., October 1st).
+- Create an indexer which listens and record token transfers from gRPC Geyser based validator.
+- Ensure the indexer is resilient to failures and ensures data correctly and availability.
 
 #### Database Schema Design
 - Design a schema in TimescaleDB to store token transfer data efficiently.
-- Implement partitions or hypertables for optimized querying and retention management.
+- Use its hypertable feature for optimized querying and data management.
 
 #### API Implementation
 - Develop JSON RPC endpoints to query token transfer history.

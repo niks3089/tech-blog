@@ -19,7 +19,7 @@
     
     <title>Solana Token History Indexer: Problem Statement</title>
     <meta name="description" content="A requirement for token history indexer">
-    <meta name="keywords" content='blog, gokarna, hugo, solana'>
+    <meta name="keywords" content='blog, gokarna, hugo, solana, rust'>
 
     <meta property="og:url" content="http://localhost:1313/posts/token-history-problem-statement/">
     <meta property="og:type" content="website">
@@ -114,10 +114,6 @@
                 <a href="https://www.buymeacoffee.com/niks3089"><span data-feather='coffee'></span>  </a>
             </div>
             
-            <div class="nav-link">
-                <a href="http://localhost:1313/index.xml"><span data-feather='rss'></span>  </a>
-            </div>
-            
 
             <span class="nav-icons-divider"></span>
             <div class="nav-link dark-theme-toggle">
@@ -157,10 +153,6 @@
                     <a href="https://www.buymeacoffee.com/niks3089"><span data-feather='coffee'></span>  </a>
                 </li>
                 
-                <li class="nav-item">
-                    <a href="http://localhost:1313/index.xml"><span data-feather='rss'></span>  </a>
-                </li>
-                
                 <li class="nav-item dark-theme-toggle">
                     <span class="sr-only dark-theme-toggle-screen-reader-target">theme</span>
                     <a>
@@ -177,7 +169,7 @@
     <div class="post-header-section">
         <h1>Solana Token History Indexer: Problem Statement</h1>
         <small role="doc-subtitle">A requirement for token history indexer</small>
-        <p class="post-date">August 10, 2024
+        <p class="post-date">August 11, 2024
         
         </p>
 
@@ -185,14 +177,16 @@
         
             <li class="post-tag"><a href="http://localhost:1313/tags/solana">solana</a></li>
         
+            <li class="post-tag"><a href="http://localhost:1313/tags/rust">rust</a></li>
+        
         </ul>
     </div>
 
     <div class="post-content">
         <h1 id="problem-statement-token-transfer-history-indexer-for-wallets">Problem Statement: Token Transfer History Indexer for Wallets</h1>
 <h3 id="background">Background</h3>
-<p>Retrieving transaction history for a specific wallet on the Solana blockchain, especially for token transfers, currently requires multiple RPC calls. This process is slow and inefficient, making it challenging to quickly access and filter token transfer data. There is a clear need for a streamlined and optimized method to retrieve token transfer history.</p>
-<p>Here&rsquo;s an example of how to fetch token transfer history specifically between two wallets</p>
+<p>Retrieving transaction history for a specific wallet or multiple wallets on the Solana blockchain, especially for token transfers, currently requires multiple RPC calls and complicated filtering. This process is slow and inefficient, making it challenging to quickly access and filter token transfer data. There is a clear need for a streamlined and optimized method to retrieve token transfer history.</p>
+<p>Here&rsquo;s an example of how we fetch token transfer history specifically between two wallets today</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> solana_client::rpc_client::RpcClient;
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> solana_sdk::signature::Signature;
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> solana_transaction_status::{EncodedTransaction, UiTransactionEncoding};
@@ -250,11 +244,11 @@
 </span></span><span style="display:flex;"><span>            }
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    Ok(())
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="objective">Objective</h3>
-<p>Develop an indexer that efficiently captures and stores token transfer histories for specific wallets across various token types (e.g., token extensions, SPL tokens, Metaplex tokens). This indexer will enable quick and efficient querying of token transfer histories, reducing the dependency on multiple RPC calls.</p>
+</span></span></code></pre></div><p>As you can see, its not straight-forward.</p>
+<h3 id="objective">Objective</h3>
+<p>Develop an indexer that efficiently captures and stores token transfer histories for specific wallets across various token types (e.g., SPL tokens, Token Extensions and Metaplex tokens). This indexer will enable quick and efficient querying of token transfer histories, reducing the dependency on multiple RPC calls.</p>
 <h3 id="requirements">Requirements</h3>
 <h4 id="data-retention">Data Retention</h4>
 <ul>
@@ -277,20 +271,20 @@
 </ul>
 <h4 id="api-development">API Development</h4>
 <ul>
-<li>Develop an API to provide access to the indexed token transfer history.</li>
+<li>Develop multiple APIs to provide access to the indexed token transfer history.</li>
 <li>Support querying token transfers to/from a specific wallet.</li>
 <li>Implement filtering options such as date ranges and specific token types.</li>
 </ul>
 <h3 id="scope">Scope</h3>
 <h4 id="indexer-development">Indexer Development</h4>
 <ul>
-<li>Create a robust indexer to monitor and record token transfers from the blockchain.</li>
-<li>Ensure the indexer starts recording data from a specified date (e.g., October 1st).</li>
+<li>Create an indexer which listens and record token transfers from gRPC Geyser based validator.</li>
+<li>Ensure the indexer is resilient to failures and ensures data correctly and availability.</li>
 </ul>
 <h4 id="database-schema-design">Database Schema Design</h4>
 <ul>
 <li>Design a schema in TimescaleDB to store token transfer data efficiently.</li>
-<li>Implement partitions or hypertables for optimized querying and retention management.</li>
+<li>Use its hypertable feature for optimized querying and data management.</li>
 </ul>
 <h4 id="api-implementation">API Implementation</h4>
 <ul>

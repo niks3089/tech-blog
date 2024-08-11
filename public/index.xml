@@ -6,14 +6,21 @@
     <description>Recent content on nikhil acharya</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 10 Aug 2024 17:55:28 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 11 Aug 2024 17:55:28 +0800</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Lifetime vs Arc in Rust</title>
+      <link>http://localhost:1313/posts/arc-vs-lifetime/</link>
+      <pubDate>Sun, 11 Aug 2024 17:55:28 +0800</pubDate>
+      <guid>http://localhost:1313/posts/arc-vs-lifetime/</guid>
+      <description>Understanding Arc vs Lifetimes in Rust In Rust, both Arc and lifetimes are tools used to manage how data is shared or accessed across different parts of a program, but they serve different purposes and are used in different contexts.&#xA;1. Lifetimes Lifetimes in Rust are a way to ensure that references are always valid. They help the Rust compiler understand how long references to data should be valid to prevent dangling references, which could lead to undefined behavior.</description>
+    </item>
     <item>
       <title>Solana Token History Indexer: Problem Statement</title>
       <link>http://localhost:1313/posts/token-history-problem-statement/</link>
-      <pubDate>Sat, 10 Aug 2024 17:55:28 +0800</pubDate>
+      <pubDate>Sun, 11 Aug 2024 17:55:28 +0800</pubDate>
       <guid>http://localhost:1313/posts/token-history-problem-statement/</guid>
-      <description>Problem Statement: Token Transfer History Indexer for Wallets Background Retrieving transaction history for a specific wallet on the Solana blockchain, especially for token transfers, currently requires multiple RPC calls. This process is slow and inefficient, making it challenging to quickly access and filter token transfer data. There is a clear need for a streamlined and optimized method to retrieve token transfer history.&#xA;Here&amp;rsquo;s an example of how to fetch token transfer history specifically between two wallets</description>
+      <description>Problem Statement: Token Transfer History Indexer for Wallets Background Retrieving transaction history for a specific wallet or multiple wallets on the Solana blockchain, especially for token transfers, currently requires multiple RPC calls and complicated filtering. This process is slow and inefficient, making it challenging to quickly access and filter token transfer data. There is a clear need for a streamlined and optimized method to retrieve token transfer history.&#xA;Here&amp;rsquo;s an example of how we fetch token transfer history specifically between two wallets today</description>
     </item>
     <item>
       <title>Staking SOL on Solana in India: A Guide</title>

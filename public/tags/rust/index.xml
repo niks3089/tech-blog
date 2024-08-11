@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on nikhil acharya</title>
-    <link>http://localhost:1313/posts/</link>
-    <description>Recent content in Posts on nikhil acharya</description>
+    <title>Rust on nikhil acharya</title>
+    <link>http://localhost:1313/tags/rust/</link>
+    <description>Recent content in Rust on nikhil acharya</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Sun, 11 Aug 2024 17:55:28 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/tags/rust/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Lifetime vs Arc in Rust</title>
       <link>http://localhost:1313/posts/arc-vs-lifetime/</link>
@@ -21,13 +21,6 @@
       <pubDate>Sun, 11 Aug 2024 17:55:28 +0800</pubDate>
       <guid>http://localhost:1313/posts/token-history-problem-statement/</guid>
       <description>Problem Statement: Token Transfer History Indexer for Wallets Background Retrieving transaction history for a specific wallet or multiple wallets on the Solana blockchain, especially for token transfers, currently requires multiple RPC calls and complicated filtering. This process is slow and inefficient, making it challenging to quickly access and filter token transfer data. There is a clear need for a streamlined and optimized method to retrieve token transfer history.&#xA;Here&amp;rsquo;s an example of how we fetch token transfer history specifically between two wallets today</description>
-    </item>
-    <item>
-      <title>Staking SOL on Solana in India: A Guide</title>
-      <link>http://localhost:1313/posts/staking-sol-in-india/</link>
-      <pubDate>Tue, 30 Jul 2024 17:55:28 +0800</pubDate>
-      <guid>http://localhost:1313/posts/staking-sol-in-india/</guid>
-      <description>Staking SOL on Solana: A Guide Staking on Solana is a process where you lock up your SOL tokens to support the network&amp;rsquo;s operations and, in return, earn rewards. While Helius is now the number one validator in Solana, it’s still challenging to stake SOL regularly. To know more about how to stake on Helius, see this blog.&#xA;Challenges in Staking SOL in India Despite the detailed staking instructions, acquiring Solana in a wallet remains a hurdle in India.</description>
     </item>
   </channel>
 </rss>
