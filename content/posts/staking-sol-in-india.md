@@ -46,10 +46,10 @@ Coinbase also supports purchasing crypto via third-party aggregators like Onramp
 2. **Transfer Using UPI:** Use PhonePe to transfer funds to their UPI, then submit the UTR after payment.
 3. **Complete Purchase:** After completing these steps, you will see your crypto in the Coinbase wallet.
 
-**Disadvantage:** The KYC setup is cumbersome, requiring salary slips and tax returns. Onramper, however, simplifies the process with email signup, PAN entry, Aadhar Verification, and a photo submission. Using PhonePe for UPI transfer and submitting UTR completes the transaction.
+**Disadvantage:** The KYC setup is cumbersome, requiring salary slips and tax returns. Onramper, however, simplifies the process but still it requires email signup, PAN entry, Aadhar Verification, and a photo submission. Using PhonePe for UPI transfer and submitting UTR completes the transaction.However, if it times out, you will need to wait and/or reach out to Onramper to look into the issue
 
 ## Conclusion
 
-Both CoinDCX and Coinbase Wallet offer viable options for buying and managing Solana in India. While CoinDCX is simpler for investment, Coinbase Wallet, despite its lengthy setup, provides more flexibility for staking and advanced crypto management. For a streamlined staking process, I hope for future integrations like SIP features.
+Both CoinDCX and Coinbase Wallet offer viable options for buying and managing Solana in India. While CoinDCX is simpler for investment, Coinbase Wallet, despite its lengthy setup, provides more flexibility for staking and advanced crypto management. For a streamlined staking process, I hope we can setup SIP to stake on Helius but that seems like a wishful thinking.
 
 For more details on staking, refer to the [Helius blog](https://www.helius.dev/blog/how-to-stake-solana#staking-sol-with-a-wallet).

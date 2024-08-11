@@ -259,7 +259,7 @@ Given the above 2 examples, you might be wondering why not use `Arc` or `Rc` bot
 
 ## C++ Tangent
 
-I like C++ (17 and above only) and often make comparisons between C++ features and Rust to understand systems better. While Rust's `Arc` and lifetimes have parallels in C++, there's no direct equivalent to Rust's lifetimes, and this is partly due to how C++ handles memory management.
+I like C++ (17 and above only) and often make comparisons between C++ features and Rust to understand the concepts better. While Rust's `Arc` and lifetimes have parallels in C++, there's no direct equivalent to Rust's lifetimes, and this is partly due to how C++ handles memory management.
 
 ### `Arc` in Rust vs. `std::shared_ptr` in C++
 
