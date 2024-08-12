@@ -19,7 +19,9 @@ Here's an example of how we fetch token transfer history specifically between tw
 ```rust
 use solana_client::rpc_client::RpcClient;
 use solana_sdk::signature::Signature;
+use solana_sdk::pubkey::Pubkey;
 use solana_transaction_status::{EncodedTransaction, UiTransactionEncoding};
+use spl_token::state::Account;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Set up the RPC client
@@ -27,44 +29,55 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = RpcClient::new(rpc_url);
 
     // Specify the source and destination wallet addresses
-    let source_wallet = "SourceWalletAddress";
-    let destination_wallet = "DestinationWalletAddress";
-    
-    // Fetch the transaction signatures for the source wallet address
-    let signatures = client.get_signatures_for_address_with_config(
-        &source_wallet.parse()?,
-        solana_client::rpc_request::RpcSignaturesForAddressConfig {
-            limit: Some(1000),
-            before: None,
-            until: None,
-            commitment: None,
-        },
+    let source_wallet: Pubkey = "SourceWalletAddress".parse()?;
+    let destination_wallet: Pubkey = "DestinationWalletAddress".parse()?;
+
+    // Fetch all token accounts associated with the source wallet
+    let source_token_accounts = client.get_token_accounts_by_owner(
+        &source_wallet,
+        solana_client::rpc_request::TokenAccountsFilter::ProgramId(spl_token::id()),
     )?;
 
-    // Iterate over the transaction signatures and fetch the details
-    for signature in signatures {
-        let transaction_signature = Signature::from_str(&signature.signature)?;
-        let transaction = client.get_transaction_with_config(
-            &transaction_signature,
-            solana_transaction_status::UiTransactionEncoding::JsonParsed,
+    // Iterate over all token accounts
+    for token_account in source_token_accounts.value.iter() {
+        let token_account_pubkey: Pubkey = token_account.pubkey.parse()?;
+
+        // Fetch the transaction signatures for each token account address
+        let signatures = client.get_signatures_for_address_with_config(
+            &token_account_pubkey,
+            solana_client::rpc_request::RpcSignaturesForAddressConfig {
+                limit: Some(1000),
+                before: None,
+                until: None,
+                commitment: None,
+            },
         )?;
 
-        // Parse the transaction instructions to identify token transfers
-        if let Some(meta) = &transaction.transaction.meta {
-            for instruction in &meta.inner_instructions {
-                for ui_instruction in &instruction.instructions {
-                    // Filter for token transfer instructions by program ID
-                    if ui_instruction.program_id == "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" {
-                        if let solana_transaction_status::UiInstruction::Parsed(parsed_instruction) = ui_instruction {
-                            // Check if this is a transfer instruction
-                            if let Some(parsed) = &parsed_instruction.parsed {
-                                if let solana_transaction_status::UiInstructionParsed::Transfer { source, destination, amount } = parsed {
-                                    // Only print if the transfer is between the specified wallets
-                                    if source == source_wallet && destination == destination_wallet {
-                                        println!(
-                                            "Transfer: {} SOL from {} to {}",
-                                            amount, source, destination
-                                        );
+        // Iterate over the transaction signatures and fetch the details
+        for signature in signatures {
+            let transaction_signature = Signature::from_str(&signature.signature)?;
+            let transaction = client.get_transaction_with_config(
+                &transaction_signature,
+                solana_transaction_status::UiTransactionEncoding::JsonParsed,
+            )?;
+
+            // Parse the transaction instructions to identify token transfers
+            if let Some(meta) = &transaction.transaction.meta {
+                for instruction in &meta.inner_instructions {
+                    for ui_instruction in &instruction.instructions {
+                        // Filter for token transfer instructions by program ID
+                        if ui_instruction.program_id == "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" {
+                            if let solana_transaction_status::UiInstruction::Parsed(parsed_instruction) = ui_instruction {
+                                // Check if this is a transfer instruction
+                                if let Some(parsed) = &parsed_instruction.parsed {
+                                    if let solana_transaction_status::UiInstructionParsed::Transfer { source, destination, amount } = parsed {
+                                        // Only print if the transfer is between the specified wallets
+                                        if source == source_wallet.to_string() && destination == destination_wallet.to_string() {
+                                            println!(
+                                                "Transfer: {} tokens from {} to {}",
+                                                amount, source, destination
+                                            );
+                                        }
                                     }
                                 }
                             }
@@ -77,7 +90,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
-As you can see, its not straight-forward. 
+The provided code retrieves the token transfer history between two wallets on the Solana blockchain by first identifying all token accounts associated with the source wallet. It then iterates through each token account, fetching transaction signatures and the corresponding transaction details. By parsing the transaction instructions, the code filters for token transfer operations specifically involving the SPL token program. It ensures that only transfers between the specified source and destination wallets are captured, including transfers that occur through associated token accounts rather than the main wallet address. 
+
+So to fully capture a wallet's transaction history, one must first discover all associated token accounts and then query the blockchain for each of these accounts individually. Moreover, the process involves making multiple RPC calls to fetch transaction signatures and details, parsing intricate transaction data and filtering relevant token transfers. This can be resource-intensive and slow, especially with high transaction volumes or when dealing with multiple wallets, making it challenging to efficiently gather and process comprehensive token transfer history.
 
 ### Objective
 Develop an indexer that efficiently captures and stores token transfer histories for specific wallets across various token types (e.g., SPL tokens, Token Extensions and Metaplex tokens). This indexer will enable quick and efficient querying of token transfer histories, reducing the dependency on multiple RPC calls.
@@ -89,7 +104,7 @@ Develop an indexer that efficiently captures and stores token transfer histories
 - Plan for potential extensions of retention periods to 60-90 days.
 
 #### Token Compatibility
-- Ensure compatibility with all uncompressed token types, including token extensions, regular tokens, and Metaplex tokens.
+- Ensure compatibility with all uncompressed token types, including token extensions, regular tokens and Metaplex tokens.
 
 #### Performance
 - Optimize the indexer for speed and filtering capabilities.
@@ -110,24 +125,21 @@ Develop an indexer that efficiently captures and stores token transfer histories
 - Create an indexer which listens and record token transfers from gRPC Geyser based validator.
 - Ensure the indexer is resilient to failures and ensures data correctly and availability.
 
-#### Database Schema Design
-- Design a schema in TimescaleDB to store token transfer data efficiently.
+#### Database Storage 
+- Design a schema using TimescaleDB to store token transfer data and retrieve it quickly and efficiently.
 - Use its hypertable feature for optimized querying and data management.
 
 #### API Implementation
 - Develop JSON RPC endpoints to query token transfer history.
-- Endpoints should support filtering by wallet address, token type, and date range.
+- Endpoints should support filtering by wallet address, token type and date range.
 
-#### Monitoring and Maintenance
-- Implement monitoring to ensure the indexer is capturing data correctly.
-- Develop maintenance scripts to manage data retention policies.
 
 ### Deliverables
 
 #### Indexer
 - A fully functional indexer that captures token transfer data from the blockchain.
 
-#### Database Schema
+#### Database
 - A TimescaleDB schema designed for efficient storage and querying of token transfer data.
 
 #### API
@@ -135,15 +147,15 @@ Develop an indexer that efficiently captures and stores token transfer histories
 - Documentation for API usage and querying capabilities.
 
 #### Monitoring and Maintenance Tools
-- Scripts and tools for monitoring the indexer's performance and maintaining data retention policies.
+- Scripts and tools for monitoring the indexer's and api performance and maintaining data retention policies.
 
 ### Expected Challenges
 
 #### Data Volume
 - Handling high volumes of token transfer data while ensuring the indexer remains performant.
 
-#### Compatibility
-- Ensuring compatibility with various token standards and types.
+#### Querying Speed
+- Ensuring querying such large amount of data is fast, reliable and accurate. 
 
 #### Retention Management
 - Efficiently managing data retention to comply with the specified retention period.
