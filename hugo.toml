@@ -70,9 +70,9 @@ pygmentsStyle = "monokai"
     weight = 4
 
   [[menu.main]]
-    identifier = "buymeacoffee"
+    identifier = "tip me"
     pre = "<span data-feather='coffee'></span>"
-    url = "https://www.buymeacoffee.com/niks3089"
+    url = "https://tipcard.getcode.com/x/niks3089"
     weight = 6
 
 [markup]

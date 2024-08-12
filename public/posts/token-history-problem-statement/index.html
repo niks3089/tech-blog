@@ -111,7 +111,7 @@
             </div>
             
             <div class="nav-link">
-                <a href="https://www.buymeacoffee.com/niks3089"><span data-feather='coffee'></span>  </a>
+                <a href="https://tipcard.getcode.com/x/niks3089"><span data-feather='coffee'></span>  </a>
             </div>
             
 
@@ -150,7 +150,7 @@
                 </li>
                 
                 <li class="nav-item">
-                    <a href="https://www.buymeacoffee.com/niks3089"><span data-feather='coffee'></span>  </a>
+                    <a href="https://tipcard.getcode.com/x/niks3089"><span data-feather='coffee'></span>  </a>
                 </li>
                 
                 <li class="nav-item dark-theme-toggle">
@@ -189,7 +189,9 @@
 <p>Here&rsquo;s an example of how we fetch token transfer history specifically between two wallets today</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> solana_client::rpc_client::RpcClient;
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> solana_sdk::signature::Signature;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> solana_sdk::pubkey::Pubkey;
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> solana_transaction_status::{EncodedTransaction, UiTransactionEncoding};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> spl_token::state::Account;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() -&gt; Result<span style="color:#f92672">&lt;</span>(), Box<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">dyn</span> std::error::Error<span style="color:#f92672">&gt;&gt;</span> {
 </span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Set up the RPC client
@@ -197,44 +199,55 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> client <span style="color:#f92672">=</span> RpcClient::new(rpc_url);
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Specify the source and destination wallet addresses
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> source_wallet <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SourceWalletAddress&#34;</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> destination_wallet <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;DestinationWalletAddress&#34;</span>;
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Fetch the transaction signatures for the source wallet address
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> signatures <span style="color:#f92672">=</span> client.get_signatures_for_address_with_config(
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&amp;</span>source_wallet.parse()<span style="color:#f92672">?</span>,
-</span></span><span style="display:flex;"><span>        solana_client::rpc_request::RpcSignaturesForAddressConfig {
-</span></span><span style="display:flex;"><span>            limit: Some(<span style="color:#ae81ff">1000</span>),
-</span></span><span style="display:flex;"><span>            before: None,
-</span></span><span style="display:flex;"><span>            until: None,
-</span></span><span style="display:flex;"><span>            commitment: None,
-</span></span><span style="display:flex;"><span>        },
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> source_wallet: <span style="color:#a6e22e">Pubkey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SourceWalletAddress&#34;</span>.parse()<span style="color:#f92672">?</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> destination_wallet: <span style="color:#a6e22e">Pubkey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;DestinationWalletAddress&#34;</span>.parse()<span style="color:#f92672">?</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Fetch all token accounts associated with the source wallet
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> source_token_accounts <span style="color:#f92672">=</span> client.get_token_accounts_by_owner(
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&amp;</span>source_wallet,
+</span></span><span style="display:flex;"><span>        solana_client::rpc_request::TokenAccountsFilter::ProgramId(spl_token::id()),
 </span></span><span style="display:flex;"><span>    )<span style="color:#f92672">?</span>;
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Iterate over the transaction signatures and fetch the details
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span> signature <span style="color:#66d9ef">in</span> signatures {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> transaction_signature <span style="color:#f92672">=</span> Signature::from_str(<span style="color:#f92672">&amp;</span>signature.signature)<span style="color:#f92672">?</span>;
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> transaction <span style="color:#f92672">=</span> client.get_transaction_with_config(
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;</span>transaction_signature,
-</span></span><span style="display:flex;"><span>            solana_transaction_status::UiTransactionEncoding::JsonParsed,
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Iterate over all token accounts
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span> token_account <span style="color:#66d9ef">in</span> source_token_accounts.value.iter() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> token_account_pubkey: <span style="color:#a6e22e">Pubkey</span> <span style="color:#f92672">=</span> token_account.pubkey.parse()<span style="color:#f92672">?</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Fetch the transaction signatures for each token account address
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">let</span> signatures <span style="color:#f92672">=</span> client.get_signatures_for_address_with_config(
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;</span>token_account_pubkey,
+</span></span><span style="display:flex;"><span>            solana_client::rpc_request::RpcSignaturesForAddressConfig {
+</span></span><span style="display:flex;"><span>                limit: Some(<span style="color:#ae81ff">1000</span>),
+</span></span><span style="display:flex;"><span>                before: None,
+</span></span><span style="display:flex;"><span>                until: None,
+</span></span><span style="display:flex;"><span>                commitment: None,
+</span></span><span style="display:flex;"><span>            },
 </span></span><span style="display:flex;"><span>        )<span style="color:#f92672">?</span>;
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Parse the transaction instructions to identify token transfers
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> Some(meta) <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>transaction.transaction.meta {
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> instruction <span style="color:#66d9ef">in</span> <span style="color:#f92672">&amp;</span>meta.inner_instructions {
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> ui_instruction <span style="color:#66d9ef">in</span> <span style="color:#f92672">&amp;</span>instruction.instructions {
-</span></span><span style="display:flex;"><span>                    <span style="color:#75715e">// Filter for token transfer instructions by program ID
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                    <span style="color:#66d9ef">if</span> ui_instruction.program_id <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA&#34;</span> {
-</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> solana_transaction_status::UiInstruction::Parsed(parsed_instruction) <span style="color:#f92672">=</span> ui_instruction {
-</span></span><span style="display:flex;"><span>                            <span style="color:#75715e">// Check if this is a transfer instruction
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                            <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> Some(parsed) <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>parsed_instruction.parsed {
-</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> solana_transaction_status::UiInstructionParsed::Transfer { source, destination, amount } <span style="color:#f92672">=</span> parsed {
-</span></span><span style="display:flex;"><span>                                    <span style="color:#75715e">// Only print if the transfer is between the specified wallets
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                                    <span style="color:#66d9ef">if</span> source <span style="color:#f92672">==</span> source_wallet <span style="color:#f92672">&amp;&amp;</span> destination <span style="color:#f92672">==</span> destination_wallet {
-</span></span><span style="display:flex;"><span>                                        println!(
-</span></span><span style="display:flex;"><span>                                            <span style="color:#e6db74">&#34;Transfer: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74"> SOL from </span><span style="color:#e6db74">{}</span><span style="color:#e6db74"> to </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>,
-</span></span><span style="display:flex;"><span>                                            amount, source, destination
-</span></span><span style="display:flex;"><span>                                        );
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Iterate over the transaction signatures and fetch the details
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">for</span> signature <span style="color:#66d9ef">in</span> signatures {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">let</span> transaction_signature <span style="color:#f92672">=</span> Signature::from_str(<span style="color:#f92672">&amp;</span>signature.signature)<span style="color:#f92672">?</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">let</span> transaction <span style="color:#f92672">=</span> client.get_transaction_with_config(
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&amp;</span>transaction_signature,
+</span></span><span style="display:flex;"><span>                solana_transaction_status::UiTransactionEncoding::JsonParsed,
+</span></span><span style="display:flex;"><span>            )<span style="color:#f92672">?</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Parse the transaction instructions to identify token transfers
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> Some(meta) <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>transaction.transaction.meta {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> instruction <span style="color:#66d9ef">in</span> <span style="color:#f92672">&amp;</span>meta.inner_instructions {
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> ui_instruction <span style="color:#66d9ef">in</span> <span style="color:#f92672">&amp;</span>instruction.instructions {
+</span></span><span style="display:flex;"><span>                        <span style="color:#75715e">// Filter for token transfer instructions by program ID
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                        <span style="color:#66d9ef">if</span> ui_instruction.program_id <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA&#34;</span> {
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> solana_transaction_status::UiInstruction::Parsed(parsed_instruction) <span style="color:#f92672">=</span> ui_instruction {
+</span></span><span style="display:flex;"><span>                                <span style="color:#75715e">// Check if this is a transfer instruction
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                                <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> Some(parsed) <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>parsed_instruction.parsed {
+</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> solana_transaction_status::UiInstructionParsed::Transfer { source, destination, amount } <span style="color:#f92672">=</span> parsed {
+</span></span><span style="display:flex;"><span>                                        <span style="color:#75715e">// Only print if the transfer is between the specified wallets
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                                        <span style="color:#66d9ef">if</span> source <span style="color:#f92672">==</span> source_wallet.to_string() <span style="color:#f92672">&amp;&amp;</span> destination <span style="color:#f92672">==</span> destination_wallet.to_string() {
+</span></span><span style="display:flex;"><span>                                            println!(
+</span></span><span style="display:flex;"><span>                                                <span style="color:#e6db74">&#34;Transfer: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74"> tokens from </span><span style="color:#e6db74">{}</span><span style="color:#e6db74"> to </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>,
+</span></span><span style="display:flex;"><span>                                                amount, source, destination
+</span></span><span style="display:flex;"><span>                                            );
+</span></span><span style="display:flex;"><span>                                        }
 </span></span><span style="display:flex;"><span>                                    }
 </span></span><span style="display:flex;"><span>                                }
 </span></span><span style="display:flex;"><span>                            }
@@ -246,7 +259,8 @@
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>    Ok(())
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>As you can see, its not straight-forward.</p>
+</span></span></code></pre></div><p>The provided code retrieves the token transfer history between two wallets on the Solana blockchain by first identifying all token accounts associated with the source wallet. It then iterates through each token account, fetching transaction signatures and the corresponding transaction details. By parsing the transaction instructions, the code filters for token transfer operations specifically involving the SPL token program. It ensures that only transfers between the specified source and destination wallets are captured, including transfers that occur through associated token accounts rather than the main wallet address.</p>
+<p>So to fully capture a wallet&rsquo;s transaction history, one must first discover all associated token accounts and then query the blockchain for each of these accounts individually. Moreover, the process involves making multiple RPC calls to fetch transaction signatures and details, parsing intricate transaction data and filtering relevant token transfers. This can be resource-intensive and slow, especially with high transaction volumes or when dealing with multiple wallets, making it challenging to efficiently gather and process comprehensive token transfer history.</p>
 <h3 id="objective">Objective</h3>
 <p>Develop an indexer that efficiently captures and stores token transfer histories for specific wallets across various token types (e.g., SPL tokens, Token Extensions and Metaplex tokens). This indexer will enable quick and efficient querying of token transfer histories, reducing the dependency on multiple RPC calls.</p>
 <h3 id="requirements">Requirements</h3>
@@ -257,7 +271,7 @@
 </ul>
 <h4 id="token-compatibility">Token Compatibility</h4>
 <ul>
-<li>Ensure compatibility with all uncompressed token types, including token extensions, regular tokens, and Metaplex tokens.</li>
+<li>Ensure compatibility with all uncompressed token types, including token extensions, regular tokens and Metaplex tokens.</li>
 </ul>
 <h4 id="performance">Performance</h4>
 <ul>
@@ -281,27 +295,22 @@
 <li>Create an indexer which listens and record token transfers from gRPC Geyser based validator.</li>
 <li>Ensure the indexer is resilient to failures and ensures data correctly and availability.</li>
 </ul>
-<h4 id="database-schema-design">Database Schema Design</h4>
+<h4 id="database-storage">Database Storage</h4>
 <ul>
-<li>Design a schema in TimescaleDB to store token transfer data efficiently.</li>
+<li>Design a schema using TimescaleDB to store token transfer data and retrieve it quickly and efficiently.</li>
 <li>Use its hypertable feature for optimized querying and data management.</li>
 </ul>
 <h4 id="api-implementation">API Implementation</h4>
 <ul>
 <li>Develop JSON RPC endpoints to query token transfer history.</li>
-<li>Endpoints should support filtering by wallet address, token type, and date range.</li>
-</ul>
-<h4 id="monitoring-and-maintenance">Monitoring and Maintenance</h4>
-<ul>
-<li>Implement monitoring to ensure the indexer is capturing data correctly.</li>
-<li>Develop maintenance scripts to manage data retention policies.</li>
+<li>Endpoints should support filtering by wallet address, token type and date range.</li>
 </ul>
 <h3 id="deliverables">Deliverables</h3>
 <h4 id="indexer">Indexer</h4>
 <ul>
 <li>A fully functional indexer that captures token transfer data from the blockchain.</li>
 </ul>
-<h4 id="database-schema">Database Schema</h4>
+<h4 id="database">Database</h4>
 <ul>
 <li>A TimescaleDB schema designed for efficient storage and querying of token transfer data.</li>
 </ul>
@@ -312,16 +321,16 @@
 </ul>
 <h4 id="monitoring-and-maintenance-tools">Monitoring and Maintenance Tools</h4>
 <ul>
-<li>Scripts and tools for monitoring the indexer&rsquo;s performance and maintaining data retention policies.</li>
+<li>Scripts and tools for monitoring the indexer&rsquo;s and api performance and maintaining data retention policies.</li>
 </ul>
 <h3 id="expected-challenges">Expected Challenges</h3>
 <h4 id="data-volume">Data Volume</h4>
 <ul>
 <li>Handling high volumes of token transfer data while ensuring the indexer remains performant.</li>
 </ul>
-<h4 id="compatibility">Compatibility</h4>
+<h4 id="querying-speed">Querying Speed</h4>
 <ul>
-<li>Ensuring compatibility with various token standards and types.</li>
+<li>Ensuring querying such large amount of data is fast, reliable and accurate.</li>
 </ul>
 <h4 id="retention-management">Retention Management</h4>
 <ul>
@@ -388,15 +397,14 @@
             <li><a href="#scope">Scope</a>
               <ul>
                 <li><a href="#indexer-development">Indexer Development</a></li>
-                <li><a href="#database-schema-design">Database Schema Design</a></li>
+                <li><a href="#database-storage">Database Storage</a></li>
                 <li><a href="#api-implementation">API Implementation</a></li>
-                <li><a href="#monitoring-and-maintenance">Monitoring and Maintenance</a></li>
               </ul>
             </li>
             <li><a href="#deliverables">Deliverables</a>
               <ul>
                 <li><a href="#indexer">Indexer</a></li>
-                <li><a href="#database-schema">Database Schema</a></li>
+                <li><a href="#database">Database</a></li>
                 <li><a href="#api">API</a></li>
                 <li><a href="#monitoring-and-maintenance-tools">Monitoring and Maintenance Tools</a></li>
               </ul>
@@ -404,7 +412,7 @@
             <li><a href="#expected-challenges">Expected Challenges</a>
               <ul>
                 <li><a href="#data-volume">Data Volume</a></li>
-                <li><a href="#compatibility">Compatibility</a></li>
+                <li><a href="#querying-speed">Querying Speed</a></li>
                 <li><a href="#retention-management">Retention Management</a></li>
               </ul>
             </li>

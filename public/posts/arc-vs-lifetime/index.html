@@ -111,7 +111,7 @@
             </div>
             
             <div class="nav-link">
-                <a href="https://www.buymeacoffee.com/niks3089"><span data-feather='coffee'></span>  </a>
+                <a href="https://tipcard.getcode.com/x/niks3089"><span data-feather='coffee'></span>  </a>
             </div>
             
 
@@ -150,7 +150,7 @@
                 </li>
                 
                 <li class="nav-item">
-                    <a href="https://www.buymeacoffee.com/niks3089"><span data-feather='coffee'></span>  </a>
+                    <a href="https://tipcard.getcode.com/x/niks3089"><span data-feather='coffee'></span>  </a>
                 </li>
                 
                 <li class="nav-item dark-theme-toggle">
@@ -404,7 +404,7 @@
 </span></span></code></pre></div><h3 id="why-not-just-use-arc-all-the-time">Why not just use Arc all the time?</h3>
 <p>Given the above 2 examples, you might be wondering why not use <code>Arc</code> or <code>Rc</code> both the times. Sure, this is possible but keep in mind of the overhead due to atomic operations that manage reference counting, which is only needed for thread-safe, shared ownership across multiple threads. In single-threaded contexts or when shared ownership isn&rsquo;t required, simple references with lifetimes (&amp;T) are more efficient and straightforward. Lifetimes provide compile-time safety without any runtime cost, ensuring that references are valid without the need for complex ownership semantics. Therefore, while Arc is essential for multi-threaded scenarios, in many cases, using lifetimes or other simpler constructs is more performant and appropriate.</p>
 <h2 id="c-tangent">C++ Tangent</h2>
-<p>I like C++ (17 and above only) and often make comparisons between C++ features and Rust to understand systems better. While Rust&rsquo;s <code>Arc</code> and lifetimes have parallels in C++, there&rsquo;s no direct equivalent to Rust&rsquo;s lifetimes, and this is partly due to how C++ handles memory management.</p>
+<p>I like C++ (17 and above only) and often make comparisons between C++ features and Rust to understand the concepts better. While Rust&rsquo;s <code>Arc</code> and lifetimes have parallels in C++, there&rsquo;s no direct equivalent to Rust&rsquo;s lifetimes, and this is partly due to how C++ handles memory management.</p>
 <h3 id="arc-in-rust-vs-stdshared_ptr-in-c"><code>Arc</code> in Rust vs. <code>std::shared_ptr</code> in C++</h3>
 <p>The closest equivalent in C++ is <code>std::shared_ptr</code>, which also allows multiple ownership of dynamically allocated memory. Both <code>Arc</code> and <code>std::shared_ptr</code> use reference counting to manage the lifetime of the object they own, deallocating it only when the last reference is dropped.</p>
 <h3 id="example-in-c">Example in C++:</h3>
