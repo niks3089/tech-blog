@@ -72,7 +72,7 @@ pygmentsStyle = "monokai"
   [[menu.main]]
     identifier = "tip me"
     pre = "<span data-feather='coffee'></span>"
-    url = "https://tipcard.getcode.com/x/niks3089"
+    url = "https://tiplink.io/blinks/donate?dest=BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe&mint=usdc"
     weight = 6
 
 [markup]
