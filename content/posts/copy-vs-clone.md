@@ -1,7 +1,7 @@
 ---
 title: "To copy or to clone? That's the question"
 date: 2024-08-15T17:55:28+08:00
-description: "A comparision vs copy and clone in rust and knowing when to use what"
+description: "A comparision of copy vs clone in rust and knowing when to use what"
 tags: ["rust"]
 type: post
 weight: 25
@@ -10,7 +10,7 @@ showTableOfContents: true
 
 I like having the rust-analyser fix issues for me. I hover over the code and see an issue like this 
 
-```rust
+```
 cannot move out of `host.metal_type` which is behind a shared reference
 move occurs because `host.metal_type` has type `std::option::Option<MetalType>`, which does not implement the `Copy trait`
 ```
@@ -19,11 +19,11 @@ and the first thing I do is `host.metal_type.clone()` and that fixes the problem
 
 First thing is what is a `trait`? 
 
-## Tangent: What is a `trait` in Rust?
+## `trait` in Rust
 
-Before we jump in, we need to understand what a trait is in Rusy. In Rust, a **trait** is a language feature that defines a set of methods that types can implement. Traits are somewhat similar to **interfaces** in languages like C++ but with some important distinctions and additional capabilities. Like before, I like comparing Rust features with C++
+Before we jump in, we need to understand what a trait is. In Rust, a **trait** is a language feature that defines a set of methods that types can implement. Traits are somewhat similar to **interfaces** in languages like C++ but with some important distinctions and additional capabilities. Like in other blogs, I like comparing Rust features with C++
 
-### Key Concepts of Traits in Rust
+### Key Traits of Traits in Rust
 
 1. **Method Definitions**:
    - A trait defines one or more method signatures, but it does not provide an implementation for those methods (except for default implementations, which are optional).
@@ -159,29 +159,33 @@ fn print_description(item: &impl Describe) {
 }
 ```
 
-
 ## What is the `Copy` Trait in Rust?
 
-In Rust, the `Copy` trait is a special marker trait that indicates a type can be duplicated by making a simple bitwise copy of its memory. This trait is designed for types that are inexpensive to copy, such as scalar values (integers, floating-point numbers, booleans) or types that contain only `Copy` types. When a type implements the `Copy` trait, its values are copied implicitly whenever they are assigned to another variable or passed to a function, rather than being moved.
+In Rust, the `Copy` trait is a special marker trait that indicates a type can be duplicated by making a simple bitwise copy of its memory. This trait is designed for types that are inexpensive to copy, such as scalar values (integers, floating-point numbers, booleans) or types that contain only `Copy` types. When a type implements the `Copy` trait, its values are copied implicitly whenever they are assigned to another variable or passed to a function, rather than being moved. Sounds complicated? Lets simplify 
 
-### Key Characteristics of the `Copy` Trait
+### Characteristics of the `Copy` Trait
 
 1. **Implicit Copying**:
    - Types that implement `Copy` do not require an explicit call to `.clone()` to duplicate values. Instead, they are automatically copied when assigned to another variable or when passed as arguments to functions.
 
 2. **Shallow Copy**:
    - The `Copy` trait performs a shallow copy, which is a direct bitwise duplication of the value. This is efficient but means that `Copy` types cannot own heap-allocated memory or other resources that require deep copying.
+   - A shallow copy means copying the value exactly as it is stored in memory, without considering any deeper structures or references that the value might contain.
+   ```rust
+    fn main() {
+        let x = 42; // `x` is an integer, which is a `Copy` type
+        let y = x;  // This creates a shallow copy of `x`
 
-3. **No Destructors**:
-   - A type that implements `Copy` cannot also implement the `Drop` trait, which is used for custom destructors. This is because the `Copy` trait implies that the original value remains valid after copying, which is incompatible with types that need custom cleanup.
+        println!("x: {}, y: {}", x, y);
+    }
+   ```
+   - Direct bitwise duplication refers to copying the raw memory representation of a value from one location to another. This process doesn't involve any deeper logic or traversal of structures—it's simply duplicating the exact binary data (the bits) as it exists in memory. For example, when you copy an integer, Rust simply duplicates the bits that represent that integer. The process is very fast and efficient because it doesn’t require any additional computation or memory management.
 
-4. **Deriving `Copy`**:
+
+3. **Deriving `Copy`**:
    - The `Copy` trait can often be automatically derived by the compiler for simple types. For example, most primitive types in Rust, such as `i32`, `u32`, `f64`, and `bool`, implement `Copy` by default.
 
-5. **Combination with `Clone`**:
-   - All types that implement `Copy` must also implement the `Clone` trait, which provides a `.clone()` method for explicit copying. However, for `Copy` types, the `.clone()` method is typically trivial and just returns `*self`.
-
-### Example of a `Copy` Type
+#### Example of a `Copy` Type
 
 Here’s a simple example of how the `Copy` trait is used in Rust:
 
@@ -200,13 +204,10 @@ fn main() {
 }
 ```
 
-Explanation:
+#### Explanation:
 - Deriving Copy and Clone: In the example, the Point struct is marked with #[derive(Copy, Clone)]. This tells the compiler to automatically implement both the Copy and Clone traits for Point.
 - Implicit Copying: When p1 is assigned to p2, p1 is not moved but copied. Both p1 and p2 contain the same data, and both remain valid after the assignment.
 - No Drop Implementation: Because Point implements Copy, it cannot have a custom destructor (Drop implementation), which aligns with the expectation that Copy types are trivial to copy and do not require cleanup.
-
-
-What is a `clone trait`? 
 
 ### What is the `Clone` Trait in Rust?
 
@@ -228,7 +229,7 @@ The `Clone` trait in Rust is a standard library trait that allows for the explic
 4. **Combination with `Copy`**:
    - The `Clone` trait is often implemented alongside the `Copy` trait for simple types. However, when a type implements both, the `.clone()` method typically just returns `*self`, because the `Copy` trait guarantees that the type can be duplicated by copying bits.
 
-### Example of a `Clone` Implementation
+#### Example of a `Clone` Implementation
 
 Here’s a simple example of how the `Clone` trait is used in Rust:
 
@@ -247,21 +248,42 @@ fn main() {
 }
 ```
 
-### Explanation:
+#### Explanation:
 
 - **Deriving `Clone`**: In the example, the `Point` struct is marked with `#[derive(Clone)]`, which automatically implements the `Clone` trait for the struct. This is possible because `i32` (the type of the fields `x` and `y`) implements `Clone`.
 
 - **Explicit Cloning**: When `p1.clone()` is called, it creates a new `Point` instance `p2` with the same values as `p1`. Unlike the `Copy` trait, which would simply duplicate `p1` implicitly when assigning it to `p2`, the `Clone` trait requires the explicit call to `.clone()`.
 
+### How do you know if your data is on stack or the heap?
+
+- In Rust, simple data types like integers, booleans, and fixed-size arrays are stored on the stack. These types can be copied quickly and easily using a shallow copy because they are small and don’t involve complex memory management.
+- More complex data types, such as strings (String), vectors (Vec<T>), and other types that can grow dynamically, are stored on the heap. The heap is a region of memory used for dynamic allocations, where data can be stored that doesn’t fit within the fixed-size limits of the stack.
+- When a type allocates memory on the heap, it typically involves a pointer stored on the stack that points to the actual data on the heap. A shallow copy of this pointer would just duplicate the pointer itself, not the data it points to. This could lead to issues like double-free errors or data corruption if both copies try to manage the same heap-allocated memory.
+- To properly duplicate heap-allocated data, a deep copy is required, where the data on the heap is also copied to a new location, and the new pointer points to this new location
+
 ### How `Copy` and `Clone` are Implemented in Rust's Source Code
 
-In Rust, the `Copy` and `Clone` traits are fundamental components of the language's type system, implemented within the standard library. The `Copy` trait is a marker trait that signifies a type can be duplicated by simply copying its bits, making it suitable for types that are small and inexpensive to copy, such as integers or floating-point numbers. In contrast, the `Clone` trait is more general and allows for deep copying of an object, which is necessary for types that manage resources like heap-allocated memory.
+In Rust, the `Copy` and `Clone` are implemented within the standard library. The `Copy` trait is a marker trait that signifies a type can be duplicated by simply copying its bits, making it suitable for types that are small and inexpensive to copy, such as integers or floating-point numbers. In contrast, the `Clone` trait is more general and allows for deep copying of an object, which is necessary for types that manage resources like heap-allocated memory.
 
 #### `Clone` Trait
+
+```rust
+pub trait Clone {
+    fn clone(&self) -> Self;
+
+    fn clone_from(&mut self, source: &Self) {
+        *self = source.clone();
+    }
+}
+```
 
 The `Clone` trait defines the `clone` method, which is used to create a deep copy of an object. This method must be implemented by any type that wants to provide a custom way to duplicate its values. Additionally, the `Clone` trait includes a `clone_from` method, which is optional and provides a more efficient way to clone by reusing the resources of the existing value when possible.
 
 #### `Copy` Trait
+
+```rust
+pub trait Copy: Clone {}
+```
 
 The `Copy` trait is defined as a subtrait of `Clone`. It does not define any methods and serves as a marker trait to indicate that a type can be copied with a simple bitwise copy. Since `Copy` is a subtrait of `Clone`, any type that implements `Copy` must also implement `Clone`. This ensures that `Copy` types can always be cloned, even though the `clone` method for `Copy` types is generally trivial and simply returns the value itself.
 
@@ -288,22 +310,7 @@ The `Copy` and `Clone` traits in Rust have different memory implications due to 
 
 - **Use `Clone` When Necessary**: You should use `Clone` when you need to perform a deep copy of a type that manages heap-allocated memory or other resources that cannot be safely duplicated with a simple bitwise copy. Types like `String`, `Vec<T>`, and other heap-allocated structures typically implement `Clone` because they need to create entirely new instances of their data rather than just copying a pointer or reference.
 
-### Example Use Case: Why `Copy` is Preferred and When It's Unavoidable to Use `Clone`
 
-#### When `Copy` is Preferred:
-Consider a scenario where you are working with simple, small data types like integers, floats, or `bool`. For example, if you have a function that needs to pass a numeric value by value and return it, using `Copy` is ideal because it incurs no additional overhead:
+### Summary
 
-```rust
-fn increment(x: i32) -> i32 {
-    x + 1
-}
-```
-In this case, the integer i32 implements Copy, so when you pass x to the function, Rust makes a shallow copy of the value, which is very efficient.
-
-When Clone is Unavoidable:
-Now, consider a scenario where you have a vector of data that needs to be duplicated:
-Memory implcation of using copy and clone? 
-
-Given a choice which should you use and why? 
-
-Example usecase of why copy is preferred and when its unavoidable to use clone 
+In summary, Rust's `Copy` and `Clone` traits offer different approaches to data duplication, each with its own advantages. The `Copy` trait enables efficient, shallow copying of small, simple types by directly duplicating their memory bits, making it ideal for types like integers and booleans. In contrast, the `Clone` trait provides a way to perform deep copying, necessary for more complex types that manage heap-allocated resources, such as `String` or `Vec<T>`. Understanding when to use `Copy` versus `Clone` is crucial for optimizing both performance and memory usage in Rust, with `Copy` being preferable for its speed and simplicity when applicable, and `Clone` being necessary for ensuring the safe duplication of more complex, heap-based data.

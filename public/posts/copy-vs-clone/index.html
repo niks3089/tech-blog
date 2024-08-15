@@ -18,19 +18,19 @@
 
     
     <title>To copy or to clone? That&#39;s the question</title>
-    <meta name="description" content="A comparision vs copy and clone in rust and knowing when to use what">
+    <meta name="description" content="A comparision of copy vs clone in rust and knowing when to use what">
     <meta name="keywords" content='blog, gokarna, hugo, rust'>
 
     <meta property="og:url" content="http://localhost:1313/posts/copy-vs-clone/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="To copy or to clone? That&#39;s the question">
-    <meta property="og:description" content="A comparision vs copy and clone in rust and knowing when to use what">
+    <meta property="og:description" content="A comparision of copy vs clone in rust and knowing when to use what">
     <meta property="og:image" content="http://localhost:1313/images/avatar.webp">
     <meta property="og:image:secure_url" content="http://localhost:1313/images/avatar.webp">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="To copy or to clone? That&#39;s the question">
-    <meta name="twitter:description" content="A comparision vs copy and clone in rust and knowing when to use what">
+    <meta name="twitter:description" content="A comparision of copy vs clone in rust and knowing when to use what">
     <meta property="twitter:domain" content="http://localhost:1313/posts/copy-vs-clone/">
     <meta property="twitter:url" content="http://localhost:1313/posts/copy-vs-clone/">
     <meta name="twitter:image" content="http://localhost:1313/images/avatar.webp">
@@ -168,7 +168,7 @@
     <div class="post container">
     <div class="post-header-section">
         <h1>To copy or to clone? That&#39;s the question</h1>
-        <small role="doc-subtitle">A comparision vs copy and clone in rust and knowing when to use what</small>
+        <small role="doc-subtitle">A comparision of copy vs clone in rust and knowing when to use what</small>
         <p class="post-date">August 15, 2024
         
         </p>
@@ -182,13 +182,13 @@
 
     <div class="post-content">
         <p>I like having the rust-analyser fix issues for me. I hover over the code and see an issue like this</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span>cannot <span style="color:#66d9ef">move</span> out of <span style="color:#960050;background-color:#1e0010">`</span>host.metal_type<span style="color:#960050;background-color:#1e0010">`</span> which is behind a shared reference
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">move</span> occurs because <span style="color:#960050;background-color:#1e0010">`</span>host.metal_type<span style="color:#960050;background-color:#1e0010">`</span> has <span style="color:#66d9ef">type</span> <span style="color:#960050;background-color:#1e0010">`</span>std::option::Option<span style="color:#f92672">&lt;</span>MetalType<span style="color:#f92672">&gt;</span><span style="color:#960050;background-color:#1e0010">`</span>, which does not implement the <span style="color:#960050;background-color:#1e0010">`</span>Copy <span style="color:#66d9ef">trait</span><span style="color:#960050;background-color:#1e0010">`</span>
-</span></span></code></pre></div><p>and the first thing I do is <code>host.metal_type.clone()</code> and that fixes the problem. But why does it fix the problem? What was the problem? Should I add a copy trait to my struct? Lets deep dive.</p>
+<pre tabindex="0"><code>cannot move out of `host.metal_type` which is behind a shared reference
+move occurs because `host.metal_type` has type `std::option::Option&lt;MetalType&gt;`, which does not implement the `Copy trait`
+</code></pre><p>and the first thing I do is <code>host.metal_type.clone()</code> and that fixes the problem. But why does it fix the problem? What was the problem? Should I add a copy trait to my struct? Lets deep dive.</p>
 <p>First thing is what is a <code>trait</code>?</p>
-<h2 id="tangent-what-is-a-trait-in-rust">Tangent: What is a <code>trait</code> in Rust?</h2>
-<p>Before we jump in, we need to understand what a trait is in Rusy. In Rust, a <strong>trait</strong> is a language feature that defines a set of methods that types can implement. Traits are somewhat similar to <strong>interfaces</strong> in languages like C++ but with some important distinctions and additional capabilities. Like before, I like comparing Rust features with C++</p>
-<h3 id="key-concepts-of-traits-in-rust">Key Concepts of Traits in Rust</h3>
+<h2 id="trait-in-rust"><code>trait</code> in Rust</h2>
+<p>Before we jump in, we need to understand what a trait is. In Rust, a <strong>trait</strong> is a language feature that defines a set of methods that types can implement. Traits are somewhat similar to <strong>interfaces</strong> in languages like C++ but with some important distinctions and additional capabilities. Like in other blogs, I like comparing Rust features with C++</p>
+<h3 id="key-traits-of-traits-in-rust">Key Traits of Traits in Rust</h3>
 <ol>
 <li>
 <p><strong>Method Definitions</strong>:</p>
@@ -326,8 +326,8 @@
 </span></span><span style="display:flex;"><span>    println!(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, item.describe());
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><h2 id="what-is-the-copy-trait-in-rust">What is the <code>Copy</code> Trait in Rust?</h2>
-<p>In Rust, the <code>Copy</code> trait is a special marker trait that indicates a type can be duplicated by making a simple bitwise copy of its memory. This trait is designed for types that are inexpensive to copy, such as scalar values (integers, floating-point numbers, booleans) or types that contain only <code>Copy</code> types. When a type implements the <code>Copy</code> trait, its values are copied implicitly whenever they are assigned to another variable or passed to a function, rather than being moved.</p>
-<h3 id="key-characteristics-of-the-copy-trait">Key Characteristics of the <code>Copy</code> Trait</h3>
+<p>In Rust, the <code>Copy</code> trait is a special marker trait that indicates a type can be duplicated by making a simple bitwise copy of its memory. This trait is designed for types that are inexpensive to copy, such as scalar values (integers, floating-point numbers, booleans) or types that contain only <code>Copy</code> types. When a type implements the <code>Copy</code> trait, its values are copied implicitly whenever they are assigned to another variable or passed to a function, rather than being moved. Sounds complicated? Lets simplify</p>
+<h3 id="characteristics-of-the-copy-trait">Characteristics of the <code>Copy</code> Trait</h3>
 <ol>
 <li>
 <p><strong>Implicit Copying</strong>:</p>
@@ -339,12 +339,16 @@
 <p><strong>Shallow Copy</strong>:</p>
 <ul>
 <li>The <code>Copy</code> trait performs a shallow copy, which is a direct bitwise duplication of the value. This is efficient but means that <code>Copy</code> types cannot own heap-allocated memory or other resources that require deep copying.</li>
+<li>A shallow copy means copying the value exactly as it is stored in memory, without considering any deeper structures or references that the value might contain.</li>
 </ul>
-</li>
-<li>
-<p><strong>No Destructors</strong>:</p>
-<ul>
-<li>A type that implements <code>Copy</code> cannot also implement the <code>Drop</code> trait, which is used for custom destructors. This is because the <code>Copy</code> trait implies that the original value remains valid after copying, which is incompatible with types that need custom cleanup.</li>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">let</span> x <span style="color:#f92672">=</span> <span style="color:#ae81ff">42</span>; <span style="color:#75715e">// `x` is an integer, which is a `Copy` type
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>     <span style="color:#66d9ef">let</span> y <span style="color:#f92672">=</span> x;  <span style="color:#75715e">// This creates a shallow copy of `x`
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>     println!(<span style="color:#e6db74">&#34;x: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">, y: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, x, y);
+</span></span><span style="display:flex;"><span> }
+</span></span></code></pre></div><ul>
+<li>Direct bitwise duplication refers to copying the raw memory representation of a value from one location to another. This process doesn&rsquo;t involve any deeper logic or traversal of structures—it&rsquo;s simply duplicating the exact binary data (the bits) as it exists in memory. For example, when you copy an integer, Rust simply duplicates the bits that represent that integer. The process is very fast and efficient because it doesn’t require any additional computation or memory management.</li>
 </ul>
 </li>
 <li>
@@ -353,14 +357,8 @@
 <li>The <code>Copy</code> trait can often be automatically derived by the compiler for simple types. For example, most primitive types in Rust, such as <code>i32</code>, <code>u32</code>, <code>f64</code>, and <code>bool</code>, implement <code>Copy</code> by default.</li>
 </ul>
 </li>
-<li>
-<p><strong>Combination with <code>Clone</code></strong>:</p>
-<ul>
-<li>All types that implement <code>Copy</code> must also implement the <code>Clone</code> trait, which provides a <code>.clone()</code> method for explicit copying. However, for <code>Copy</code> types, the <code>.clone()</code> method is typically trivial and just returns <code>*self</code>.</li>
-</ul>
-</li>
 </ol>
-<h3 id="example-of-a-copy-type">Example of a <code>Copy</code> Type</h3>
+<h4 id="example-of-a-copy-type">Example of a <code>Copy</code> Type</h4>
 <p>Here’s a simple example of how the <code>Copy</code> trait is used in Rust:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">#[derive(Copy, Clone)]</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Point</span> {
@@ -374,13 +372,12 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
 </span></span><span style="display:flex;"><span>    println!(<span style="color:#e6db74">&#34;p1: (</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">, </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">), p2: (</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">, </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">)&#34;</span>, p1.x, p1.y, p2.x, p2.y);
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>Explanation:</p>
+</span></span></code></pre></div><h4 id="explanation">Explanation:</h4>
 <ul>
 <li>Deriving Copy and Clone: In the example, the Point struct is marked with #[derive(Copy, Clone)]. This tells the compiler to automatically implement both the Copy and Clone traits for Point.</li>
 <li>Implicit Copying: When p1 is assigned to p2, p1 is not moved but copied. Both p1 and p2 contain the same data, and both remain valid after the assignment.</li>
 <li>No Drop Implementation: Because Point implements Copy, it cannot have a custom destructor (Drop implementation), which aligns with the expectation that Copy types are trivial to copy and do not require cleanup.</li>
 </ul>
-<p>What is a <code>clone trait</code>?</p>
 <h3 id="what-is-the-clone-trait-in-rust">What is the <code>Clone</code> Trait in Rust?</h3>
 <p>The <code>Clone</code> trait in Rust is a standard library trait that allows for the explicit duplication of an object. When a type implements the <code>Clone</code> trait, it provides a method for creating a deep copy of the object, meaning that all of the data is duplicated, rather than just copying the memory address (which would be a shallow copy).</p>
 <h3 id="key-characteristics-of-the-clone-trait">Key Characteristics of the <code>Clone</code> Trait</h3>
@@ -412,7 +409,7 @@
 </ul>
 </li>
 </ol>
-<h3 id="example-of-a-clone-implementation">Example of a <code>Clone</code> Implementation</h3>
+<h4 id="example-of-a-clone-implementation">Example of a <code>Clone</code> Implementation</h4>
 <p>Here’s a simple example of how the <code>Clone</code> trait is used in Rust:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">#[derive(Clone)]</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Point</span> {
@@ -426,7 +423,7 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
 </span></span><span style="display:flex;"><span>    println!(<span style="color:#e6db74">&#34;p1: (</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">, </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">), p2: (</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">, </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">))&#34;</span>, p1.x, p1.y, p2.x, p2.y);
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="explanation">Explanation:</h3>
+</span></span></code></pre></div><h4 id="explanation-1">Explanation:</h4>
 <ul>
 <li>
 <p><strong>Deriving <code>Clone</code></strong>: In the example, the <code>Point</code> struct is marked with <code>#[derive(Clone)]</code>, which automatically implements the <code>Clone</code> trait for the struct. This is possible because <code>i32</code> (the type of the fields <code>x</code> and <code>y</code>) implements <code>Clone</code>.</p>
@@ -435,12 +432,27 @@
 <p><strong>Explicit Cloning</strong>: When <code>p1.clone()</code> is called, it creates a new <code>Point</code> instance <code>p2</code> with the same values as <code>p1</code>. Unlike the <code>Copy</code> trait, which would simply duplicate <code>p1</code> implicitly when assigning it to <code>p2</code>, the <code>Clone</code> trait requires the explicit call to <code>.clone()</code>.</p>
 </li>
 </ul>
+<h3 id="how-do-you-know-if-your-data-is-on-stack-or-the-heap">How do you know if your data is on stack or the heap?</h3>
+<ul>
+<li>In Rust, simple data types like integers, booleans, and fixed-size arrays are stored on the stack. These types can be copied quickly and easily using a shallow copy because they are small and don’t involve complex memory management.</li>
+<li>More complex data types, such as strings (String), vectors (Vec<!-- raw HTML omitted -->), and other types that can grow dynamically, are stored on the heap. The heap is a region of memory used for dynamic allocations, where data can be stored that doesn’t fit within the fixed-size limits of the stack.</li>
+<li>When a type allocates memory on the heap, it typically involves a pointer stored on the stack that points to the actual data on the heap. A shallow copy of this pointer would just duplicate the pointer itself, not the data it points to. This could lead to issues like double-free errors or data corruption if both copies try to manage the same heap-allocated memory.</li>
+<li>To properly duplicate heap-allocated data, a deep copy is required, where the data on the heap is also copied to a new location, and the new pointer points to this new location</li>
+</ul>
 <h3 id="how-copy-and-clone-are-implemented-in-rusts-source-code">How <code>Copy</code> and <code>Clone</code> are Implemented in Rust&rsquo;s Source Code</h3>
-<p>In Rust, the <code>Copy</code> and <code>Clone</code> traits are fundamental components of the language&rsquo;s type system, implemented within the standard library. The <code>Copy</code> trait is a marker trait that signifies a type can be duplicated by simply copying its bits, making it suitable for types that are small and inexpensive to copy, such as integers or floating-point numbers. In contrast, the <code>Clone</code> trait is more general and allows for deep copying of an object, which is necessary for types that manage resources like heap-allocated memory.</p>
+<p>In Rust, the <code>Copy</code> and <code>Clone</code> are implemented within the standard library. The <code>Copy</code> trait is a marker trait that signifies a type can be duplicated by simply copying its bits, making it suitable for types that are small and inexpensive to copy, such as integers or floating-point numbers. In contrast, the <code>Clone</code> trait is more general and allows for deep copying of an object, which is necessary for types that manage resources like heap-allocated memory.</p>
 <h4 id="clone-trait"><code>Clone</code> Trait</h4>
-<p>The <code>Clone</code> trait defines the <code>clone</code> method, which is used to create a deep copy of an object. This method must be implemented by any type that wants to provide a custom way to duplicate its values. Additionally, the <code>Clone</code> trait includes a <code>clone_from</code> method, which is optional and provides a more efficient way to clone by reusing the resources of the existing value when possible.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">trait</span> Clone {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">clone</span>(<span style="color:#f92672">&amp;</span>self) -&gt; <span style="color:#a6e22e">Self</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">clone_from</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self, source: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">Self</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">*</span>self <span style="color:#f92672">=</span> source.clone();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The <code>Clone</code> trait defines the <code>clone</code> method, which is used to create a deep copy of an object. This method must be implemented by any type that wants to provide a custom way to duplicate its values. Additionally, the <code>Clone</code> trait includes a <code>clone_from</code> method, which is optional and provides a more efficient way to clone by reusing the resources of the existing value when possible.</p>
 <h4 id="copy-trait"><code>Copy</code> Trait</h4>
-<p>The <code>Copy</code> trait is defined as a subtrait of <code>Clone</code>. It does not define any methods and serves as a marker trait to indicate that a type can be copied with a simple bitwise copy. Since <code>Copy</code> is a subtrait of <code>Clone</code>, any type that implements <code>Copy</code> must also implement <code>Clone</code>. This ensures that <code>Copy</code> types can always be cloned, even though the <code>clone</code> method for <code>Copy</code> types is generally trivial and simply returns the value itself.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">trait</span> Copy: Clone {}
+</span></span></code></pre></div><p>The <code>Copy</code> trait is defined as a subtrait of <code>Clone</code>. It does not define any methods and serves as a marker trait to indicate that a type can be copied with a simple bitwise copy. Since <code>Copy</code> is a subtrait of <code>Clone</code>, any type that implements <code>Copy</code> must also implement <code>Clone</code>. This ensures that <code>Copy</code> types can always be cloned, even though the <code>clone</code> method for <code>Copy</code> types is generally trivial and simply returns the value itself.</p>
 <h4 id="auto-deriving-copy-and-clone">Auto-Deriving <code>Copy</code> and <code>Clone</code></h4>
 <p>Rust allows types to automatically derive implementations of <code>Copy</code> and <code>Clone</code> if all of their fields also implement these traits. This auto-derivation simplifies the process of making simple structs and enums <code>Copy</code> and <code>Clone</code> by avoiding the need to manually implement these traits.</p>
 <h4 id="how-copy-and-clone-work-together">How <code>Copy</code> and <code>Clone</code> Work Together</h4>
@@ -464,18 +476,8 @@
 <p><strong>Use <code>Clone</code> When Necessary</strong>: You should use <code>Clone</code> when you need to perform a deep copy of a type that manages heap-allocated memory or other resources that cannot be safely duplicated with a simple bitwise copy. Types like <code>String</code>, <code>Vec&lt;T&gt;</code>, and other heap-allocated structures typically implement <code>Clone</code> because they need to create entirely new instances of their data rather than just copying a pointer or reference.</p>
 </li>
 </ul>
-<h3 id="example-use-case-why-copy-is-preferred-and-when-its-unavoidable-to-use-clone">Example Use Case: Why <code>Copy</code> is Preferred and When It&rsquo;s Unavoidable to Use <code>Clone</code></h3>
-<h4 id="when-copy-is-preferred">When <code>Copy</code> is Preferred:</h4>
-<p>Consider a scenario where you are working with simple, small data types like integers, floats, or <code>bool</code>. For example, if you have a function that needs to pass a numeric value by value and return it, using <code>Copy</code> is ideal because it incurs no additional overhead:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">increment</span>(x: <span style="color:#66d9ef">i32</span>) -&gt; <span style="color:#66d9ef">i32</span> {
-</span></span><span style="display:flex;"><span>    x <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>In this case, the integer i32 implements Copy, so when you pass x to the function, Rust makes a shallow copy of the value, which is very efficient.</p>
-<p>When Clone is Unavoidable:
-Now, consider a scenario where you have a vector of data that needs to be duplicated:
-Memory implcation of using copy and clone?</p>
-<p>Given a choice which should you use and why?</p>
-<p>Example usecase of why copy is preferred and when its unavoidable to use clone</p>
+<h3 id="summary">Summary</h3>
+<p>In summary, Rust&rsquo;s <code>Copy</code> and <code>Clone</code> traits offer different approaches to data duplication, each with its own advantages. The <code>Copy</code> trait enables efficient, shallow copying of small, simple types by directly duplicating their memory bits, making it ideal for types like integers and booleans. In contrast, the <code>Clone</code> trait provides a way to perform deep copying, necessary for more complex types that manage heap-allocated resources, such as <code>String</code> or <code>Vec&lt;T&gt;</code>. Understanding when to use <code>Copy</code> versus <code>Clone</code> is crucial for optimizing both performance and memory usage in Rust, with <code>Copy</code> being preferable for its speed and simplicity when applicable, and <code>Clone</code> being necessary for ensuring the safe duplication of more complex, heap-based data.</p>
 
         
     </div>
@@ -519,9 +521,9 @@ Memory implcation of using copy and clone?</p>
   <ul>
     <li>
       <ul>
-        <li><a href="#tangent-what-is-a-trait-in-rust">Tangent: What is a <code>trait</code> in Rust?</a>
+        <li><a href="#trait-in-rust"><code>trait</code> in Rust</a>
           <ul>
-            <li><a href="#key-concepts-of-traits-in-rust">Key Concepts of Traits in Rust</a></li>
+            <li><a href="#key-traits-of-traits-in-rust">Key Traits of Traits in Rust</a></li>
             <li><a href="#example-of-a-trait-in-rust">Example of a Trait in Rust</a>
               <ul>
                 <li><a href="#rust-example">Rust Example</a></li>
@@ -532,12 +534,20 @@ Memory implcation of using copy and clone?</p>
         </li>
         <li><a href="#what-is-the-copy-trait-in-rust">What is the <code>Copy</code> Trait in Rust?</a>
           <ul>
-            <li><a href="#key-characteristics-of-the-copy-trait">Key Characteristics of the <code>Copy</code> Trait</a></li>
-            <li><a href="#example-of-a-copy-type">Example of a <code>Copy</code> Type</a></li>
+            <li><a href="#characteristics-of-the-copy-trait">Characteristics of the <code>Copy</code> Trait</a>
+              <ul>
+                <li><a href="#example-of-a-copy-type">Example of a <code>Copy</code> Type</a></li>
+                <li><a href="#explanation">Explanation:</a></li>
+              </ul>
+            </li>
             <li><a href="#what-is-the-clone-trait-in-rust">What is the <code>Clone</code> Trait in Rust?</a></li>
-            <li><a href="#key-characteristics-of-the-clone-trait">Key Characteristics of the <code>Clone</code> Trait</a></li>
-            <li><a href="#example-of-a-clone-implementation">Example of a <code>Clone</code> Implementation</a></li>
-            <li><a href="#explanation">Explanation:</a></li>
+            <li><a href="#key-characteristics-of-the-clone-trait">Key Characteristics of the <code>Clone</code> Trait</a>
+              <ul>
+                <li><a href="#example-of-a-clone-implementation">Example of a <code>Clone</code> Implementation</a></li>
+                <li><a href="#explanation-1">Explanation:</a></li>
+              </ul>
+            </li>
+            <li><a href="#how-do-you-know-if-your-data-is-on-stack-or-the-heap">How do you know if your data is on stack or the heap?</a></li>
             <li><a href="#how-copy-and-clone-are-implemented-in-rusts-source-code">How <code>Copy</code> and <code>Clone</code> are Implemented in Rust&rsquo;s Source Code</a>
               <ul>
                 <li><a href="#clone-trait"><code>Clone</code> Trait</a></li>
@@ -548,11 +558,7 @@ Memory implcation of using copy and clone?</p>
             </li>
             <li><a href="#memory-implications-of-using-copy-and-clone">Memory Implications of Using <code>Copy</code> and <code>Clone</code></a></li>
             <li><a href="#given-a-choice-which-should-you-use-and-why">Given a Choice, Which Should You Use and Why?</a></li>
-            <li><a href="#example-use-case-why-copy-is-preferred-and-when-its-unavoidable-to-use-clone">Example Use Case: Why <code>Copy</code> is Preferred and When It&rsquo;s Unavoidable to Use <code>Clone</code></a>
-              <ul>
-                <li><a href="#when-copy-is-preferred">When <code>Copy</code> is Preferred:</a></li>
-              </ul>
-            </li>
+            <li><a href="#summary">Summary</a></li>
           </ul>
         </li>
       </ul>

@@ -6,15 +6,8 @@
     <description>Recent content in Solana on nikhil acharya</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 15 Aug 2024 17:55:28 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 11 Aug 2024 17:55:28 +0800</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/solana/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Unikernels and Solana: A Hypothetical Exploration</title>
-      <link>http://localhost:1313/posts/using-unikernels-in-solana/</link>
-      <pubDate>Thu, 15 Aug 2024 17:55:28 +0800</pubDate>
-      <guid>http://localhost:1313/posts/using-unikernels-in-solana/</guid>
-      <description>Unikernels and Solana: A Hypothetical Exploration Introduction I’ve always enjoyed pondering the &amp;ldquo;what-ifs&amp;rdquo; of technology and one area that has fascinated me for years is the concept of unikernels. Back in 2017-2018, I spent a lot of my free time researching unikernels. The idea of tailoring an application with only the necessary components of the kernel to create a lightweight, highly optimized library operating system (libOS) struck me as incredibly innovative.</description>
-    </item>
     <item>
       <title>Solana Token History Indexer: Problem Statement</title>
       <link>http://localhost:1313/posts/token-history-problem-statement/</link>
