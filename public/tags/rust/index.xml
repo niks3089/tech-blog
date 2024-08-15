@@ -22,5 +22,12 @@
       <guid>http://localhost:1313/posts/token-history-problem-statement/</guid>
       <description>Problem Statement: Token Transfer History Indexer for Wallets Background Retrieving transaction history for a specific wallet or multiple wallets on the Solana blockchain, especially for token transfers, currently requires multiple RPC calls and complicated filtering. This process is slow and inefficient, making it challenging to quickly access and filter token transfer data. There is a clear need for a streamlined and optimized method to retrieve token transfer history.&#xA;Here&amp;rsquo;s an example of how we fetch token transfer history specifically between two wallets today</description>
     </item>
+    <item>
+      <title>To copy or to clone? That&#39;s the question</title>
+      <link>http://localhost:1313/posts/copy-vs-clone/</link>
+      <pubDate>Sun, 11 Aug 2024 17:55:28 +0800</pubDate>
+      <guid>http://localhost:1313/posts/copy-vs-clone/</guid>
+      <description>I like having the rust-analyser fix issues for me. I hover over the code and see an issue like this&#xA;cannot move out of `host.metal_type` which is behind a shared reference move occurs because `host.metal_type` has type `std::option::Option&amp;lt;MetalType&amp;gt;`, which does not implement the `Copy trait` and the first thing I do is host.metal_type.clone() and that fixes the problem. But why does it fix the problem? What was the problem? Should I add a copy trait to my struct?</description>
+    </item>
   </channel>
 </rss>

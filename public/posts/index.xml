@@ -6,8 +6,15 @@
     <description>Recent content in Posts on nikhil acharya</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 11 Aug 2024 17:55:28 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 15 Aug 2024 17:55:28 +0800</lastBuildDate>
     <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>To copy or to clone? That&#39;s the question</title>
+      <link>http://localhost:1313/posts/copy-vs-clone/</link>
+      <pubDate>Thu, 15 Aug 2024 17:55:28 +0800</pubDate>
+      <guid>http://localhost:1313/posts/copy-vs-clone/</guid>
+      <description>I like having the rust-analyser fix issues for me. I hover over the code and see an issue like this&#xA;cannot move out of `host.metal_type` which is behind a shared reference move occurs because `host.metal_type` has type `std::option::Option&amp;lt;MetalType&amp;gt;`, which does not implement the `Copy trait` and the first thing I do is host.metal_type.clone() and that fixes the problem. But why does it fix the problem? What was the problem? Should I add a copy trait to my struct?</description>
+    </item>
     <item>
       <title>Lifetime vs Arc in Rust</title>
       <link>http://localhost:1313/posts/arc-vs-lifetime/</link>
@@ -28,13 +35,6 @@
       <pubDate>Tue, 30 Jul 2024 17:55:28 +0800</pubDate>
       <guid>http://localhost:1313/posts/staking-sol-in-india/</guid>
       <description>Staking SOL on Solana: A Guide Staking on Solana is a process where you lock up your SOL tokens to support the network&amp;rsquo;s operations and, in return, earn rewards. While Helius is now the number one validator in Solana, it’s still challenging to stake SOL regularly. To know more about how to stake on Helius, see this blog.&#xA;Challenges in Staking SOL in India Despite the detailed staking instructions, acquiring Solana in a wallet remains a hurdle in India.</description>
-    </item>
-    <item>
-      <title></title>
-      <link>http://localhost:1313/posts/using-unikernels-in-solana/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/using-unikernels-in-solana/</guid>
-      <description>Unikernels and Solana: A Hypothetical Exploration Introduction I’ve always enjoyed pondering the &amp;ldquo;what-ifs&amp;rdquo; of technology and one area that has fascinated me for years is the concept of unikernels. Back in 2017-2018, I spent a lot of my free time researching unikernels. The idea of tailoring an application with only the necessary components of the kernel to create a lightweight, highly optimized library operating system (libOS) struck me as incredibly innovative.</description>
     </item>
   </channel>
 </rss>

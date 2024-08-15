@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        :root {
+            --accent-color: #FF4D4D;
+        }
+    </style>
+
+    
+    
+    
+    
+    
+    
+
+    
+    <title>To copy or to clone? That&#39;s the question</title>
+    <meta name="description" content="A comparision vs copy and clone in rust and knowing when to use what">
+    <meta name="keywords" content='blog, gokarna, hugo, rust'>
+
+    <meta property="og:url" content="http://localhost:1313/posts/copy-vs-clone/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="To copy or to clone? That&#39;s the question">
+    <meta property="og:description" content="A comparision vs copy and clone in rust and knowing when to use what">
+    <meta property="og:image" content="http://localhost:1313/images/avatar.webp">
+    <meta property="og:image:secure_url" content="http://localhost:1313/images/avatar.webp">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="To copy or to clone? That&#39;s the question">
+    <meta name="twitter:description" content="A comparision vs copy and clone in rust and knowing when to use what">
+    <meta property="twitter:domain" content="http://localhost:1313/posts/copy-vs-clone/">
+    <meta property="twitter:url" content="http://localhost:1313/posts/copy-vs-clone/">
+    <meta name="twitter:image" content="http://localhost:1313/images/avatar.webp">
+
+    
+    <link rel="canonical" href="http://localhost:1313/posts/copy-vs-clone/">
+
+    
+    <link rel="stylesheet" type="text/css" href="/css/normalize.min.css" media="print">
+
+    
+    <link rel="stylesheet" type="text/css" href="/css/main.min.css">
+
+    
+    <link id="dark-theme" rel="stylesheet" href="/css/dark.min.css">
+
+    
+    <script src="/js/bundle.min.9a920d7dabdbad8363b6a0a94e29a9dfebdb7ee64cfcb193a0145e512ef2bdab.js" integrity="sha256-mpINfavbrYNjtqCpTimp3&#43;vbfuZM/LGToBReUS7yvas="></script>
+
+    
+    
+        <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css" integrity="sha384-Xi8rHCmBmhbuyyhbI88391ZKP2dmfnOl4rT9ZfRI7mLTdk1wblIUnrIq35nqwEvC" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js" integrity="sha384-X/XCfMm41VSsqRNQgDerQczD69XqmjOOOwYQvr/uuC+j4OPoNhVgjdGFwhvN02Ja" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          // customised options
+          // • auto-render specific keys, e.g.:
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+          ],
+          // • rendering keys, e.g.:
+          throwOnError : false
+        });
+      });
+    </script>
+  
+    
+</head>
+<body>
+        <script>
+            
+            setThemeByUserPref();
+        </script><header class="header">
+    <nav class="header-nav">
+
+        
+        <div class="avatar">
+            <a href="http://localhost:1313/">
+                <img src='/images/avatar.webp' alt="avatar">
+            </a>
+        </div>
+        
+
+        <div class="nav-title">
+            <a class="nav-brand" href="http://localhost:1313/">nikhil acharya</a>
+        </div>
+
+        <div class="nav-links">
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/"><span data-feather='home'></span> Home </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/posts/"><span data-feather='book'></span> Posts </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/about/"><span data-feather='code'></span> About me </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/tags/"><span data-feather='tag'></span> Tags </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="https://tiplink.io/blinks/donate?dest=BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe&amp;mint=usdc"><span data-feather='coffee'></span>  </a>
+            </div>
+            
+
+            <span class="nav-icons-divider"></span>
+            <div class="nav-link dark-theme-toggle">
+                <span class="sr-only dark-theme-toggle-screen-reader-target"></span>
+                <a>
+                    <span class="theme-toggle-icon" data-feather="moon"></span>
+                </a>
+            </div>
+
+            <div class="nav-link" id="hamburger-menu-toggle">
+                <span class="sr-only hamburger-menu-toggle-screen-reader-target">menu</span>
+                <a>
+                    <span data-feather="menu"></span>
+                </a>
+            </div>
+
+            
+            <ul class="nav-hamburger-list visibility-hidden">
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/"><span data-feather='home'></span> Home </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/posts/"><span data-feather='book'></span> Posts </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/about/"><span data-feather='code'></span> About me </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/tags/"><span data-feather='tag'></span> Tags </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="https://tiplink.io/blinks/donate?dest=BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe&amp;mint=usdc"><span data-feather='coffee'></span>  </a>
+                </li>
+                
+                <li class="nav-item dark-theme-toggle">
+                    <span class="sr-only dark-theme-toggle-screen-reader-target">theme</span>
+                    <a>
+                        <span class="theme-toggle-icon" data-feather="moon"></span>
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+</header>
+<main id="content">
+    <div class="post container">
+    <div class="post-header-section">
+        <h1>To copy or to clone? That&#39;s the question</h1>
+        <small role="doc-subtitle">A comparision vs copy and clone in rust and knowing when to use what</small>
+        <p class="post-date">August 15, 2024
+        
+        </p>
+
+        <ul class="post-tags">
+        
+            <li class="post-tag"><a href="http://localhost:1313/tags/rust">rust</a></li>
+        
+        </ul>
+    </div>
+
+    <div class="post-content">
+        <p>I like having the rust-analyser fix issues for me. I hover over the code and see an issue like this</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span>cannot <span style="color:#66d9ef">move</span> out of <span style="color:#960050;background-color:#1e0010">`</span>host.metal_type<span style="color:#960050;background-color:#1e0010">`</span> which is behind a shared reference
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">move</span> occurs because <span style="color:#960050;background-color:#1e0010">`</span>host.metal_type<span style="color:#960050;background-color:#1e0010">`</span> has <span style="color:#66d9ef">type</span> <span style="color:#960050;background-color:#1e0010">`</span>std::option::Option<span style="color:#f92672">&lt;</span>MetalType<span style="color:#f92672">&gt;</span><span style="color:#960050;background-color:#1e0010">`</span>, which does not implement the <span style="color:#960050;background-color:#1e0010">`</span>Copy <span style="color:#66d9ef">trait</span><span style="color:#960050;background-color:#1e0010">`</span>
+</span></span></code></pre></div><p>and the first thing I do is <code>host.metal_type.clone()</code> and that fixes the problem. But why does it fix the problem? What was the problem? Should I add a copy trait to my struct? Lets deep dive.</p>
+<p>First thing is what is a <code>trait</code>?</p>
+<h2 id="tangent-what-is-a-trait-in-rust">Tangent: What is a <code>trait</code> in Rust?</h2>
+<p>Before we jump in, we need to understand what a trait is in Rusy. In Rust, a <strong>trait</strong> is a language feature that defines a set of methods that types can implement. Traits are somewhat similar to <strong>interfaces</strong> in languages like C++ but with some important distinctions and additional capabilities. Like before, I like comparing Rust features with C++</p>
+<h3 id="key-concepts-of-traits-in-rust">Key Concepts of Traits in Rust</h3>
+<ol>
+<li>
+<p><strong>Method Definitions</strong>:</p>
+<ul>
+<li>A trait defines one or more method signatures, but it does not provide an implementation for those methods (except for default implementations, which are optional).</li>
+<li>Types that implement the trait must provide concrete implementations for the methods defined in the trait.</li>
+<li><strong>C++ Comparison</strong>: This is akin to defining a pure virtual class (interface) in C++, where derived classes must provide implementations for the pure virtual functions.</li>
+</ul>
+</li>
+<li>
+<p><strong>Implementing Traits</strong>:</p>
+<ul>
+<li>Types (like structs, enums, or even other traits) can implement one or more traits. When a type implements a trait, it agrees to provide the method implementations defined by that trait.</li>
+<li>This allows you to define common behavior across different types in a consistent way.</li>
+<li><strong>C++ Comparison</strong>: In C++, when a class inherits from an interface (pure virtual class), it must implement the virtual functions, similar to how a type in Rust implements the methods of a trait.</li>
+</ul>
+</li>
+<li>
+<p><strong>Trait Bounds</strong>:</p>
+<ul>
+<li>Traits can be used to define constraints on generic types. This is known as &ldquo;trait bounds.&rdquo; It allows you to write generic functions or structs that work with any type that implements a specific trait.</li>
+<li><strong>C++ Comparison</strong>: This is similar to <strong>template specialization</strong> or <strong>concepts</strong> in C++20, where you can constrain a template to only work with types that fulfill certain conditions.</li>
+</ul>
+</li>
+<li>
+<p><strong>Dynamic Dispatch</strong>:</p>
+<ul>
+<li>Traits can be used for polymorphism in Rust, allowing different types to be treated uniformly based on the trait they implement. This is often used in conjunction with trait objects (<code>&amp;dyn Trait</code> or <code>Box&lt;dyn Trait&gt;</code>) to achieve dynamic dispatch.</li>
+<li><strong>C++ Comparison</strong>: This is analogous to <strong>polymorphism</strong> in C++ using pointers or references to base classes (interfaces), where virtual functions enable dynamic dispatch.</li>
+</ul>
+</li>
+<li>
+<p><strong>Default Implementations</strong>:</p>
+<ul>
+<li>Traits can provide default implementations for some or all of their methods. When a type implements the trait, it can choose to use the default implementation or provide its own.</li>
+<li><strong>C++ Comparison</strong>: Similar to providing a default implementation for a virtual function in a base class in C++, which derived classes can override if needed.</li>
+</ul>
+</li>
+</ol>
+<h3 id="example-of-a-trait-in-rust">Example of a Trait in Rust</h3>
+<p>Here’s an example of defining and implementing a trait in Rust, with a comparison to how it might look in C++:</p>
+<h4 id="rust-example">Rust Example</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">// Define a trait named `Describe`
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">trait</span> Describe {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">describe</span>(<span style="color:#f92672">&amp;</span>self) -&gt; String;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Implement the `Describe` trait for a struct `Person`
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Person</span> {
+</span></span><span style="display:flex;"><span>    name: String,
+</span></span><span style="display:flex;"><span>    age: <span style="color:#66d9ef">u32</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span> Describe <span style="color:#66d9ef">for</span> Person {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">describe</span>(<span style="color:#f92672">&amp;</span>self) -&gt; String {
+</span></span><span style="display:flex;"><span>        format!(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{}</span><span style="color:#e6db74"> is </span><span style="color:#e6db74">{}</span><span style="color:#e6db74"> years old.&#34;</span>, self.name, self.age)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Implement the `Describe` trait for a struct `Car`
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Car</span> {
+</span></span><span style="display:flex;"><span>    make: String,
+</span></span><span style="display:flex;"><span>    model: String,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span> Describe <span style="color:#66d9ef">for</span> Car {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">describe</span>(<span style="color:#f92672">&amp;</span>self) -&gt; String {
+</span></span><span style="display:flex;"><span>        format!(<span style="color:#e6db74">&#34;This is a </span><span style="color:#e6db74">{}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">.&#34;</span>, self.make, self.model)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> person <span style="color:#f92672">=</span> Person {
+</span></span><span style="display:flex;"><span>        name: String::from(<span style="color:#e6db74">&#34;Alice&#34;</span>),
+</span></span><span style="display:flex;"><span>        age: <span style="color:#ae81ff">30</span>,
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> car <span style="color:#f92672">=</span> Car {
+</span></span><span style="display:flex;"><span>        make: String::from(<span style="color:#e6db74">&#34;Toyota&#34;</span>),
+</span></span><span style="display:flex;"><span>        model: String::from(<span style="color:#e6db74">&#34;Corolla&#34;</span>),
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Both `Person` and `Car` can use the `describe` method
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    println!(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, person.describe());
+</span></span><span style="display:flex;"><span>    println!(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, car.describe());
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The same example in C++</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Define an interface (pure virtual class) named `Describe`
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Describe</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> std<span style="color:#f92672">::</span>string describe() <span style="color:#66d9ef">const</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;  <span style="color:#75715e">// Pure virtual function
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">virtual</span> <span style="color:#f92672">~</span>Describe() <span style="color:#f92672">=</span> <span style="color:#66d9ef">default</span>;             <span style="color:#75715e">// Virtual destructor
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Implement the `Describe` interface for a class `Person`
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Person</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Describe {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string name;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> age;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    Person(std<span style="color:#f92672">::</span>string n, <span style="color:#66d9ef">int</span> a) <span style="color:#f92672">:</span> name(n), age(a) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string describe() <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">override</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> name <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; is &#34;</span> <span style="color:#f92672">+</span> std<span style="color:#f92672">::</span>to_string(age) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; years old.&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Implement the `Describe` interface for a class `Car`
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Car</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Describe {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string make;
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string model;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    Car(std<span style="color:#f92672">::</span>string m, std<span style="color:#f92672">::</span>string mo) <span style="color:#f92672">:</span> make(m), model(mo) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string describe() <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">override</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;This is a &#34;</span> <span style="color:#f92672">+</span> make <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; &#34;</span> <span style="color:#f92672">+</span> model <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    Person person(<span style="color:#e6db74">&#34;Alice&#34;</span>, <span style="color:#ae81ff">30</span>);
+</span></span><span style="display:flex;"><span>    Car car(<span style="color:#e6db74">&#34;Toyota&#34;</span>, <span style="color:#e6db74">&#34;Corolla&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Both `Person` and `Car` can use the `describe` method
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> person.describe() <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> car.describe() <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="traits-and-polymorphism">Traits and Polymorphism</h3>
+<p>Traits in Rust enable polymorphism, where different types can be treated uniformly based on the trait they implement. This allows you to write code that can work with any type that implements a certain trait, promoting code reuse and flexibility.</p>
+<p>For example, you could write a function that accepts any type that implements Describe:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">print_description</span>(item: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">impl</span> Describe) {
+</span></span><span style="display:flex;"><span>    println!(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, item.describe());
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="what-is-the-copy-trait-in-rust">What is the <code>Copy</code> Trait in Rust?</h2>
+<p>In Rust, the <code>Copy</code> trait is a special marker trait that indicates a type can be duplicated by making a simple bitwise copy of its memory. This trait is designed for types that are inexpensive to copy, such as scalar values (integers, floating-point numbers, booleans) or types that contain only <code>Copy</code> types. When a type implements the <code>Copy</code> trait, its values are copied implicitly whenever they are assigned to another variable or passed to a function, rather than being moved.</p>
+<h3 id="key-characteristics-of-the-copy-trait">Key Characteristics of the <code>Copy</code> Trait</h3>
+<ol>
+<li>
+<p><strong>Implicit Copying</strong>:</p>
+<ul>
+<li>Types that implement <code>Copy</code> do not require an explicit call to <code>.clone()</code> to duplicate values. Instead, they are automatically copied when assigned to another variable or when passed as arguments to functions.</li>
+</ul>
+</li>
+<li>
+<p><strong>Shallow Copy</strong>:</p>
+<ul>
+<li>The <code>Copy</code> trait performs a shallow copy, which is a direct bitwise duplication of the value. This is efficient but means that <code>Copy</code> types cannot own heap-allocated memory or other resources that require deep copying.</li>
+</ul>
+</li>
+<li>
+<p><strong>No Destructors</strong>:</p>
+<ul>
+<li>A type that implements <code>Copy</code> cannot also implement the <code>Drop</code> trait, which is used for custom destructors. This is because the <code>Copy</code> trait implies that the original value remains valid after copying, which is incompatible with types that need custom cleanup.</li>
+</ul>
+</li>
+<li>
+<p><strong>Deriving <code>Copy</code></strong>:</p>
+<ul>
+<li>The <code>Copy</code> trait can often be automatically derived by the compiler for simple types. For example, most primitive types in Rust, such as <code>i32</code>, <code>u32</code>, <code>f64</code>, and <code>bool</code>, implement <code>Copy</code> by default.</li>
+</ul>
+</li>
+<li>
+<p><strong>Combination with <code>Clone</code></strong>:</p>
+<ul>
+<li>All types that implement <code>Copy</code> must also implement the <code>Clone</code> trait, which provides a <code>.clone()</code> method for explicit copying. However, for <code>Copy</code> types, the <code>.clone()</code> method is typically trivial and just returns <code>*self</code>.</li>
+</ul>
+</li>
+</ol>
+<h3 id="example-of-a-copy-type">Example of a <code>Copy</code> Type</h3>
+<p>Here’s a simple example of how the <code>Copy</code> trait is used in Rust:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">#[derive(Copy, Clone)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Point</span> {
+</span></span><span style="display:flex;"><span>    x: <span style="color:#66d9ef">i32</span>,
+</span></span><span style="display:flex;"><span>    y: <span style="color:#66d9ef">i32</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> p1 <span style="color:#f92672">=</span> Point { x: <span style="color:#ae81ff">10</span>, y: <span style="color:#ae81ff">20</span> };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> p2 <span style="color:#f92672">=</span> p1;  <span style="color:#75715e">// `p1` is copied to `p2`, not moved
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    println!(<span style="color:#e6db74">&#34;p1: (</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">, </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">), p2: (</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">, </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">)&#34;</span>, p1.x, p1.y, p2.x, p2.y);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Explanation:</p>
+<ul>
+<li>Deriving Copy and Clone: In the example, the Point struct is marked with #[derive(Copy, Clone)]. This tells the compiler to automatically implement both the Copy and Clone traits for Point.</li>
+<li>Implicit Copying: When p1 is assigned to p2, p1 is not moved but copied. Both p1 and p2 contain the same data, and both remain valid after the assignment.</li>
+<li>No Drop Implementation: Because Point implements Copy, it cannot have a custom destructor (Drop implementation), which aligns with the expectation that Copy types are trivial to copy and do not require cleanup.</li>
+</ul>
+<p>What is a <code>clone trait</code>?</p>
+<h3 id="what-is-the-clone-trait-in-rust">What is the <code>Clone</code> Trait in Rust?</h3>
+<p>The <code>Clone</code> trait in Rust is a standard library trait that allows for the explicit duplication of an object. When a type implements the <code>Clone</code> trait, it provides a method for creating a deep copy of the object, meaning that all of the data is duplicated, rather than just copying the memory address (which would be a shallow copy).</p>
+<h3 id="key-characteristics-of-the-clone-trait">Key Characteristics of the <code>Clone</code> Trait</h3>
+<ol>
+<li>
+<p><strong>Explicit Copying</strong>:</p>
+<ul>
+<li>The <code>Clone</code> trait is used for types where a deep copy is necessary or desired. This includes types that manage resources like heap-allocated memory, file handles, or network connections.</li>
+<li>Unlike the <code>Copy</code> trait, which allows for implicit copying, cloning is always explicit. You must call the <code>.clone()</code> method to create a duplicate of the object.</li>
+</ul>
+</li>
+<li>
+<p><strong>Deep Copy</strong>:</p>
+<ul>
+<li>The <code>Clone</code> trait usually involves a deep copy, meaning that all of the data associated with the object is duplicated. For example, if a type owns a heap-allocated array, <code>.clone()</code> will create a new array with the same elements, rather than just copying the pointer to the original array.</li>
+</ul>
+</li>
+<li>
+<p><strong>Custom Implementation</strong>:</p>
+<ul>
+<li>Types that implement <code>Clone</code> can provide a custom implementation of the <code>.clone()</code> method. This allows you to control exactly how the type is duplicated.</li>
+<li>If the type consists entirely of other types that implement <code>Clone</code>, you can often derive <code>Clone</code> automatically using <code>#[derive(Clone)]</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Combination with <code>Copy</code></strong>:</p>
+<ul>
+<li>The <code>Clone</code> trait is often implemented alongside the <code>Copy</code> trait for simple types. However, when a type implements both, the <code>.clone()</code> method typically just returns <code>*self</code>, because the <code>Copy</code> trait guarantees that the type can be duplicated by copying bits.</li>
+</ul>
+</li>
+</ol>
+<h3 id="example-of-a-clone-implementation">Example of a <code>Clone</code> Implementation</h3>
+<p>Here’s a simple example of how the <code>Clone</code> trait is used in Rust:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">#[derive(Clone)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Point</span> {
+</span></span><span style="display:flex;"><span>    x: <span style="color:#66d9ef">i32</span>,
+</span></span><span style="display:flex;"><span>    y: <span style="color:#66d9ef">i32</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> p1 <span style="color:#f92672">=</span> Point { x: <span style="color:#ae81ff">10</span>, y: <span style="color:#ae81ff">20</span> };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> p2 <span style="color:#f92672">=</span> p1.clone();  <span style="color:#75715e">// Explicitly clone `p1` to create `p2`
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    println!(<span style="color:#e6db74">&#34;p1: (</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">, </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">), p2: (</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">, </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">))&#34;</span>, p1.x, p1.y, p2.x, p2.y);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="explanation">Explanation:</h3>
+<ul>
+<li>
+<p><strong>Deriving <code>Clone</code></strong>: In the example, the <code>Point</code> struct is marked with <code>#[derive(Clone)]</code>, which automatically implements the <code>Clone</code> trait for the struct. This is possible because <code>i32</code> (the type of the fields <code>x</code> and <code>y</code>) implements <code>Clone</code>.</p>
+</li>
+<li>
+<p><strong>Explicit Cloning</strong>: When <code>p1.clone()</code> is called, it creates a new <code>Point</code> instance <code>p2</code> with the same values as <code>p1</code>. Unlike the <code>Copy</code> trait, which would simply duplicate <code>p1</code> implicitly when assigning it to <code>p2</code>, the <code>Clone</code> trait requires the explicit call to <code>.clone()</code>.</p>
+</li>
+</ul>
+<h3 id="how-copy-and-clone-are-implemented-in-rusts-source-code">How <code>Copy</code> and <code>Clone</code> are Implemented in Rust&rsquo;s Source Code</h3>
+<p>In Rust, the <code>Copy</code> and <code>Clone</code> traits are fundamental components of the language&rsquo;s type system, implemented within the standard library. The <code>Copy</code> trait is a marker trait that signifies a type can be duplicated by simply copying its bits, making it suitable for types that are small and inexpensive to copy, such as integers or floating-point numbers. In contrast, the <code>Clone</code> trait is more general and allows for deep copying of an object, which is necessary for types that manage resources like heap-allocated memory.</p>
+<h4 id="clone-trait"><code>Clone</code> Trait</h4>
+<p>The <code>Clone</code> trait defines the <code>clone</code> method, which is used to create a deep copy of an object. This method must be implemented by any type that wants to provide a custom way to duplicate its values. Additionally, the <code>Clone</code> trait includes a <code>clone_from</code> method, which is optional and provides a more efficient way to clone by reusing the resources of the existing value when possible.</p>
+<h4 id="copy-trait"><code>Copy</code> Trait</h4>
+<p>The <code>Copy</code> trait is defined as a subtrait of <code>Clone</code>. It does not define any methods and serves as a marker trait to indicate that a type can be copied with a simple bitwise copy. Since <code>Copy</code> is a subtrait of <code>Clone</code>, any type that implements <code>Copy</code> must also implement <code>Clone</code>. This ensures that <code>Copy</code> types can always be cloned, even though the <code>clone</code> method for <code>Copy</code> types is generally trivial and simply returns the value itself.</p>
+<h4 id="auto-deriving-copy-and-clone">Auto-Deriving <code>Copy</code> and <code>Clone</code></h4>
+<p>Rust allows types to automatically derive implementations of <code>Copy</code> and <code>Clone</code> if all of their fields also implement these traits. This auto-derivation simplifies the process of making simple structs and enums <code>Copy</code> and <code>Clone</code> by avoiding the need to manually implement these traits.</p>
+<h4 id="how-copy-and-clone-work-together">How <code>Copy</code> and <code>Clone</code> Work Together</h4>
+<p>The relationship between <code>Copy</code> and <code>Clone</code> ensures that any <code>Copy</code> type can also be cloned, but in a straightforward manner. When a type implements <code>Copy</code>, the <code>clone</code> method typically just returns a bitwise copy of the value, making the <code>clone</code> method trivial. This relationship allows for efficient handling of simple, small types while still providing the flexibility to perform more complex cloning operations when needed.</p>
+<h3 id="memory-implications-of-using-copy-and-clone">Memory Implications of Using <code>Copy</code> and <code>Clone</code></h3>
+<p>The <code>Copy</code> and <code>Clone</code> traits in Rust have different memory implications due to how they handle data duplication.</p>
+<ul>
+<li>
+<p><strong><code>Copy</code></strong>: The <code>Copy</code> trait performs a shallow bitwise copy of the data, which is very efficient in terms of both time and memory. Since <code>Copy</code> does not involve any heap allocation or complex data structures, it simply duplicates the data by copying its bits directly. This makes <code>Copy</code> ideal for small, simple types like integers, floating-point numbers, and other types that occupy a fixed, small amount of memory. The memory implication of using <code>Copy</code> is minimal because it doesn&rsquo;t require additional memory beyond the space needed for the original and copied values.</p>
+</li>
+<li>
+<p><strong><code>Clone</code></strong>: The <code>Clone</code> trait, on the other hand, typically involves a deep copy of the data. This means that all elements of a compound data structure (like a vector or a string) are duplicated, including any heap-allocated memory. Consequently, <code>Clone</code> can be more memory-intensive because it allocates new memory for the copied data and duplicates everything, which may also include performing additional operations like reference counting or other forms of resource management.</p>
+</li>
+</ul>
+<h3 id="given-a-choice-which-should-you-use-and-why">Given a Choice, Which Should You Use and Why?</h3>
+<ul>
+<li>
+<p><strong>Use <code>Copy</code> When Possible</strong>: If your type can implement <code>Copy</code>, you should prefer it over <code>Clone</code> due to its efficiency. <code>Copy</code> is faster and uses less memory because it simply performs a shallow copy of the data. Additionally, the use of <code>Copy</code> leads to more predictable performance and fewer surprises, as it avoids the potential overhead associated with heap allocations and other complex operations that <code>Clone</code> might involve.</p>
+</li>
+<li>
+<p><strong>Use <code>Clone</code> When Necessary</strong>: You should use <code>Clone</code> when you need to perform a deep copy of a type that manages heap-allocated memory or other resources that cannot be safely duplicated with a simple bitwise copy. Types like <code>String</code>, <code>Vec&lt;T&gt;</code>, and other heap-allocated structures typically implement <code>Clone</code> because they need to create entirely new instances of their data rather than just copying a pointer or reference.</p>
+</li>
+</ul>
+<h3 id="example-use-case-why-copy-is-preferred-and-when-its-unavoidable-to-use-clone">Example Use Case: Why <code>Copy</code> is Preferred and When It&rsquo;s Unavoidable to Use <code>Clone</code></h3>
+<h4 id="when-copy-is-preferred">When <code>Copy</code> is Preferred:</h4>
+<p>Consider a scenario where you are working with simple, small data types like integers, floats, or <code>bool</code>. For example, if you have a function that needs to pass a numeric value by value and return it, using <code>Copy</code> is ideal because it incurs no additional overhead:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">increment</span>(x: <span style="color:#66d9ef">i32</span>) -&gt; <span style="color:#66d9ef">i32</span> {
+</span></span><span style="display:flex;"><span>    x <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In this case, the integer i32 implements Copy, so when you pass x to the function, Rust makes a shallow copy of the value, which is very efficient.</p>
+<p>When Clone is Unavoidable:
+Now, consider a scenario where you have a vector of data that needs to be duplicated:
+Memory implcation of using copy and clone?</p>
+<p>Given a choice which should you use and why?</p>
+<p>Example usecase of why copy is preferred and when its unavoidable to use clone</p>
+
+        
+    </div>
+
+    <div class="prev-next">
+        
+    </div>
+
+    
+    
+    <svg id="btt-button" class="arrow-logo" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512" onclick="scrollToTop()" title="Go to top">
+        
+        <path d="M177 159.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 255.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 329.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1z"/>
+    </svg>
+    <script>
+        let backToTopButton = document.getElementById("btt-button");
+
+        window.onscroll = function() {
+            scrollFunction()
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                backToTopButton.style.display = "block";
+            } else {
+                backToTopButton.style.display = "none";
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo(0, 0);
+        }
+    </script>
+    
+    
+</div>
+
+<aside class="post-toc">
+    <nav id="toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#tangent-what-is-a-trait-in-rust">Tangent: What is a <code>trait</code> in Rust?</a>
+          <ul>
+            <li><a href="#key-concepts-of-traits-in-rust">Key Concepts of Traits in Rust</a></li>
+            <li><a href="#example-of-a-trait-in-rust">Example of a Trait in Rust</a>
+              <ul>
+                <li><a href="#rust-example">Rust Example</a></li>
+              </ul>
+            </li>
+            <li><a href="#traits-and-polymorphism">Traits and Polymorphism</a></li>
+          </ul>
+        </li>
+        <li><a href="#what-is-the-copy-trait-in-rust">What is the <code>Copy</code> Trait in Rust?</a>
+          <ul>
+            <li><a href="#key-characteristics-of-the-copy-trait">Key Characteristics of the <code>Copy</code> Trait</a></li>
+            <li><a href="#example-of-a-copy-type">Example of a <code>Copy</code> Type</a></li>
+            <li><a href="#what-is-the-clone-trait-in-rust">What is the <code>Clone</code> Trait in Rust?</a></li>
+            <li><a href="#key-characteristics-of-the-clone-trait">Key Characteristics of the <code>Clone</code> Trait</a></li>
+            <li><a href="#example-of-a-clone-implementation">Example of a <code>Clone</code> Implementation</a></li>
+            <li><a href="#explanation">Explanation:</a></li>
+            <li><a href="#how-copy-and-clone-are-implemented-in-rusts-source-code">How <code>Copy</code> and <code>Clone</code> are Implemented in Rust&rsquo;s Source Code</a>
+              <ul>
+                <li><a href="#clone-trait"><code>Clone</code> Trait</a></li>
+                <li><a href="#copy-trait"><code>Copy</code> Trait</a></li>
+                <li><a href="#auto-deriving-copy-and-clone">Auto-Deriving <code>Copy</code> and <code>Clone</code></a></li>
+                <li><a href="#how-copy-and-clone-work-together">How <code>Copy</code> and <code>Clone</code> Work Together</a></li>
+              </ul>
+            </li>
+            <li><a href="#memory-implications-of-using-copy-and-clone">Memory Implications of Using <code>Copy</code> and <code>Clone</code></a></li>
+            <li><a href="#given-a-choice-which-should-you-use-and-why">Given a Choice, Which Should You Use and Why?</a></li>
+            <li><a href="#example-use-case-why-copy-is-preferred-and-when-its-unavoidable-to-use-clone">Example Use Case: Why <code>Copy</code> is Preferred and When It&rsquo;s Unavoidable to Use <code>Clone</code></a>
+              <ul>
+                <li><a href="#when-copy-is-preferred">When <code>Copy</code> is Preferred:</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </nav>
+</aside>
+
+
+
+    
+
+        </main><footer class="footer">
+    
+    
+</footer></body>
+</html>

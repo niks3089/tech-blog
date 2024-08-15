@@ -97,11 +97,17 @@ So to fully capture a wallet's transaction history, one must first discover all 
 ### Objective
 Develop an indexer that efficiently captures and stores token transfer histories for specific wallets across various token types (e.g., SPL tokens, Token Extensions and Metaplex tokens). This indexer will enable quick and efficient querying of token transfer histories, reducing the dependency on multiple RPC calls.
 
+### Usecases 
+
+- Enterprise users of Token Extensions or SPL will need history of all the transactions that ever happened to fulfill their audit requirements
+- Chargeback via permanent delegates will require transaction history to identify and validate frauds
+
 ### Requirements
 
 #### Data Retention
 - Support at least 30 days of token transfer history, starting from a specified launch date (e.g., October 1st).
 - Plan for potential extensions of retention periods to 60-90 days.
+- Customers requiring beyond the 60-90 days of history can reach out and can pay for the additional storage/compute costs 
 
 #### Token Compatibility
 - Ensure compatibility with all uncompressed token types, including token extensions, regular tokens and Metaplex tokens.
@@ -113,6 +119,7 @@ Develop an indexer that efficiently captures and stores token transfer histories
 #### Storage Solution
 - Utilize TimescaleDB for efficient time-series data management.
 - Design the database schema to handle high volumes of token transfer data efficiently.
+- Consider scaling the database to store *all* transfer transactions from genesis. 
 
 #### API Development
 - Develop multiple APIs to provide access to the indexed token transfer history.

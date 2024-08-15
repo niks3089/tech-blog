@@ -263,11 +263,17 @@
 <p>So to fully capture a wallet&rsquo;s transaction history, one must first discover all associated token accounts and then query the blockchain for each of these accounts individually. Moreover, the process involves making multiple RPC calls to fetch transaction signatures and details, parsing intricate transaction data and filtering relevant token transfers. This can be resource-intensive and slow, especially with high transaction volumes or when dealing with multiple wallets, making it challenging to efficiently gather and process comprehensive token transfer history.</p>
 <h3 id="objective">Objective</h3>
 <p>Develop an indexer that efficiently captures and stores token transfer histories for specific wallets across various token types (e.g., SPL tokens, Token Extensions and Metaplex tokens). This indexer will enable quick and efficient querying of token transfer histories, reducing the dependency on multiple RPC calls.</p>
+<h3 id="usecases">Usecases</h3>
+<ul>
+<li>Enterprise users of Token Extensions or SPL will need history of all the transactions that ever happened to fulfill their audit requirements</li>
+<li>Chargeback via permanent delegates will require transaction history to identify and validate frauds</li>
+</ul>
 <h3 id="requirements">Requirements</h3>
 <h4 id="data-retention">Data Retention</h4>
 <ul>
 <li>Support at least 30 days of token transfer history, starting from a specified launch date (e.g., October 1st).</li>
 <li>Plan for potential extensions of retention periods to 60-90 days.</li>
+<li>Customers requiring beyond the 60-90 days of history can reach out and can pay for the additional storage/compute costs</li>
 </ul>
 <h4 id="token-compatibility">Token Compatibility</h4>
 <ul>
@@ -282,6 +288,7 @@
 <ul>
 <li>Utilize TimescaleDB for efficient time-series data management.</li>
 <li>Design the database schema to handle high volumes of token transfer data efficiently.</li>
+<li>Consider scaling the database to store <em>all</em> transfer transactions from genesis.</li>
 </ul>
 <h4 id="api-development">API Development</h4>
 <ul>
@@ -385,6 +392,7 @@
           <ul>
             <li><a href="#background">Background</a></li>
             <li><a href="#objective">Objective</a></li>
+            <li><a href="#usecases">Usecases</a></li>
             <li><a href="#requirements">Requirements</a>
               <ul>
                 <li><a href="#data-retention">Data Retention</a></li>
