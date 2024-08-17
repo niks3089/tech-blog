@@ -1,6 +1,6 @@
 ---
 title: "To copy or to clone? That's the question"
-date: 2024-08-17T17:55:28+08:00
+date: 2024-08-17T00:00:00+08:00
 description: "A comparision of copy vs clone in rust and knowing when to use what"
 tags: ["rust"]
 type: post
