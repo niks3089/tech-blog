@@ -12,7 +12,7 @@ showTableOfContents: true
 
 ## Introduction
 
-I’ve always enjoyed pondering the "what-ifs" of technology and one area that has fascinated me for years is the concept of unikernels. Back in 2017-2018, I spent a lot of my free time researching unikernels. The idea of tailoring an application with only the necessary components of the kernel to create a lightweight, highly optimized library operating system (libOS) struck me as incredibly innovative.
+I’ve always enjoyed pondering the "what-ifs" of technology and one area that has fascinated me for years is the concept of unikernels. Back in 2017-2018, I spent a lot of my free time researching [unikernels](http://unikernel.org/). The idea of tailoring an application with only the necessary components of the kernel to create a lightweight, highly optimized library operating system (libOS) struck me as incredibly innovative.
 
 For those of you who might not be familiar with unikernels, let me explain.
 
@@ -110,6 +110,28 @@ fn main() {
 }
 ``` 
 
+### Some Challenges with JIT Compilation
+
+Just-In-Time (JIT) compilation is a powerful technique used to optimize code at runtime, but it comes with several challenges
+
+#### 1. Startup Performance Impact
+- **Compilation Overhead**: JIT compilers compile code at runtime, which can cause delays during the initial execution of a program, leading to slower startup times compared to ahead-of-time (AOT) compiled code.
+- **Warm-up Time**: The code may run slower initially until the JIT compiler has had time to optimize it. During this "warm-up" period, performance can be less predictable.
+
+#### 2. Memory Usage
+- **Increased Memory Footprint**: JIT compilation requires memory for storing both the JIT compiler itself and the generated machine code. This can lead to higher memory consumption compared to AOT compilation, where the machine code is generated once and reused.
+- **Garbage Collection Interactions**: JIT compilers often run in environments with garbage collection, which can add additional pressure on memory management systems, potentially leading to performance bottlenecks.
+
+#### 3. Unpredictable Performance
+- **Unpredictable Latency**: Because JIT compilation happens at runtime, the performance can be unpredictable. For instance, a critical section of code might be interrupted by a JIT compilation process, causing a sudden increase in execution time.
+- **Variable Optimization Levels**: The level of optimization applied by a JIT compiler can vary depending on runtime conditions, leading to inconsistent performance across different runs or environments.
+
+#### 4. Code Size Inflation
+- **Code Bloat**: JIT compilers might generate more machine code than necessary due to conservative optimization strategies or the need to handle various edge cases. This can lead to code bloat and increased cache pressure.
+
+
+With above limitation in mind, lets dive in.
+
 ### A Hypothetical Solana Unikernel
 
 Is there a Rust based Unikernel? Yes, there's [hermit](https://github.com/hermit-os/hermit-rs). Now, imagine a scenario where Solana programs are not just compiled as eBPF bytecode to be executed in the Sealevel runtime, but instead are packaged as unikernels. How would this look?
@@ -126,28 +148,29 @@ In a Solana + Unikernel setup:
 
 In the envisioned Solana + Unikernel setup, where each Solana smart contract is compiled with as a Unikernel, the process extends beyond merely creating and executing these contracts. The real challenge lies in managing the entire lifecycle of these unikernel-based smart contracts, ensuring their seamless execution, state management, and orchestration across the network. The end-to-end workflow begins with the compilation of a Solana smart contract into a binary along with the Hermit unikernel, producing a standalone unikernel binary that encapsulates the smart contract and the minimal runtime needed to execute it. This binary is then deployed to a Solana node or a cluster of nodes, where it runs as a userspace process within the unikernel. During execution, the unikernel interacts with Solana's state, handling tasks like account management, transaction validation, and state persistence. To effectively manage these processes, a robust orchestration layer is essential. The orchestrator is responsible for coordinating the deployment of unikernel binaries across the network, managing the lifecycle of these unikernels by starting, stopping, and scaling them as needed, and ensuring they have the necessary resources to operate efficiently. Additionally, the orchestrator plays a critical role in monitoring the health and performance of each unikernel, collecting real-time status information, and synchronizing state changes across the network to maintain consistency and integrity in the blockchain.
 
-Compilation: When a developer submits a Solana smart contract, it is first compiled into a binary along with the Hermit unikernel. This compilation produces a standalone unikernel binary that encapsulates the smart contract and the minimal runtime needed to execute it.
+#### Compilation
+
+When a developer submits a Solana smart contract, it is first compiled into a binary along with the Hermit unikernel. This compilation produces a standalone unikernel binary that encapsulates the smart contract and the minimal runtime needed to execute it.
 Deployment: The compiled binary is then deployed to a Solana node or a cluster of nodes. Each node is capable of executing the unikernel binary in a controlled environment, such as a virtual machine (VM) or a container, ensuring isolation and security.
 Execution:
 
-Runtime Execution: The deployed unikernel runs as a userspace process on the node. The Hermit unikernel provides the necessary runtime environment, executing the smart contract logic while handling low-level operations like memory management, input/output, and networking.
-State Management: During execution, the smart contract interacts with Solana's state, including account balances, transaction validation, and other blockchain-specific operations. The unikernel must be equipped to handle these operations efficiently, ensuring that the state is correctly updated and persisted.
+#### Runtime Execution 
+The deployed unikernel runs as a userspace process on the node. The Hermit unikernel provides the necessary runtime environment, executing the smart contract logic while handling low-level operations like memory management, input/output, and networking.
+
+#### State Management
+During execution, the smart contract interacts with Solana's state, including account balances, transaction validation, and other blockchain-specific operations. The unikernel must be equipped to handle these operations efficiently, ensuring that the state is correctly updated and persisted.
 Orchestration:
 
-Need for an Orchestrator: Given that each smart contract is now a self-contained unikernel binary, there needs to be a robust orchestration layer to manage these unikernels. The orchestrator will be responsible for:
-Deployment Coordination: Deploying and distributing unikernel binaries across the Solana network.
-Lifecycle Management: Starting, stopping, and scaling unikernel instances as needed based on the network's demands.
-Resource Allocation: Ensuring that each unikernel has the necessary resources (CPU, memory, storage) to execute efficiently.
-Health Monitoring: Continuously monitoring the health and performance of each unikernel instance, ensuring that they are functioning correctly.
-Status Collection and State Synchronization:
-
-Status Collection: The orchestrator will collect real-time status information from each running unikernel. This includes metrics like CPU usage, memory consumption, execution time, and any errors or exceptions that occur during execution.
-State Synchronization: Since each unikernel may modify the blockchain state, it’s crucial to synchronize this state across the network. The orchestrator will ensure that state changes are propagated and validated across all relevant nodes, maintaining consistency and integrity in the blockchain.
-Logging and Auditing: The orchestrator will also be responsible for logging all actions and maintaining an audit trail, which is critical for debugging, security, and compliance.
-Finalization and Consensus:
-
-Transaction Finalization: Once a transaction is processed by a unikernel, the result is sent back to the Solana network for finalization. The orchestrator ensures that the results are consistent and that consensus is reached among nodes.
-State Persistence: After finalization, the updated state is persisted on the blockchain. The orchestrator helps coordinate this process, ensuring that all nodes in the network have a consistent view of the blockchain state.
+#### Orchestrator
+Given that each smart contract is now a self-contained unikernel binary, there needs to be a robust orchestration layer to manage these unikernels. The orchestrator will be responsible for:
+- Deployment Coordination: Deploying and distributing unikernel binaries across the Solana network.
+- Lifecycle Management: Starting, stopping, and scaling unikernel instances as needed based on the network's demands.
+- Resource Allocation: Ensuring that each unikernel has the necessary resources (CPU, memory, storage) to execute efficiently.
+- Health Monitoring: Continuously monitoring the health and performance of each unikernel instance, ensuring that they are functioning correctly
+- Status Collection: The orchestrator will collect real-time status information from each running unikernel. This includes metrics like CPU usage, memory consumption, execution time, and any errors or exceptions that occur during execution.
+- State Synchronization: Since each unikernel may modify the blockchain state, it’s crucial to synchronize this state across the network. The orchestrator will ensure that state changes are propagated and validated across all relevant nodes, maintaining consistency and integrity in the blockchain
+- Transaction Finalization: Once a transaction is processed by a unikernel, the result is sent back to the Solana network for finalization. The orchestrator ensures that the results are consistent and that consensus is reached among nodes.
+- State Persistence: After finalization, the updated state is persisted on the blockchain. The orchestrator helps coordinate this process, ensuring that all nodes in the network have a consistent view of the blockchain state.
 
 ### Advantages and Challenges
 
