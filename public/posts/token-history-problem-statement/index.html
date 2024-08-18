@@ -262,89 +262,67 @@
 </span></span></code></pre></div><p>The provided code retrieves the token transfer history between two wallets on the Solana blockchain by first identifying all token accounts associated with the source wallet. It then iterates through each token account, fetching transaction signatures and the corresponding transaction details. By parsing the transaction instructions, the code filters for token transfer operations specifically involving the SPL token program. It ensures that only transfers between the specified source and destination wallets are captured, including transfers that occur through associated token accounts rather than the main wallet address.</p>
 <p>So to fully capture a wallet&rsquo;s transaction history, one must first discover all associated token accounts and then query the blockchain for each of these accounts individually. Moreover, the process involves making multiple RPC calls to fetch transaction signatures and details, parsing intricate transaction data and filtering relevant token transfers. This can be resource-intensive and slow, especially with high transaction volumes or when dealing with multiple wallets, making it challenging to efficiently gather and process comprehensive token transfer history.</p>
 <h3 id="objective">Objective</h3>
-<p>Develop an indexer that efficiently captures and stores token transfer histories for specific wallets across various token types (e.g., SPL tokens &amp; Token Extensions). This indexer will enable quick and efficient querying of token transfer histories, reducing the dependency on multiple RPC calls.</p>
+<p>Develop an indexer and APIs that efficiently captures, stores and exposes token transfer histories across various token types (e.g., SPL tokens &amp; Token Extensions). The APIs will enable quick and efficient querying of token transfer histories thus reducing the need to make multiple RPC calls.</p>
 <h3 id="usecases">Usecases</h3>
+<p>Here&rsquo;s some of the usecases where an token transfer indexer will be useful</p>
 <ul>
 <li>Enterprise users of Token Extensions or SPL will need history of all the transactions that ever happened to fulfill their audit requirements</li>
 <li>Chargeback via permanent delegates will require transaction history to identify and validate frauds</li>
 </ul>
 <h3 id="requirements">Requirements</h3>
-<h4 id="data-retention">Data Retention</h4>
-<ul>
-<li>Support at least 30 days of token transfer history, starting from a specified launch date (e.g., October 1st).</li>
-<li>Plan for potential extensions of retention periods to 60-90 days.</li>
-<li>Customers requiring beyond the 60-90 days of history can reach out and can pay for the additional storage/compute costs</li>
-</ul>
-<h4 id="token-compatibility">Token Compatibility</h4>
-<ul>
-<li>Ensure compatibility with all uncompressed token types, including token extensions &amp; regular SPL tokens.</li>
-</ul>
-<h4 id="performance">Performance</h4>
-<ul>
-<li>Optimize the indexer for speed and filtering capabilities.</li>
-<li>Minimize the need for multiple RPC calls to retrieve token transfer histories.</li>
-</ul>
-<h4 id="storage-solution">Storage Solution</h4>
-<ul>
-<li>Utilize TimescaleDB for efficient time-series data management.</li>
-<li>Design the database schema to handle high volumes of token transfer data efficiently.</li>
-<li>Consider scaling the database to store <em>all</em> transfer transactions from genesis.</li>
-</ul>
-<h4 id="api-development">API Development</h4>
-<ul>
-<li>Develop multiple APIs to provide access to the indexed token transfer history.</li>
-<li>Support querying token transfers to/from a specific wallet.</li>
-<li>Implement filtering options such as date ranges and specific token types.</li>
-</ul>
-<h3 id="scope">Scope</h3>
-<h4 id="indexer-development">Indexer Development</h4>
-<ul>
-<li>Create an indexer which listens and record token transfers from gRPC Geyser based validator.</li>
-<li>Ensure the indexer is resilient to failures and ensures data correctly and availability.</li>
-</ul>
-<h4 id="database-storage">Database Storage</h4>
-<ul>
-<li>Design a schema using TimescaleDB to store token transfer data and retrieve it quickly and efficiently.</li>
-<li>Use its hypertable feature for optimized querying and data management.</li>
-</ul>
-<h4 id="api-implementation">API Implementation</h4>
-<ul>
-<li>Develop JSON RPC endpoints to query token transfer history.</li>
-<li>Endpoints should support filtering by wallet address, token type and date range.</li>
-</ul>
-<h3 id="deliverables">Deliverables</h3>
 <h4 id="indexer">Indexer</h4>
 <ul>
-<li>A fully functional indexer that captures token transfer data from the blockchain.</li>
-</ul>
-<h4 id="database">Database</h4>
+<li>Parse and index token transfer transactions</li>
+<li>I will start with indexing the following fields
 <ul>
-<li>A TimescaleDB schema designed for efficient storage and querying of token transfer data.</li>
+<li>transaction signature</li>
+<li>source account</li>
+<li>destination account</li>
+<li>source associated token account</li>
+<li>destination associated token account</li>
+<li>mint account</li>
+<li>amount</li>
+<li>slot</li>
+</ul>
+</li>
+<li>Support at least 90 days of token transfer history, starting from a specified launch date (e.g., October 1st).</li>
+<li>Customers requiring beyond the 90 days of history can reach out and can pay for the additional storage/compute costs and system should be able to handle indexing from genesis.</li>
+<li>Ensure compatibility with all all token types, including token extensions &amp; regular SPL tokens.</li>
+<li>Ensure the system can be extended to easily index new token types, for example, ZK compressed tokens.</li>
+<li>Design the database schema to handle high volumes of token transfer data efficiently.</li>
 </ul>
 <h4 id="api">API</h4>
 <ul>
-<li>A set of JSON RPC API endpoints to access token transfer history.</li>
-<li>Documentation for API usage and querying capabilities.</li>
+<li>Develop multiple APIs to provide access to the indexed token transfer history. Initially, we will just have a single <code>GetTransactions</code> JSON RPC API. The request could look something like this
+<pre tabindex="0"><code class="language-api" data-lang="api"> {
+  &#34;jsonrpc&#34;: &#34;2.0&#34;,
+  &#34;id&#34;: &#34;helius&#34;,
+  &#34;method&#34;: &#34;GetTransactions&#34;
+  &#34;params&#34;: {
+    &#34;sourceAccount&#34;: &lt;source wallet&gt;
+    &#34;destinationAccount&#34;: &lt;destination wallet (optional)&gt;
+    &#34;mintAccount&#34;: &lt;mint account to filter on (optional)&gt; 
+    &#34;from&#34;: &lt;date in dd/mm/yy to filter on (optional)&gt;
+    &#34;to&#34;: &lt;date in dd/mm/yy to filter on (optional)&gt;
+  }
+}
+</code></pre></li>
+<li>Ensure that the API responses are fast, reliable and correct</li>
 </ul>
-<h4 id="monitoring-and-maintenance-tools">Monitoring and Maintenance Tools</h4>
+<h3 id="deliverables">Deliverables</h3>
 <ul>
-<li>Scripts and tools for monitoring the indexer&rsquo;s and api performance and maintaining data retention policies.</li>
+<li>A fully functional indexer that captures token transfer data from the blockchain.</li>
+<li>A peristent DB designed for efficient storage and querying of token transfer data.</li>
+<li>A set of JSON RPC API endpoints to access token transfer history.</li>
 </ul>
 <h3 id="expected-challenges">Expected Challenges</h3>
-<h4 id="data-volume">Data Volume</h4>
 <ul>
-<li>Handling high volumes of token transfer data while ensuring the indexer remains performant.</li>
-</ul>
-<h4 id="querying-speed">Querying Speed</h4>
-<ul>
+<li>Indexing high volumes of token transfer data while ensuring the there no gaps when fetching transactions.</li>
 <li>Ensuring querying such large amount of data is fast, reliable and accurate.</li>
-</ul>
-<h4 id="retention-management">Retention Management</h4>
-<ul>
-<li>Efficiently managing data retention to comply with the specified retention period.</li>
+<li>Efficiently scaling the system as the data grows without it getting out of budget and making good tradeoffs.</li>
 </ul>
 <h3 id="conclusion">Conclusion</h3>
-<p>By developing an efficient indexer and API for token transfer history, we aim to significantly improve the speed and ease of retrieving and filtering token transfer data. This solution will enhance the user experience and provide a scalable method for managing and querying blockchain transaction data.</p>
+<p>By developing an efficient indexer and API for token transfer history, we aim to significantly improve the speed and ease of retrieving and filtering token transfer data. This solution will enhance the user experience and provide a scalable method for managing and querying Solana transaction data.</p>
 
         
     </div>
@@ -395,35 +373,12 @@
             <li><a href="#usecases">Usecases</a></li>
             <li><a href="#requirements">Requirements</a>
               <ul>
-                <li><a href="#data-retention">Data Retention</a></li>
-                <li><a href="#token-compatibility">Token Compatibility</a></li>
-                <li><a href="#performance">Performance</a></li>
-                <li><a href="#storage-solution">Storage Solution</a></li>
-                <li><a href="#api-development">API Development</a></li>
-              </ul>
-            </li>
-            <li><a href="#scope">Scope</a>
-              <ul>
-                <li><a href="#indexer-development">Indexer Development</a></li>
-                <li><a href="#database-storage">Database Storage</a></li>
-                <li><a href="#api-implementation">API Implementation</a></li>
-              </ul>
-            </li>
-            <li><a href="#deliverables">Deliverables</a>
-              <ul>
                 <li><a href="#indexer">Indexer</a></li>
-                <li><a href="#database">Database</a></li>
                 <li><a href="#api">API</a></li>
-                <li><a href="#monitoring-and-maintenance-tools">Monitoring and Maintenance Tools</a></li>
               </ul>
             </li>
-            <li><a href="#expected-challenges">Expected Challenges</a>
-              <ul>
-                <li><a href="#data-volume">Data Volume</a></li>
-                <li><a href="#querying-speed">Querying Speed</a></li>
-                <li><a href="#retention-management">Retention Management</a></li>
-              </ul>
-            </li>
+            <li><a href="#deliverables">Deliverables</a></li>
+            <li><a href="#expected-challenges">Expected Challenges</a></li>
             <li><a href="#conclusion">Conclusion</a></li>
           </ul>
         </li>

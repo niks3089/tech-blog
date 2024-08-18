@@ -95,77 +95,64 @@ The provided code retrieves the token transfer history between two wallets on th
 So to fully capture a wallet's transaction history, one must first discover all associated token accounts and then query the blockchain for each of these accounts individually. Moreover, the process involves making multiple RPC calls to fetch transaction signatures and details, parsing intricate transaction data and filtering relevant token transfers. This can be resource-intensive and slow, especially with high transaction volumes or when dealing with multiple wallets, making it challenging to efficiently gather and process comprehensive token transfer history.
 
 ### Objective
-Develop an indexer that efficiently captures and stores token transfer histories for specific wallets across various token types (e.g., SPL tokens & Token Extensions). This indexer will enable quick and efficient querying of token transfer histories, reducing the dependency on multiple RPC calls.
+Develop an indexer and APIs that efficiently captures, stores and exposes token transfer histories across various token types (e.g., SPL tokens & Token Extensions). The APIs will enable quick and efficient querying of token transfer histories thus reducing the need to make multiple RPC calls.
 
 ### Usecases 
+
+Here's some of the usecases where an token transfer indexer will be useful 
 
 - Enterprise users of Token Extensions or SPL will need history of all the transactions that ever happened to fulfill their audit requirements
 - Chargeback via permanent delegates will require transaction history to identify and validate frauds
 
 ### Requirements
 
-#### Data Retention
-- Support at least 30 days of token transfer history, starting from a specified launch date (e.g., October 1st).
-- Plan for potential extensions of retention periods to 60-90 days.
-- Customers requiring beyond the 60-90 days of history can reach out and can pay for the additional storage/compute costs 
-
-#### Token Compatibility
-- Ensure compatibility with all uncompressed token types, including token extensions & regular SPL tokens.
-
-#### Performance
-- Optimize the indexer for speed and filtering capabilities.
-- Minimize the need for multiple RPC calls to retrieve token transfer histories.
-
-#### Storage Solution
-- Utilize TimescaleDB for efficient time-series data management.
+#### Indexer 
+- Parse and index token transfer transactions 
+- I will start with indexing the following fields 
+    - transaction signature
+    - source account
+    - destination account 
+    - source associated token account 
+    - destination associated token account
+    - mint account
+    - amount 
+    - slot
+- Support at least 90 days of token transfer history, starting from a specified launch date (e.g., October 1st).
+- Customers requiring beyond the 90 days of history can reach out and can pay for the additional storage/compute costs and system should be able to handle indexing from genesis. 
+- Ensure compatibility with all all token types, including token extensions & regular SPL tokens. 
+- Ensure the system can be extended to easily index new token types, for example, ZK compressed tokens.
 - Design the database schema to handle high volumes of token transfer data efficiently.
-- Consider scaling the database to store *all* transfer transactions from genesis. 
 
-#### API Development
-- Develop multiple APIs to provide access to the indexed token transfer history.
-- Support querying token transfers to/from a specific wallet.
-- Implement filtering options such as date ranges and specific token types.
-
-### Scope
-
-#### Indexer Development
-- Create an indexer which listens and record token transfers from gRPC Geyser based validator.
-- Ensure the indexer is resilient to failures and ensures data correctly and availability.
-
-#### Database Storage 
-- Design a schema using TimescaleDB to store token transfer data and retrieve it quickly and efficiently.
-- Use its hypertable feature for optimized querying and data management.
-
-#### API Implementation
-- Develop JSON RPC endpoints to query token transfer history.
-- Endpoints should support filtering by wallet address, token type and date range.
-
+#### API 
+- Develop multiple APIs to provide access to the indexed token transfer history. Initially, we will just have a single `GetTransactions` JSON RPC API. The request could look something like this
+    ```api
+     {
+      "jsonrpc": "2.0",
+      "id": "helius",
+      "method": "GetTransactions"
+      "params": {
+        "sourceAccount": <source wallet>
+        "destinationAccount": <destination wallet (optional)>
+        "mintAccount": <mint account to filter on (optional)> 
+        "from": <date in dd/mm/yy to filter on (optional)>
+        "to": <date in dd/mm/yy to filter on (optional)>
+      }
+    }
+    ```
+- Ensure that the API responses are fast, reliable and correct
 
 ### Deliverables
 
-#### Indexer
 - A fully functional indexer that captures token transfer data from the blockchain.
-
-#### Database
-- A TimescaleDB schema designed for efficient storage and querying of token transfer data.
-
-#### API
+- A peristent DB designed for efficient storage and querying of token transfer data.
 - A set of JSON RPC API endpoints to access token transfer history.
-- Documentation for API usage and querying capabilities.
-
-#### Monitoring and Maintenance Tools
-- Scripts and tools for monitoring the indexer's and api performance and maintaining data retention policies.
 
 ### Expected Challenges
 
-#### Data Volume
-- Handling high volumes of token transfer data while ensuring the indexer remains performant.
-
-#### Querying Speed
+- Indexing high volumes of token transfer data while ensuring the there no gaps when fetching transactions.
 - Ensuring querying such large amount of data is fast, reliable and accurate. 
-
-#### Retention Management
-- Efficiently managing data retention to comply with the specified retention period.
+- Efficiently scaling the system as the data grows without it getting out of budget and making good tradeoffs.
 
 ### Conclusion
-By developing an efficient indexer and API for token transfer history, we aim to significantly improve the speed and ease of retrieving and filtering token transfer data. This solution will enhance the user experience and provide a scalable method for managing and querying blockchain transaction data.
+By developing an efficient indexer and API for token transfer history, we aim to significantly improve the speed and ease of retrieving and filtering token transfer data. This solution will enhance the user experience and provide a scalable method for managing and querying Solana transaction data.
+
