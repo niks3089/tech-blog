@@ -6,8 +6,22 @@
     <description>Recent content in Posts on nikhil acharya</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 17 Aug 2024 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 18 Aug 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Solana Token Transfer Indexer: Problem Statement</title>
+      <link>http://localhost:1313/posts/token-history-problem-statement/</link>
+      <pubDate>Sun, 18 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/token-history-problem-statement/</guid>
+      <description>Problem Statement: Token Transfer History Indexer Background Retrieving transaction history for a specific wallet or multiple wallets on the Solana blockchain, especially for token transfers, currently requires multiple RPC calls and complicated filtering. This process is slow and inefficient, making it challenging to quickly access and filter token transfer data. There is a clear need for a streamlined and optimized method to retrieve token transfer history.&#xA;Here&amp;rsquo;s an example of how we fetch token transfer history specifically between two wallets today</description>
+    </item>
+    <item>
+      <title>Unikernels and Solana: A Hypothetical Exploration</title>
+      <link>http://localhost:1313/posts/using-unikernels-in-solana/</link>
+      <pubDate>Sun, 18 Aug 2024 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/posts/using-unikernels-in-solana/</guid>
+      <description>Unikernels and Solana: A Hypothetical Exploration Introduction I’ve always enjoyed pondering the &amp;ldquo;what-ifs&amp;rdquo; of technology and one area that has fascinated me for years is the concept of unikernels. Back in 2017-2018, I spent a lot of my free time researching unikernels. The idea of tailoring an application with only the necessary components of the kernel to create a lightweight, highly optimized library operating system (libOS) struck me as incredibly innovative.</description>
+    </item>
     <item>
       <title>To copy or to clone? That&#39;s the question</title>
       <link>http://localhost:1313/posts/copy-vs-clone/</link>
@@ -21,13 +35,6 @@
       <pubDate>Sun, 11 Aug 2024 17:55:28 +0800</pubDate>
       <guid>http://localhost:1313/posts/arc-vs-lifetime/</guid>
       <description>Understanding Arc vs Lifetimes in Rust In Rust, both Arc and lifetimes are tools used to manage how data is shared or accessed across different parts of a program, but they serve different purposes and are used in different contexts.&#xA;1. Lifetimes Lifetimes in Rust are a way to ensure that references are always valid. They help the Rust compiler understand how long references to data should be valid to prevent dangling references, which could lead to undefined behavior.</description>
-    </item>
-    <item>
-      <title>Solana Token History Indexer: Problem Statement</title>
-      <link>http://localhost:1313/posts/token-history-problem-statement/</link>
-      <pubDate>Sun, 11 Aug 2024 17:55:28 +0800</pubDate>
-      <guid>http://localhost:1313/posts/token-history-problem-statement/</guid>
-      <description>Problem Statement: Token Transfer History Indexer for Wallets Background Retrieving transaction history for a specific wallet or multiple wallets on the Solana blockchain, especially for token transfers, currently requires multiple RPC calls and complicated filtering. This process is slow and inefficient, making it challenging to quickly access and filter token transfer data. There is a clear need for a streamlined and optimized method to retrieve token transfer history.&#xA;Here&amp;rsquo;s an example of how we fetch token transfer history specifically between two wallets today</description>
     </item>
     <item>
       <title>Staking SOL on Solana in India: A Guide</title>
