@@ -6,8 +6,22 @@
     <description>Recent content in Tags on nikhil acharya</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 18 Aug 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 23 Aug 2024 00:00:00 +0800</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Solana</title>
+      <link>http://localhost:1313/tags/solana/</link>
+      <pubDate>Fri, 23 Aug 2024 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/tags/solana/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Radar-Hackathon</title>
+      <link>http://localhost:1313/tags/radar-hackathon/</link>
+      <pubDate>Sun, 18 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/radar-hackathon/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Rust</title>
       <link>http://localhost:1313/tags/rust/</link>
@@ -16,10 +30,10 @@
       <description></description>
     </item>
     <item>
-      <title>Solana</title>
-      <link>http://localhost:1313/tags/solana/</link>
+      <title>Transaction-Indexer</title>
+      <link>http://localhost:1313/tags/transaction-indexer/</link>
       <pubDate>Sun, 18 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/solana/</guid>
+      <guid>http://localhost:1313/tags/transaction-indexer/</guid>
       <description></description>
     </item>
     <item>

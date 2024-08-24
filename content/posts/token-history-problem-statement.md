@@ -2,7 +2,7 @@
 title: "Solana Token Transfer Indexer: Problem Statement"
 date: 2024-08-18T00:00:00+00:00
 description: "A requirement for token history indexer"
-tags: ["solana", "rust"]
+tags: ["solana", "rust", "transaction-indexer", "radar-hackathon"]
 type: post
 weight: 25
 showTableOfContents: true
@@ -144,7 +144,7 @@ Here's some of the usecases where an token transfer indexer will be useful
 ### Deliverables
 
 - A fully functional indexer that captures token transfer data from the blockchain.
-- A peristent DB designed for efficient storage and querying of token transfer data.
+- A persistent DB designed for efficient storage and querying of token transfer data.
 - A set of JSON RPC API endpoints to access token transfer history.
 
 ### Expected Challenges

@@ -169,7 +169,7 @@
     <div class="post-header-section">
         <h1>Unikernels and Solana: A Hypothetical Exploration</h1>
         <small role="doc-subtitle">A what-if about using Unikernel as Solana VM</small>
-        <p class="post-date">August 18, 2024
+        <p class="post-date">August 23, 2024
         
         </p>
 
@@ -204,17 +204,11 @@
 </ul>
 <h3 id="how-ebpf-works-as-a-virtual-machine">How eBPF Works as a Virtual Machine</h3>
 <p>eBPF (extended Berkeley Packet Filter) started as a technology for filtering network packets in the Linux kernel, but it has evolved into a tool for running sandboxed programs in various contexts, including network filtering, performance monitoring and security enforcement.</p>
-<h4 id="bytecode-execution">Bytecode Execution</h4>
+<h4 id="ebpf-execution">eBPF Execution</h4>
 <ul>
 <li>eBPF programs are compiled into bytecode, a set of low-level instructions similar to assembly language.</li>
 <li>This bytecode is loaded into the kernel via system calls and executed by an eBPF interpreter within the kernel.</li>
-</ul>
-<h4 id="jit-compilation">JIT Compilation</h4>
-<ul>
 <li>To boost performance, the eBPF VM can Just-In-Time (JIT) compile bytecode into native machine code, allowing for faster execution.</li>
-</ul>
-<h4 id="sandboxing">Sandboxing</h4>
-<ul>
 <li>eBPF programs run in a sandboxed environment, isolated from the kernel and user space, ensuring safety and correctness.</li>
 </ul>
 <p>Here&rsquo;s an example to disassemble and print eBPF instructions</p>
@@ -270,43 +264,19 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Disassemble and print the program
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    disassemble_program(prog);
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="some-challenges-with-jit-compilation">Some Challenges with JIT Compilation</h3>
-<p>Just-In-Time (JIT) compilation is a powerful technique used to optimize code at runtime, but it comes with several challenges</p>
-<h4 id="1-startup-performance-impact">1. Startup Performance Impact</h4>
-<ul>
-<li><strong>Compilation Overhead</strong>: JIT compilers compile code at runtime, which can cause delays during the initial execution of a program, leading to slower startup times compared to ahead-of-time (AOT) compiled code.</li>
-<li><strong>Warm-up Time</strong>: The code may run slower initially until the JIT compiler has had time to optimize it. During this &ldquo;warm-up&rdquo; period, performance can be less predictable.</li>
-</ul>
-<h4 id="2-memory-usage">2. Memory Usage</h4>
-<ul>
-<li><strong>Increased Memory Footprint</strong>: JIT compilation requires memory for storing both the JIT compiler itself and the generated machine code. This can lead to higher memory consumption compared to AOT compilation, where the machine code is generated once and reused.</li>
-<li><strong>Garbage Collection Interactions</strong>: JIT compilers often run in environments with garbage collection, which can add additional pressure on memory management systems, potentially leading to performance bottlenecks.</li>
-</ul>
-<h4 id="3-unpredictable-performance">3. Unpredictable Performance</h4>
-<ul>
-<li><strong>Unpredictable Latency</strong>: Because JIT compilation happens at runtime, the performance can be unpredictable. For instance, a critical section of code might be interrupted by a JIT compilation process, causing a sudden increase in execution time.</li>
-<li><strong>Variable Optimization Levels</strong>: The level of optimization applied by a JIT compiler can vary depending on runtime conditions, leading to inconsistent performance across different runs or environments.</li>
-</ul>
-<h4 id="4-code-size-inflation">4. Code Size Inflation</h4>
-<ul>
-<li><strong>Code Bloat</strong>: JIT compilers might generate more machine code than necessary due to conservative optimization strategies or the need to handle various edge cases. This can lead to code bloat and increased cache pressure.</li>
-</ul>
-<p>With above limitation in mind, lets dive in.</p>
-<h3 id="a-hypothetical-solana-unikernel">A Hypothetical Solana Unikernel</h3>
-<p>Is there a Rust based Unikernel? Yes, there&rsquo;s <a href="https://github.com/hermit-os/hermit-rs">hermit</a>. Now, imagine a scenario where Solana programs are not just compiled as eBPF bytecode to be executed in the Sealevel runtime, but instead are packaged as unikernels. How would this look?</p>
+</span></span></code></pre></div><h3 id="a-hypothetical-solana-unikernel">A Hypothetical Solana Unikernel</h3>
+<p>Now let&rsquo;s imagine an hypothetical world with Solana and Unikernel. First, is there a Rust based Unikernel? Yes, there&rsquo;s <a href="https://github.com/hermit-os/hermit-rs">hermit</a>. Now, imagine a scenario where Solana programs are not just compiled as eBPF bytecode to be executed in the Sealevel runtime, but instead are packaged as hermit unikernels. How would this look?</p>
 <h4 id="conceptual-overview">Conceptual Overview</h4>
 <p>In a Solana + Unikernel setup:</p>
 <ul>
 <li><strong>Compilation:</strong> Each Solana program would be compiled along with a unikernel like Hermit, creating a single binary.</li>
-<li><strong>Execution:</strong> The execution of Solana smart contracts would occur within this unikernel and as a userspace process, which provides the necessary runtime environment, replacing the need for eBPF. We will use <a href="https://github.com/hermit-os/hermit-playground?tab=readme-ov-file#uhyve---a-lightweight-hypervisor">uhyve</a>, A hypervisior to start our unikernels as userspace process within a KVM-accelerated virtual machine</li>
+<li><strong>Execution:</strong> The execution of Solana smart contracts would occur within this unikernel and as a userspace process, which provides the necessary runtime environment, replacing the need for eBPF. We will use <a href="https://github.com/hermit-os/hermit-playground?tab=readme-ov-file#uhyve---a-lightweight-hypervisor">uhyve</a>, A hypervisor to start our unikernels as userspace process within a KVM-accelerated virtual machine</li>
 <li><strong>Customization:</strong> Hermit would need to be customized to support Solana-specific features like account management, transaction validation and state persistence.</li>
 </ul>
 <h3 id="next-steps-end-to-end-flow">Next Steps: End-to-End Flow</h3>
 <p>In the envisioned Solana + Unikernel setup, where each Solana smart contract is compiled with as a Unikernel, the process extends beyond merely creating and executing these contracts. The real challenge lies in managing the entire lifecycle of these unikernel-based smart contracts, ensuring their seamless execution, state management, and orchestration across the network. The end-to-end workflow begins with the compilation of a Solana smart contract into a binary along with the Hermit unikernel, producing a standalone unikernel binary that encapsulates the smart contract and the minimal runtime needed to execute it. This binary is then deployed to a Solana node or a cluster of nodes, where it runs as a userspace process within the unikernel. During execution, the unikernel interacts with Solana&rsquo;s state, handling tasks like account management, transaction validation, and state persistence. To effectively manage these processes, a robust orchestration layer is essential. The orchestrator is responsible for coordinating the deployment of unikernel binaries across the network, managing the lifecycle of these unikernels by starting, stopping, and scaling them as needed, and ensuring they have the necessary resources to operate efficiently. Additionally, the orchestrator plays a critical role in monitoring the health and performance of each unikernel, collecting real-time status information, and synchronizing state changes across the network to maintain consistency and integrity in the blockchain.</p>
 <h4 id="compilation">Compilation</h4>
-<p>When a developer submits a Solana smart contract, it is first compiled into a binary along with the Hermit unikernel. This compilation produces a standalone unikernel binary that encapsulates the smart contract and the minimal runtime needed to execute it.
-Deployment: The compiled binary is then deployed to a Solana node or a cluster of nodes. Each node is capable of executing the unikernel binary in a controlled environment, such as a virtual machine (VM) or a container, ensuring isolation and security.
-Execution:</p>
+<p>When a developer submits a Solana smart contract, it is first compiled into a binary along with the Hermit unikernel. This compilation produces a standalone unikernel binary that encapsulates the smart contract and the minimal runtime needed to execute it. The compiled binary is then deployed to a Solana node or a cluster of nodes. Each node is capable of executing the unikernel binary in a controlled environment, such as a virtual machine (VM) or a container, ensuring isolation and security.</p>
 <h4 id="runtime-execution">Runtime Execution</h4>
 <p>The deployed unikernel runs as a userspace process on the node. The Hermit unikernel provides the necessary runtime environment, executing the smart contract logic while handling low-level operations like memory management, input/output, and networking.</p>
 <h4 id="state-management">State Management</h4>
@@ -323,19 +293,6 @@ Orchestration:</p>
 <li>State Synchronization: Since each unikernel may modify the blockchain state, it’s crucial to synchronize this state across the network. The orchestrator will ensure that state changes are propagated and validated across all relevant nodes, maintaining consistency and integrity in the blockchain</li>
 <li>Transaction Finalization: Once a transaction is processed by a unikernel, the result is sent back to the Solana network for finalization. The orchestrator ensures that the results are consistent and that consensus is reached among nodes.</li>
 <li>State Persistence: After finalization, the updated state is persisted on the blockchain. The orchestrator helps coordinate this process, ensuring that all nodes in the network have a consistent view of the blockchain state.</li>
-</ul>
-<h3 id="advantages-and-challenges">Advantages and Challenges</h3>
-<h4 id="advantages">Advantages</h4>
-<ul>
-<li><strong>Performance:</strong> Unikernels are highly optimized, with minimal overhead, potentially leading to faster execution of Solana programs.</li>
-<li><strong>Security:</strong> With no full OS, the attack surface is significantly reduced, enhancing security.</li>
-<li><strong>Isolation:</strong> Each Solana program could be compiled into its own unikernel, providing strong isolation from other programs.</li>
-</ul>
-<h4 id="challenges">Challenges</h4>
-<ul>
-<li><strong>Integration Complexity:</strong> Solana’s current model relies on a multi-program execution environment. Moving to unikernels would require significant changes to how programs interact with the blockchain and each other.</li>
-<li><strong>State Management:</strong> Handling persistent state across multiple unikernels would be complex, especially in a distributed ledger context like Solana.</li>
-<li><strong>Tooling:</strong> The Solana developer ecosystem, including deployment, debugging and monitoring tools, would need significant modifications to support unikernel-based execution.</li>
 </ul>
 <h3 id="managing-state-in-a-unikernel-based-solana">Managing State in a Unikernel-Based Solana</h3>
 <p>Let’s explore how state persistence could be managed if each Solana program were running in its own unikernel.</p>
@@ -355,9 +312,25 @@ Orchestration:</p>
 <li><strong>Coordination Service:</strong> A dedicated service could manage the interaction between unikernels, handling transaction ordering, state synchronization and conflict resolution.</li>
 <li><strong>Event-Driven State Updates:</strong> Unikernels could be designed to respond to state change events triggered by the coordination service, ensuring that state updates are applied consistently across the network.</li>
 </ul>
+<h3 id="advantages-and-challenges">Advantages and Challenges</h3>
+<h4 id="advantages">Advantages</h4>
+<ul>
+<li><strong>Performance:</strong> Unikernels are highly optimized, with minimal overhead, potentially leading to faster execution of Solana programs.</li>
+<li><strong>Security:</strong> With no full OS, the attack surface is significantly reduced, enhancing security.</li>
+<li><strong>Isolation:</strong> Each Solana program could be compiled into its own unikernel, providing strong isolation from other programs.</li>
+</ul>
+<h4 id="challenges">Challenges</h4>
+<ul>
+<li><strong>Integration Complexity:</strong> Solana’s current model relies on a multi-program execution environment. Moving to unikernels would require significant changes to how programs interact with the blockchain and each other.</li>
+<li><strong>State Management:</strong> Handling persistent state across multiple unikernels would be complex, especially in a distributed ledger context like Solana.</li>
+<li><strong>Tooling:</strong> The Solana developer ecosystem, including deployment, debugging and monitoring tools, would need significant modifications to support unikernel-based execution.</li>
+</ul>
+<h3 id="feasibility">Feasibility</h3>
+<p>While the concept of integrating unikernels into Solana’s architecture may seem far-fetched to some, it could potentially strengthen the decentralized nature of the network by introducing a new layer of node specialization. A set of nodes running Solana unikernels might offer enhanced security, performance, and isolation. However, this approach would only be justifiable if the advantages significantly outweigh the complexities involved.</p>
+<p>Unikernels, although promising, are still in the early stages of adoption and have not yet seen widespread use since their initial conceptualization. The main challenges would include managing state persistence, synchronization, and consistency across multiple unikernels in a distributed environment, which would require innovative solutions and a rethinking of Solana’s current architecture.</p>
+<p>Nonetheless, the idea of deploying Solana programs as unikernels is an intriguing proposition. It pushes the boundaries of what’s possible with decentralized systems, even if it remains hypothetical at this stage.</p>
 <h3 id="conclusion">Conclusion</h3>
-<p>In this hypothetical scenario, each Solana program would run within its own unikernel, offering potential performance and security benefits. However, the complexity of managing state persistence, synchronization and consistency across multiple unikernels would pose significant challenges, particularly in a distributed ledger environment like Solana.</p>
-<p>While the idea is intriguing and offers some unique advantages, it would require substantial architectural changes and innovation to address the challenges of state management and integration with Solana’s existing infrastructure. Whether or not this approach could be practical or superior to the current model is a fascinating question that would need further exploration and experimentation.</p>
+<p>Exploring the potential of unikernels in the context of Solana opens up a realm of possibilities for enhancing security, performance, and decentralization. While the idea is still largely theoretical, it underscores the importance of continuously re-imagining the tools and architectures that power decentralized networks. Whether or not this approach will become feasible or practical in the future, it is a fascinating direction for research and experimentation. As unikernels evolve and gain traction, they could play a role in shaping the future of blockchain technology, pushing the envelope of what’s possible in decentralized computing.</p>
 
         
     </div>
@@ -408,17 +381,7 @@ Orchestration:</p>
             <li><a href="#solanas-bpf-model">Solana’s BPF Model</a></li>
             <li><a href="#how-ebpf-works-as-a-virtual-machine">How eBPF Works as a Virtual Machine</a>
               <ul>
-                <li><a href="#bytecode-execution">Bytecode Execution</a></li>
-                <li><a href="#jit-compilation">JIT Compilation</a></li>
-                <li><a href="#sandboxing">Sandboxing</a></li>
-              </ul>
-            </li>
-            <li><a href="#some-challenges-with-jit-compilation">Some Challenges with JIT Compilation</a>
-              <ul>
-                <li><a href="#1-startup-performance-impact">1. Startup Performance Impact</a></li>
-                <li><a href="#2-memory-usage">2. Memory Usage</a></li>
-                <li><a href="#3-unpredictable-performance">3. Unpredictable Performance</a></li>
-                <li><a href="#4-code-size-inflation">4. Code Size Inflation</a></li>
+                <li><a href="#ebpf-execution">eBPF Execution</a></li>
               </ul>
             </li>
             <li><a href="#a-hypothetical-solana-unikernel">A Hypothetical Solana Unikernel</a>
@@ -434,12 +397,6 @@ Orchestration:</p>
                 <li><a href="#orchestrator">Orchestrator</a></li>
               </ul>
             </li>
-            <li><a href="#advantages-and-challenges">Advantages and Challenges</a>
-              <ul>
-                <li><a href="#advantages">Advantages</a></li>
-                <li><a href="#challenges">Challenges</a></li>
-              </ul>
-            </li>
             <li><a href="#managing-state-in-a-unikernel-based-solana">Managing State in a Unikernel-Based Solana</a>
               <ul>
                 <li><a href="#distributed-state-management">Distributed State Management</a></li>
@@ -447,6 +404,13 @@ Orchestration:</p>
                 <li><a href="#state-coordination-layer">State Coordination Layer</a></li>
               </ul>
             </li>
+            <li><a href="#advantages-and-challenges">Advantages and Challenges</a>
+              <ul>
+                <li><a href="#advantages">Advantages</a></li>
+                <li><a href="#challenges">Challenges</a></li>
+              </ul>
+            </li>
+            <li><a href="#feasibility">Feasibility</a></li>
             <li><a href="#conclusion">Conclusion</a></li>
           </ul>
         </li>
