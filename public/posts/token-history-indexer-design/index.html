@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        :root {
+            --accent-color: #FF4D4D;
+        }
+    </style>
+
+    
+    
+    
+    
+    
+    
+
+    
+    <title>Solana Token Transfer Indexer: Design</title>
+    <meta name="description" content="A design doc for token history indexer">
+    <meta name="keywords" content='blog, gokarna, hugo, solana, rust, transaction-indexer, radar-hackathon'>
+
+    <meta property="og:url" content="http://localhost:1313/posts/token-history-indexer-design/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Solana Token Transfer Indexer: Design">
+    <meta property="og:description" content="A design doc for token history indexer">
+    <meta property="og:image" content="http://localhost:1313/images/avatar.webp">
+    <meta property="og:image:secure_url" content="http://localhost:1313/images/avatar.webp">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Solana Token Transfer Indexer: Design">
+    <meta name="twitter:description" content="A design doc for token history indexer">
+    <meta property="twitter:domain" content="http://localhost:1313/posts/token-history-indexer-design/">
+    <meta property="twitter:url" content="http://localhost:1313/posts/token-history-indexer-design/">
+    <meta name="twitter:image" content="http://localhost:1313/images/avatar.webp">
+
+    
+    <link rel="canonical" href="http://localhost:1313/posts/token-history-indexer-design/">
+
+    
+    <link rel="stylesheet" type="text/css" href="/css/normalize.min.css" media="print">
+
+    
+    <link rel="stylesheet" type="text/css" href="/css/main.min.css">
+
+    
+    <link id="dark-theme" rel="stylesheet" href="/css/dark.min.css">
+
+    
+    <script src="/js/bundle.min.9a920d7dabdbad8363b6a0a94e29a9dfebdb7ee64cfcb193a0145e512ef2bdab.js" integrity="sha256-mpINfavbrYNjtqCpTimp3&#43;vbfuZM/LGToBReUS7yvas="></script>
+
+    
+    
+        <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css" integrity="sha384-Xi8rHCmBmhbuyyhbI88391ZKP2dmfnOl4rT9ZfRI7mLTdk1wblIUnrIq35nqwEvC" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js" integrity="sha384-X/XCfMm41VSsqRNQgDerQczD69XqmjOOOwYQvr/uuC+j4OPoNhVgjdGFwhvN02Ja" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          // customised options
+          // • auto-render specific keys, e.g.:
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+          ],
+          // • rendering keys, e.g.:
+          throwOnError : false
+        });
+      });
+    </script>
+  
+    
+</head>
+<body>
+        <script>
+            
+            setThemeByUserPref();
+        </script><header class="header">
+    <nav class="header-nav">
+
+        
+        <div class="avatar">
+            <a href="http://localhost:1313/">
+                <img src='/images/avatar.webp' alt="avatar">
+            </a>
+        </div>
+        
+
+        <div class="nav-title">
+            <a class="nav-brand" href="http://localhost:1313/">nikhil acharya</a>
+        </div>
+
+        <div class="nav-links">
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/"><span data-feather='home'></span> Home </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/posts/"><span data-feather='book'></span> Posts </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/about/"><span data-feather='code'></span> About me </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="http://localhost:1313/tags/"><span data-feather='tag'></span> Tags </a>
+            </div>
+            
+            <div class="nav-link">
+                <a href="https://tiplink.io/blinks/donate?dest=BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe&amp;mint=usdc"><span data-feather='coffee'></span>  </a>
+            </div>
+            
+
+            <span class="nav-icons-divider"></span>
+            <div class="nav-link dark-theme-toggle">
+                <span class="sr-only dark-theme-toggle-screen-reader-target"></span>
+                <a>
+                    <span class="theme-toggle-icon" data-feather="moon"></span>
+                </a>
+            </div>
+
+            <div class="nav-link" id="hamburger-menu-toggle">
+                <span class="sr-only hamburger-menu-toggle-screen-reader-target">menu</span>
+                <a>
+                    <span data-feather="menu"></span>
+                </a>
+            </div>
+
+            
+            <ul class="nav-hamburger-list visibility-hidden">
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/"><span data-feather='home'></span> Home </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/posts/"><span data-feather='book'></span> Posts </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/about/"><span data-feather='code'></span> About me </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="http://localhost:1313/tags/"><span data-feather='tag'></span> Tags </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="https://tiplink.io/blinks/donate?dest=BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe&amp;mint=usdc"><span data-feather='coffee'></span>  </a>
+                </li>
+                
+                <li class="nav-item dark-theme-toggle">
+                    <span class="sr-only dark-theme-toggle-screen-reader-target">theme</span>
+                    <a>
+                        <span class="theme-toggle-icon" data-feather="moon"></span>
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+</header>
+<main id="content">
+    <div class="post container">
+    <div class="post-header-section">
+        <h1>Solana Token Transfer Indexer: Design</h1>
+        <small role="doc-subtitle">A design doc for token history indexer</small>
+        <p class="post-date">August 23, 2024
+        
+        </p>
+
+        <ul class="post-tags">
+        
+            <li class="post-tag"><a href="http://localhost:1313/tags/solana">solana</a></li>
+        
+            <li class="post-tag"><a href="http://localhost:1313/tags/rust">rust</a></li>
+        
+            <li class="post-tag"><a href="http://localhost:1313/tags/transaction-indexer">transaction-indexer</a></li>
+        
+            <li class="post-tag"><a href="http://localhost:1313/tags/radar-hackathon">radar-hackathon</a></li>
+        
+        </ul>
+    </div>
+
+    <div class="post-content">
+        <h2 id="introduction">Introduction</h2>
+<p>In order to design an token transaction indexer, I will compare two existing indexers currently in operation at Helius: DAS (Digital Asset RPC Infrastructure) and Photon and cherry pick some of its features.</p>
+<ul>
+<li><strong>DAS</strong> is used to index all digital assets on Solana, including Tokens, NFTs, and cNFTs. You can explore more about DAS <a href="https://github.com/helius-labs/digital-asset-rpc-infrastructure">here</a>.</li>
+<li><strong>Photon</strong> is a new indexer launched by Helius to store compressed accounts. More details can be found <a href="https://docs.helius.dev/zk-compression-and-photon-api/what-is-zk-compression-and-photon">here</a>.</li>
+</ul>
+<h2 id="das-vs-photon">DAS vs Photon</h2>
+<h3 id="streaming-mechanism">Streaming Mechanism</h3>
+<ul>
+<li><strong>DAS</strong>: Uses a custom Geyser plugin to stream accounts and transactions into its indexer. This plugin is specific to DAS and can be found <a href="https://github.com/helius-labs/digital-asset-validator-plugin">here</a>.</li>
+<li><strong>Photon</strong>: Utilizes the <a href="https://github.com/helius-labs/yellowstone-grpc">yellowstone-grpc</a> gRPC Geyser plugin to stream accounts and transactions.</li>
+</ul>
+<h3 id="message-buffering">Message Buffering</h3>
+<ul>
+<li><strong>DAS</strong>: Uses Redis streams as a message buffer, necessitating the running of a Redis server.</li>
+<li><strong>Photon</strong>: Leverages Rust&rsquo;s stream primitives to stream data from Geyser. It fetches blocks concurrently and indexes them serially.</li>
+</ul>
+<h3 id="data-backfilling">Data Backfilling</h3>
+<ul>
+<li><strong>DAS</strong>: Requires a Geyser restart to perform data backfilling.</li>
+<li><strong>Photon</strong>: Employs polling via RPC calls and auto-healing techniques to fill gaps automatically.</li>
+</ul>
+<h3 id="code-structure">Code Structure</h3>
+<ul>
+<li><strong>DAS</strong>: Has multiple binaries, one for the indexer and another for the API.</li>
+<li><strong>Photon</strong>: Consolidates functionality into a single binary, which can be run in multiple modes.</li>
+</ul>
+<h3 id="database-and-apis">Database and APIs</h3>
+<ul>
+<li><strong>Database</strong>: Both use Postgres as their database.</li>
+<li><strong>API</strong>: Both use JSON RPCs for their APIs.</li>
+</ul>
+<h2 id="design-choices-for-the-transaction-indexer">Design Choices for the Transaction Indexer</h2>
+<h3 id="streaming-mechanism-1">Streaming Mechanism</h3>
+<ul>
+<li>The Transaction Indexer will use the gRPC Geyser plugin to stream transactions from the TokenKeg and Token2022 programs. This is a natural choice given the existing infrastructure.</li>
+</ul>
+<h3 id="polling-and-backfilling">Polling and Backfilling</h3>
+<ul>
+<li>Like Photon, the Transaction Indexer will use polling via RPC as a fallback mechanism to fill in any gaps in the data.</li>
+</ul>
+<h3 id="message-passing">Message Passing</h3>
+<ul>
+<li>Given the expected volume of updates, I will use <code>mpsc</code> channels for message passing between the polling logic and the indexing logic. This approach is similar to using Redis streams and will help minimize indexing latencies.</li>
+</ul>
+<h3 id="code-structure-1">Code Structure</h3>
+<ul>
+<li>The indexer will be split into two binaries: one for indexing and another for the API. This separation keeps the API and indexing logic isolated and easier to manage.</li>
+</ul>
+<h3 id="database-choice">Database Choice</h3>
+<ul>
+<li>I will use <strong>TimescaleDB</strong> instead of vanilla Postgres. The reasons for this choice are detailed in the next section.</li>
+</ul>
+<h3 id="api-format">API Format</h3>
+<ul>
+<li>Like both DAS and Photon, the Transaction Indexer will use JSON RPCs.</li>
+</ul>
+<h2 id="timescaledb">TimescaleDB</h2>
+<h3 id="what-is-timescaledb">What is TimescaleDB?</h3>
+<p>TimescaleDB is a time-series database built on top of Postgres. It offers powerful features like automatic partitioning, compression, and scaling, making it well-suited for handling time-series data.</p>
+<h3 id="why-use-timescaledb-for-the-transaction-indexer">Why Use TimescaleDB for the Transaction Indexer?</h3>
+<ul>
+<li><strong>Performance</strong>: TimescaleDB&rsquo;s optimizations for time-series data make it ideal for indexing transactions, which inherently involve time-based data.</li>
+<li><strong>Scalability</strong>: As transaction volume grows, TimescaleDB can scale efficiently, handling large datasets with ease.</li>
+<li><strong>Flexibility</strong>: TimescaleDB allows for preserving history for a defined period (e.g., 3 months) while still enabling custom access to data from the genesis block.</li>
+</ul>
+<h3 id="why-not-use-clickhouse">Why Not Use ClickHouse?</h3>
+<ul>
+<li>While ClickHouse is another popular choice for time-series data, TimescaleDB&rsquo;s integration with Postgres provides a smoother transition for projects already using Postgres. Additionally, TimescaleDB&rsquo;s native support for SQL and compatibility with Postgres tooling is advantageous.</li>
+</ul>
+<h3 id="db-schema">DB schema</h3>
+<h3 id="blocks-table">Blocks Table</h3>
+<ul>
+<li>
+<p><strong>Purpose</strong>: Tracks the blocks indexed and identifies gaps for automatic backfilling.</p>
+</li>
+<li>
+<p><strong>Columns</strong>:</p>
+<ul>
+<li><code>slot</code>: bigint</li>
+<li><code>parent_slot</code>: bigint</li>
+<li><code>block_height</code>: bigint</li>
+<li><code>block_time</code>: bigint</li>
+</ul>
+</li>
+<li>
+<p><strong>Indexes</strong>:</p>
+<ul>
+<li>Primary Key: <code>slot, block_time</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="token-transfers-table">Token Transfers Table</h3>
+<ul>
+<li>
+<p><strong>Purpose</strong>: Indexes all token transfer instructions and associated data.</p>
+</li>
+<li>
+<p><strong>Columns</strong>:</p>
+<ul>
+<li><code>signature</code>: bytea</li>
+<li><code>source_address</code>: bytea</li>
+<li><code>program_id</code>: bytea</li>
+<li><code>destination_address</code>: bytea</li>
+<li><code>source_ata</code>: bytea (nullable)</li>
+<li><code>destination_ata</code>: bytea (nullable)</li>
+<li><code>mint_address</code>: bytea (nullable)</li>
+<li><code>slot</code>: bigint</li>
+<li><code>amount</code>: bigint</li>
+<li><code>error</code>: text (nullable)</li>
+<li><code>block_time</code>: timestamp with time zone</li>
+<li><code>created_at</code>: timestamp without time zone</li>
+</ul>
+</li>
+<li>
+<p><strong>Indexes</strong>:</p>
+<ul>
+<li>Primary Key: <code>signature, source_address, destination_address, block_time</code></li>
+</ul>
+</li>
+</ul>
+<p>The token_transfers table records token transfer transactions. It includes the signature of the transaction, the addresses involved (source_address, destination_address), and other details like program_id, slot, amount, and any potential error messages. The table also records the slot and block_time timestamp of when the transfer was created.</p>
+<p>The <code>blocks</code> table is used to keep track of indexed blocks and to automatically backfill any gaps. The <code>token_transfers</code> table records token transfer transactions, including details like the involved addresses, program ID, slot, amount, and timestamps. The focus is on indexing only the Token and TokenExtensions programs, keeping the schema simple and targeted.</p>
+<h3 id="apis">APIs</h3>
+<p>I will start off with 2 APIs</p>
+<h4 id="gettransactionsbyaddress">GetTransactionsByAddress</h4>
+<p>This endpoint retrieves a list of transactions filtered by a source address, and optionally by destination address or mint address. The results can be paginated and sorted based on the provided parameters.</p>
+<p>Request</p>
+<pre tabindex="0"><code>{
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: &#34;0&#34;,
+    &#34;method&#34;: &#34;get_transactions_by_address&#34;,
+    &#34;params&#34;: {
+        &#34;source&#34;: &#34;string&#34;,                     // Public key of the source address (required)
+        &#34;destination&#34;: &#34;string&#34;,                // Public key of the destination address (optional)
+        &#34;mint&#34;: &#34;string&#34;,                       // Public key of the mint address (optional)
+        &#34;limit&#34;: &#34;u32&#34;,                         // Limit on the number of transactions returned (optional)
+        &#34;page&#34;: &#34;u32&#34;,                          // Page number for pagination (optional)
+        &#34;before&#34;: &#34;string&#34;,                     // Filter transactions before this date (dd/mm/yyyy format, optional)
+        &#34;after&#34;: &#34;string&#34;,                      // Filter transactions after this date (dd/mm/yyyy format, optional)
+        &#34;sort_by&#34;: {                            // Sorting options (optional)
+            &#34;sort_by&#34;: &#34;TransactionSortBy&#34;,     // Field to sort by, default is &#34;slot&#34;
+            &#34;sort_direction&#34;: &#34;TransactionSortDirection&#34; // Sorting direction, default is &#34;desc&#34;
+        }
+    }
+}
+</code></pre><h4 id="gettransactionsbymint">GetTransactionsByMint</h4>
+<p>This endpoint retrieves a list of transactions filtered by a mint address. The results can be paginated and sorted based on the provided parameters.</p>
+<pre tabindex="0"><code>{
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: &#34;0&#34;,
+    &#34;method&#34;: &#34;get_transactions_by_mint&#34;,
+    &#34;params&#34;: {
+        &#34;mint&#34;: &#34;string&#34;,                       // Public key of the mint address (required)
+        &#34;limit&#34;: &#34;u32&#34;,                         // Limit on the number of transactions returned (optional)
+        &#34;page&#34;: &#34;u32&#34;,                          // Page number for pagination (optional)
+        &#34;before&#34;: &#34;string&#34;,                     // Filter transactions before this date (dd/mm/yyyy format, optional)
+        &#34;after&#34;: &#34;string&#34;,                      // Filter transactions after this date (dd/mm/yyyy format, optional)
+        &#34;sort_by&#34;: {                            // Sorting options (optional)
+            &#34;sort_by&#34;: &#34;TransactionSortBy&#34;,     // Field to sort by, default is &#34;slot&#34;
+            &#34;sort_direction&#34;: &#34;TransactionSortDirection&#34; // Sorting direction, default is &#34;desc&#34;
+        }
+    }
+}
+</code></pre><h3 id="response-schema">Response schema</h3>
+<pre tabindex="0"><code>{
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;result&#34;: {
+        &#34;total&#34;: &#34;u32&#34;,                        // Total number of transactions found
+        &#34;limit&#34;: &#34;u32&#34;,                        // Limit on the number of transactions returned
+        &#34;page&#34;: &#34;u32&#34;,                         // Current page number
+        &#34;items&#34;: [                             // List of transaction items
+            {
+                &#34;signature&#34;: &#34;string&#34;,          // Transaction signature
+                &#34;source_address&#34;: &#34;string&#34;,     // Public key of the source address
+                &#34;program_address&#34;: &#34;string&#34;,    // Public key of the program address
+                &#34;destination_address&#34;: &#34;string&#34;,// Public key of the destination address
+                &#34;source_ata&#34;: &#34;string&#34;,         // Associated token account of the source address
+                &#34;destination_ata&#34;: &#34;string&#34;,    // Associated token account of the destination address
+                &#34;mint_address&#34;: &#34;string&#34;,       // Public key of the mint address
+                &#34;slot&#34;: &#34;u64&#34;,                  // Slot number of the transaction
+                &#34;amount&#34;: &#34;u64&#34;,                // Amount transferred in the transaction
+                &#34;block_time&#34;: &#34;string&#34;          // Block time of the transaction (ISO 8601 format)
+            }
+        ]
+    },
+    &#34;id&#34;: &#34;0&#34;
+}
+</code></pre>
+        
+    </div>
+
+    <div class="prev-next">
+        
+    </div>
+
+    
+    
+    <svg id="btt-button" class="arrow-logo" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512" onclick="scrollToTop()" title="Go to top">
+        
+        <path d="M177 159.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 255.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 329.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1z"/>
+    </svg>
+    <script>
+        let backToTopButton = document.getElementById("btt-button");
+
+        window.onscroll = function() {
+            scrollFunction()
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                backToTopButton.style.display = "block";
+            } else {
+                backToTopButton.style.display = "none";
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo(0, 0);
+        }
+    </script>
+    
+    
+</div>
+
+<aside class="post-toc">
+    <nav id="toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#das-vs-photon">DAS vs Photon</a>
+          <ul>
+            <li><a href="#streaming-mechanism">Streaming Mechanism</a></li>
+            <li><a href="#message-buffering">Message Buffering</a></li>
+            <li><a href="#data-backfilling">Data Backfilling</a></li>
+            <li><a href="#code-structure">Code Structure</a></li>
+            <li><a href="#database-and-apis">Database and APIs</a></li>
+          </ul>
+        </li>
+        <li><a href="#design-choices-for-the-transaction-indexer">Design Choices for the Transaction Indexer</a>
+          <ul>
+            <li><a href="#streaming-mechanism-1">Streaming Mechanism</a></li>
+            <li><a href="#polling-and-backfilling">Polling and Backfilling</a></li>
+            <li><a href="#message-passing">Message Passing</a></li>
+            <li><a href="#code-structure-1">Code Structure</a></li>
+            <li><a href="#database-choice">Database Choice</a></li>
+            <li><a href="#api-format">API Format</a></li>
+          </ul>
+        </li>
+        <li><a href="#timescaledb">TimescaleDB</a>
+          <ul>
+            <li><a href="#what-is-timescaledb">What is TimescaleDB?</a></li>
+            <li><a href="#why-use-timescaledb-for-the-transaction-indexer">Why Use TimescaleDB for the Transaction Indexer?</a></li>
+            <li><a href="#why-not-use-clickhouse">Why Not Use ClickHouse?</a></li>
+            <li><a href="#db-schema">DB schema</a></li>
+            <li><a href="#blocks-table">Blocks Table</a></li>
+            <li><a href="#token-transfers-table">Token Transfers Table</a></li>
+            <li><a href="#apis">APIs</a>
+              <ul>
+                <li><a href="#gettransactionsbyaddress">GetTransactionsByAddress</a></li>
+                <li><a href="#gettransactionsbymint">GetTransactionsByMint</a></li>
+              </ul>
+            </li>
+            <li><a href="#response-schema">Response schema</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </nav>
+</aside>
+
+
+
+    
+
+        </main><footer class="footer">
+    
+    
+</footer></body>
+</html>

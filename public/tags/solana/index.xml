@@ -6,8 +6,15 @@
     <description>Recent content in Solana on nikhil acharya</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 23 Aug 2024 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 23 Aug 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/solana/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Solana Token Transfer Indexer: Design</title>
+      <link>http://localhost:1313/posts/token-history-indexer-design/</link>
+      <pubDate>Fri, 23 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/token-history-indexer-design/</guid>
+      <description>Introduction In order to design an token transaction indexer, I will compare two existing indexers currently in operation at Helius: DAS (Digital Asset RPC Infrastructure) and Photon and cherry pick some of its features.&#xA;DAS is used to index all digital assets on Solana, including Tokens, NFTs, and cNFTs. You can explore more about DAS here. Photon is a new indexer launched by Helius to store compressed accounts. More details can be found here.</description>
+    </item>
     <item>
       <title>Unikernels and Solana: A Hypothetical Exploration</title>
       <link>http://localhost:1313/posts/using-unikernels-in-solana/</link>
