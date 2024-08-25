@@ -68,7 +68,10 @@ TimescaleDB is a time-series database built on top of Postgres. It offers powerf
 - **Flexibility**: TimescaleDB allows for preserving history for a defined period (e.g., 3 months) while still enabling custom access to data from the genesis block.
 
 ### Why Not Use ClickHouse?
-- While ClickHouse is another popular choice for time-series data, TimescaleDB's integration with Postgres provides a smoother transition for projects already using Postgres. Additionally, TimescaleDB's native support for SQL and compatibility with Postgres tooling is advantageous.
+- While [ClickHouse](https://clickhouse.com/) is another popular choice for time-series data, TimescaleDB's integration with Postgres provides a smoother transition for projects already using Postgres. Additionally, TimescaleDB's native support for SQL and compatibility with Postgres tooling is advantageous.
+
+I also referred this doc[https://www.timescale.com/blog/what-is-clickhouse-how-does-it-compare-to-postgresql-and-timescaledb-and-how-does-it-perform-for-time-series-data/] which compares the performance of Timescale DB and Clickhouse and based on their findings, I will be using Timescale DB
+
 
 ### DB schema 
 
@@ -106,6 +109,8 @@ TimescaleDB is a time-series database built on top of Postgres. It offers powerf
 The token_transfers table records token transfer transactions. It includes the signature of the transaction, the addresses involved (source_address, destination_address), and other details like program_id, slot, amount, and any potential error messages. The table also records the slot and block_time timestamp of when the transfer was created.
 
 The `blocks` table is used to keep track of indexed blocks and to automatically backfill any gaps. The `token_transfers` table records token transfer transactions, including details like the involved addresses, program ID, slot, amount, and timestamps. The focus is on indexing only the Token and TokenExtensions programs, keeping the schema simple and targeted.
+
+Also, the `token_transfers` table will be a hypertable and compression feature will be used to compress data older than 3 months.
 
 ### APIs 
 
