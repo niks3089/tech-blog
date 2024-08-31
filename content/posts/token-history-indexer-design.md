@@ -153,14 +153,14 @@ Response
         "items": [                             // List of transaction items
             {
                 "signature": "string",          // Transaction signature
-                "source_address": "string",     // Public key of the source address
                 "program_address": "string",    // Public key of the program address
+                "mint_address": "string",       // Public key of the mint address
+                "source_address": "string",     // Public key of the source address
                 "destination_address": "string",// Public key of the destination address
                 "source_ata": "string",         // Associated token account of the source address
                 "destination_ata": "string",    // Associated token account of the destination address
-                "mint_address": "string",       // Public key of the mint address
-                "slot": "u64",                  // Slot number of the transaction
                 "amount": "u64",                // Amount transferred in the transaction
+                "slot": "u64",                  // Slot number of the transaction
                 "block_time": "string"          // Block time of the transaction (ISO 8601 format)
             }
         ]
