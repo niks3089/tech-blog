@@ -1,6 +1,6 @@
 ---
 title: "Solana Token Transfer Indexer: Design"
-date: 2024-08-23T00:00:00+00:00
+date: 2024-08-31T00:00:00+00:00
 description: "A design doc for token history indexer"
 tags: ["solana", "rust", "transaction-indexer", "radar-hackathon"]
 type: post
@@ -114,21 +114,20 @@ Also, the `token_transfers` table will be a hypertable and compression feature w
 
 ### APIs 
 
-I will start off with 2 APIs
+We're going to just 1 single API to retrive transaction data
 
 #### GetTransactionsByAddress
 
-This endpoint retrieves a list of transactions filtered by a source address, and optionally by destination address or mint address. The results can be paginated and sorted based on the provided parameters.
+This endpoint retrieves a list of transactions filtered by a source address and/or destination address or mint address. The results can be paginated and sorted based on the provided parameters.
 
-Request 
-
+Request
 ```
 {
     "jsonrpc": "2.0",
     "id": "0",
     "method": "get_transactions_by_address",
     "params": {
-        "source": "string",                     // Public key of the source address (required)
+        "source": "string",                     // Public key of the source address (optional)
         "destination": "string",                // Public key of the destination address (optional)
         "mint": "string",                       // Public key of the mint address (optional)
         "limit": "u32",                         // Limit on the number of transactions returned (optional)
@@ -143,31 +142,7 @@ Request
 }
 ```
 
-#### GetTransactionsByMint
-
-This endpoint retrieves a list of transactions filtered by a mint address. The results can be paginated and sorted based on the provided parameters.
-
-```
-{
-    "jsonrpc": "2.0",
-    "id": "0",
-    "method": "get_transactions_by_mint",
-    "params": {
-        "mint": "string",                       // Public key of the mint address (required)
-        "limit": "u32",                         // Limit on the number of transactions returned (optional)
-        "page": "u32",                          // Page number for pagination (optional)
-        "before": "string",                     // Filter transactions before this date (dd/mm/yyyy format, optional)
-        "after": "string",                      // Filter transactions after this date (dd/mm/yyyy format, optional)
-        "sort_by": {                            // Sorting options (optional)
-            "sort_by": "TransactionSortBy",     // Field to sort by, default is "slot"
-            "sort_direction": "TransactionSortDirection" // Sorting direction, default is "desc"
-        }
-    }
-}
-```
-
-### Response schema 
-
+Response
 ```
 {
     "jsonrpc": "2.0",

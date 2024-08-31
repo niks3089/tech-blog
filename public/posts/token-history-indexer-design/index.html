@@ -169,7 +169,7 @@
     <div class="post-header-section">
         <h1>Solana Token Transfer Indexer: Design</h1>
         <small role="doc-subtitle">A design doc for token history indexer</small>
-        <p class="post-date">August 23, 2024
+        <p class="post-date">August 31, 2024
         
         </p>
 
@@ -313,16 +313,16 @@
 <p>The <code>blocks</code> table is used to keep track of indexed blocks and to automatically backfill any gaps. The <code>token_transfers</code> table records token transfer transactions, including details like the involved addresses, program ID, slot, amount, and timestamps. The focus is on indexing only the Token and TokenExtensions programs, keeping the schema simple and targeted.</p>
 <p>Also, the <code>token_transfers</code> table will be a hypertable and compression feature will be used to compress data older than 3 months.</p>
 <h3 id="apis">APIs</h3>
-<p>I will start off with 2 APIs</p>
+<p>We&rsquo;re going to just 1 single API to retrive transaction data</p>
 <h4 id="gettransactionsbyaddress">GetTransactionsByAddress</h4>
-<p>This endpoint retrieves a list of transactions filtered by a source address, and optionally by destination address or mint address. The results can be paginated and sorted based on the provided parameters.</p>
+<p>This endpoint retrieves a list of transactions filtered by a source address and/or destination address or mint address. The results can be paginated and sorted based on the provided parameters.</p>
 <p>Request</p>
 <pre tabindex="0"><code>{
     &#34;jsonrpc&#34;: &#34;2.0&#34;,
     &#34;id&#34;: &#34;0&#34;,
     &#34;method&#34;: &#34;get_transactions_by_address&#34;,
     &#34;params&#34;: {
-        &#34;source&#34;: &#34;string&#34;,                     // Public key of the source address (required)
+        &#34;source&#34;: &#34;string&#34;,                     // Public key of the source address (optional)
         &#34;destination&#34;: &#34;string&#34;,                // Public key of the destination address (optional)
         &#34;mint&#34;: &#34;string&#34;,                       // Public key of the mint address (optional)
         &#34;limit&#34;: &#34;u32&#34;,                         // Limit on the number of transactions returned (optional)
@@ -335,25 +335,7 @@
         }
     }
 }
-</code></pre><h4 id="gettransactionsbymint">GetTransactionsByMint</h4>
-<p>This endpoint retrieves a list of transactions filtered by a mint address. The results can be paginated and sorted based on the provided parameters.</p>
-<pre tabindex="0"><code>{
-    &#34;jsonrpc&#34;: &#34;2.0&#34;,
-    &#34;id&#34;: &#34;0&#34;,
-    &#34;method&#34;: &#34;get_transactions_by_mint&#34;,
-    &#34;params&#34;: {
-        &#34;mint&#34;: &#34;string&#34;,                       // Public key of the mint address (required)
-        &#34;limit&#34;: &#34;u32&#34;,                         // Limit on the number of transactions returned (optional)
-        &#34;page&#34;: &#34;u32&#34;,                          // Page number for pagination (optional)
-        &#34;before&#34;: &#34;string&#34;,                     // Filter transactions before this date (dd/mm/yyyy format, optional)
-        &#34;after&#34;: &#34;string&#34;,                      // Filter transactions after this date (dd/mm/yyyy format, optional)
-        &#34;sort_by&#34;: {                            // Sorting options (optional)
-            &#34;sort_by&#34;: &#34;TransactionSortBy&#34;,     // Field to sort by, default is &#34;slot&#34;
-            &#34;sort_direction&#34;: &#34;TransactionSortDirection&#34; // Sorting direction, default is &#34;desc&#34;
-        }
-    }
-}
-</code></pre><h3 id="response-schema">Response schema</h3>
+</code></pre><p>Response</p>
 <pre tabindex="0"><code>{
     &#34;jsonrpc&#34;: &#34;2.0&#34;,
     &#34;result&#34;: {
@@ -451,10 +433,8 @@
             <li><a href="#apis">APIs</a>
               <ul>
                 <li><a href="#gettransactionsbyaddress">GetTransactionsByAddress</a></li>
-                <li><a href="#gettransactionsbymint">GetTransactionsByMint</a></li>
               </ul>
             </li>
-            <li><a href="#response-schema">Response schema</a></li>
           </ul>
         </li>
       </ul>
