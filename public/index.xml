@@ -6,8 +6,15 @@
     <description>Recent content on nikhil acharya</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 31 Aug 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 20 Oct 2024 00:00:00 +0800</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Principal Engineer</title>
+      <link>http://localhost:1313/posts/principal-engineer/</link>
+      <pubDate>Sun, 20 Oct 2024 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/posts/principal-engineer/</guid>
+      <description>Role of a Principal Engineer Technical Leadership Deep Technical Expertise: Principal Engineers are expected to be experts in their technical domain. This includes not only being highly skilled in coding and architecture but also understanding system design, scalability, and long-term technical strategy. Innovation and Problem-Solving: They should be able to solve the most challenging technical problems in the organization, innovate new ways of solving issues, and drive the adoption of cutting-edge technologies when appropriate.</description>
+    </item>
     <item>
       <title>Solana Token Transfer Indexer: Design</title>
       <link>http://localhost:1313/posts/token-history-indexer-design/</link>
