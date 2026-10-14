@@ -11,8 +11,10 @@ pygmentsStyle = "monokai"
 
 [params]
   footer = "The Marauders"
-  description = "Code in hand, innovation ahead, and success within"
-  avatarURL = "/images/avatar.webp"
+  description = "Principal engineer in Bangalore. Rust, Solana infra, distributed systems."
+  avatarURL = "/images/avatar.jpg"
+  TipWallet = "BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe"
+  TipURL = "https://tiplink.io/blinks/donate?dest=BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe&mint=usdc"
   AvatarAltText = "avatar"
   avatarSize = "size-m"
   ShowBackToTopButton = true # true or false for "back to top" button on posts
@@ -42,36 +44,36 @@ pygmentsStyle = "monokai"
     {name = "github", url = "https://github.com/niks3089"},
     {name = "email", url = "mailto:niks3089@gmail.com"}
   ]
-  metaKeywords = ["blog", "gokarna", "hugo"]
+  metaKeywords = ["nikhil acharya", "solana", "rust", "distributed systems", "blog"]
 
 [menu]
   [[menu.main]]
-    name = "Home"
-    pre = "<span data-feather='home'></span>"
+    name = "~"
     url = "/"
     weight = 1
 
   [[menu.main]]
-    name = "Posts"
-    pre = "<span data-feather='book'></span>"
+    name = "posts"
     url = "/posts/"
     weight = 2
 
   [[menu.main]]
-    name = "About me"
-    pre = "<span data-feather='code'></span>"
-    url = "/about/"
+    name = "projects"
+    url = "/#projects"
     weight = 3
 
   [[menu.main]]
-    name = "Tags"
-    pre = "<span data-feather='tag'></span>"
-    url = "/tags/"
+    name = "whoami"
+    url = "/about/"
     weight = 4
 
   [[menu.main]]
-    identifier = "tip me"
-    pre = "<span data-feather='coffee'></span>"
+    name = "tags"
+    url = "/tags/"
+    weight = 5
+
+  [[menu.main]]
+    name = "tip ◎"
     url = "https://tiplink.io/blinks/donate?dest=BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe&mint=usdc"
     weight = 6
 

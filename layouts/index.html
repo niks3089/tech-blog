@@ -1,57 +1,70 @@
 {{ define "main" }}
-<section class="home-about">
-	<div class="avatar">
-        {{ if isset .Site.Params "avatarurl" }}
-        <img class={{ .Site.Params.AvatarSize | default "size-m" }} src='{{ .Scratch.Get "avatarImgSrc" }}' alt="{{ .Site.Params.AvatarAltText|default "avatar" }}">
-        {{ end }}
-	</div>
+<section class="term">
+<pre class="ascii" aria-label="nikhil">
+███╗   ██╗██╗██╗  ██╗██╗  ██╗██╗██╗
+████╗  ██║██║██║ ██╔╝██║  ██║██║██║
+██╔██╗ ██║██║█████╔╝ ███████║██║██║
+██║╚██╗██║██║██╔═██╗ ██╔══██║██║██║
+██║ ╚████║██║██║  ██╗██║  ██║██║███████╗
+╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚══════╝</pre>
+<p class="dim">Last login: {{ now.Format "Mon Jan 2 15:04" }} on tty1 from 127.0.0.1 &middot; built with hugo</p>
 
-    <h1>{{ .Site.Title }}</h1>
-    {{ if isset .Site.Params "description" }}
-        <h3>{{ .Site.Params.Description }}</h3>
-    {{ end }}
+<p class="cmd">whoami</p>
+<p><strong>Nikhil Acharya Prakash</strong>. Principal engineer, 13+ years shipping systems software:
+networking, serverless, and since 2023, Solana infra. Rust by default, Go when it's simpler.</p>
 
+<p class="cmd">neofetch</p>
+<div class="neofetch">
+    <img src='{{ .Scratch.Get "avatarImgSrc" }}' alt="Illustration of Bangalore: BMS College, Vidyarthi Bhavan, a temple and Lalbagh lake">
+    <dl>
+        <dt>nikhil@blr</dt><dd class="rule">----------</dd>
+        <dt>Host</dt><dd>Bangalore, IN</dd>
+        <dt>Chain</dt><dd>solana mainnet-beta</dd>
+        <dt>Epoch</dt><dd id="sol-epoch">syncing&hellip;</dd>
+        <dt>Slot</dt><dd id="sol-slot">syncing&hellip;</dd>
+        <dt>Shell</dt><dd>rust, go, typescript, c</dd>
+        <dt>Uptime</dt><dd>13+ years in prod</dd>
+        <dt>Prev</dt><dd>Helius, DigitalOcean, Nimbella, Arista, IBM Research</dd>
+    </dl>
+</div>
+
+<p class="cmd">ls -l ~/projects</p>
+{{ partial "projects.html" . }}
+
+<p class="cmd">ls -lt ~/posts | head -5</p>
+<ul class="ls">
+{{ range first 5 (where .Site.RegularPages "Params.type" "post").ByDate.Reverse }}
+    <li><span class="dim">{{ .Date.Format "Jan 02 2006" }}</span> <a href="{{ .Permalink }}">{{ .File.BaseFileName }}.md</a></li>
+{{ end }}
+</ul>
+
+<p class="cmd">cat ~/.contact</p>
+<ul class="ls">
+{{ range .Site.Params.SocialIcons }}
+    <li><span class="dim">{{ .name }}</span> <a href="{{ .url }}">{{ .url | replaceRE "^(https?://|mailto:)(www\\.)?" "" }}</a></li>
+{{ end }}
+</ul>
+
+<p class="cmd">solana transfer {{ .Site.Params.TipWallet }} 0.1 <span class="dim"># tips in SOL/USDC, gm</span></p>
+<p><a href="{{ .Site.Params.TipURL }}">[ send a tip via tiplink ]</a></p>
+
+<p class="cmd"><span class="cursor">&#9608;</span></p>
 </section>
 
-<div class="flex-break"></div>
-
-{{ if isset .Site.Params "socialicons" }}
-<div class="social-icons">
-    <ul class="social-icons-list">
-        {{ range .Site.Params.SocialIcons }}
-        <li class="social-icon">
-            <a href="{{ .url }}" {{ if .rel }}rel="{{ .rel }}"{{ end }} aria-label="Learn more on {{ .name }}">
-                <img class="svg-inject" src="/svg/icons/{{ .name }}.svg" alt="">
-            </a>
-        </li>
-        {{ end }}
-    </ul>
-</div>
-{{ end }}
-
-{{ if os.FileExists "index-about.md" }}
-<div class="markdown-content">
-    {{ readFile "index-about.md" | markdownify }}
-</div>
-{{ end }}
-
-{{ if isset .Site.Params "showpostsonhomepage" }}
-
-    <div class="home-posts list-posts">
-        <h2>{{ i18n (.Site.Params.ShowPostsOnHomePage | humanize) }} Posts</h2>
-
-    {{ $posts := where .Site.Pages "Params.type" "post" }}
-
-    {{ if eq .Site.Params.ShowPostsOnHomePage "popular" }}
-        {{ range $posts.ByWeight | first 4 }}
-            {{- partial "list-posts.html" . -}}
-        {{ end }}
-    {{ else if eq .Site.Params.ShowPostsOnHomePage "recent" }}
-        {{ range $posts.ByDate.Reverse | first 4 }}
-            {{- partial "list-posts.html" . -}}
-        {{ end }}
-    {{ end }}
-    </div>
-
-{{ end }}
+<script>
+// ponytail: keyless public RPC (CORS *); if it rate-limits, the fields just say "offline"
+fetch("https://solana-rpc.publicnode.com", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getEpochInfo" })
+}).then(r => r.json()).then(({ result: e }) => {
+    const pct = e.slotIndex / e.slotsInEpoch, n = 20, done = Math.round(pct * n);
+    document.getElementById("sol-epoch").textContent =
+        `${e.epoch} [${"#".repeat(done)}${".".repeat(n - done)}] ${(pct * 100).toFixed(1)}%`;
+    document.getElementById("sol-slot").textContent = e.absoluteSlot.toLocaleString();
+}).catch(() => {
+    document.getElementById("sol-epoch").textContent = "offline";
+    document.getElementById("sol-slot").textContent = "offline";
+});
+</script>
 {{ end }}

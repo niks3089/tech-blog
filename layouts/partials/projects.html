@@ -1,0 +1,18 @@
+<div class="projects" id="projects">
+{{ range site.Data.projects.project }}
+    <article class="project">
+        <div class="project-head">
+            <span class="perm">drwxr-xr-x</span>
+            <a class="project-name" href="{{ .url | default .repo }}">{{ .name }}/</a>
+        </div>
+        <p>{{ .desc }}</p>
+        <div class="project-foot">
+            {{ range .tags }}<span class="tag">#{{ . }}</span> {{ end }}
+            <span class="project-links">
+                {{ with .url }}<a href="{{ . }}">[live]</a>{{ end }}
+                {{ with .repo }}<a href="{{ . }}">[src]</a>{{ end }}
+            </span>
+        </div>
+    </article>
+{{ end }}
+</div>

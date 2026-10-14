@@ -1,0 +1,38 @@
+# Rendered on the home page and /about via partials/projects.html
+[[project]]
+name = "pillar"
+url = "https://pillar.niks3089.com"
+repo = "https://github.com/niks3089/pillar"
+desc = "Ops platform for Solana validators. Install, monitor, self-heal and upgrade nodes, from one box up to a fleet. Two small Rust daemons and a web UI."
+tags = ["rust", "solana", "validators"]
+
+[[project]]
+name = "portfolio"
+url = "https://portfolio.niks3089.com"
+repo = "https://github.com/niks3089/solana-portfolio-tracker"
+desc = "Self-hosted multi-wallet Solana portfolio tracker. DeFi positions, trade-based P&L, XIRR, and an end-to-end encrypted vault keyed by your wallet signature."
+tags = ["solana", "defi", "typescript"]
+
+[[project]]
+name = "brigade"
+url = "https://brigade.niks3089.com"
+desc = "Crypto-native social network for Solana. Market conversation, non-custodial actions, creator rewards, token drops and a mini-app platform."
+tags = ["solana", "social", "nats"]
+
+[[project]]
+name = "techshorts"
+url = "https://techshorts.niks3089.com"
+desc = "Tech news in ~60 words. A Rust ingester that turns feeds into shorts across AI, crypto, dev and security, published to the web and Telegram."
+tags = ["rust", "gcp", "news"]
+
+[[project]]
+name = "itihas"
+repo = "https://github.com/niks3089/itihas"
+desc = "Solana transaction history indexer. The design is written up in the token-history posts on this blog."
+tags = ["rust", "solana", "indexer"]
+
+[[project]]
+name = "deep-learner"
+repo = "https://github.com/niks3089/deep-learner"
+desc = "Claude Code plugin that quizzes you on the codebase you're working in, graded against the actual code."
+tags = ["claude-code", "dx"]

@@ -1,5 +1,5 @@
 <footer class="footer">
-    <!-- Option for user to inject custom html -->
+    <span>-- {{ now.Year }} nikhil@blr &middot; <a href="https://github.com/niks3089/tech-blog">src</a> &middot; gm --</span>
     {{ if .Site.Params.CustomFooterHTML }}
     {{ .Site.Params.CustomFooterHTML | safeHTML }}
     {{ end }}
