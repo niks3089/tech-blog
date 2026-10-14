@@ -22,11 +22,6 @@ url = "https://techshorts.niks3089.com"
 desc = "Tech news in ~60 words, ingested and summarised in Rust."
 
 [[project]]
-name = "itihas"
-repo = "https://github.com/niks3089/itihas"
-desc = "Solana transaction history indexer."
-
-[[project]]
 name = "deep-learner"
 repo = "https://github.com/niks3089/deep-learner"
 desc = "Claude Code plugin that quizzes you on your own codebase."

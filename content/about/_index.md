@@ -25,7 +25,7 @@ I've been building on Solana full time since 2023.
 
 - **Solana Foundation (May 2026 onwards):** modernized Tokens, set up Kora on devnet and mainnet, built the trading infrastructure, and released a public RPC monitoring dashboard.
 - **Helius (2023 to 2026):** I joined as a founding engineer. I indexed compressed NFTs and NFTs as open standards, then regular tokens, token extensions and a new RWA indexer. I also built a global rate limiter and edge cache for RPC traffic, and worked on real-time gRPC and WebSocket streaming.
-- **Indexing:** I designed and wrote up a token transaction history indexer ([problem](/posts/token-history-problem-statement/), [design](/posts/token-history-indexer-design/)), and open-sourced [itihas](https://github.com/niks3089/itihas).
+- **Indexing:** I designed and wrote up a token transaction history indexer ([problem](/posts/token-history-problem-statement/), [design](/posts/token-history-indexer-design/)).
 - **Side projects:** [pillar](https://pillar.niks3089.com) for running validators, a self-custodial [portfolio tracker](https://portfolio.niks3089.com), and [brigade](https://brigade.niks3089.com), a crypto-native social app.
 - **Writing:** [staking SOL from India](/posts/staking-sol-in-india/), and [using unikernels in Solana](/posts/using-unikernels-in-solana/).
 
