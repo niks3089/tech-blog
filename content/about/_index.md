@@ -6,21 +6,24 @@ image: "/images/bangalore.jpg"
 ---
 
 ![Illustrated Bangalore: BMS College of Engineering, Vidyarthi Bhavan, Bull Temple, Lalbagh lake and the Glass House](/images/bangalore.jpg)
-*Basavanagudi, more or less. BMSCE, Vidyarthi Bhavan, Bull Temple, Lalbagh. Where I studied, and the city I still call home.*
+*Basavanagudi, Bangalore: BMSCE, Vidyarthi Bhavan, Bull Temple and Lalbagh.*
 
 [Solana Foundation](https://solana.org/) &middot; Bangalore, India &middot; [GitHub](https://github.com/niks3089) &middot; [LinkedIn](https://www.linkedin.com/in/nikhil-acharya-prakash-24a84719/) &middot; [Email](mailto:niks3089@gmail.com)
 
 ## Summary
-I'm a technical leader and software engineer with 15 years of experience building, owning and shipping systems software, from WAN acceleration and switch operating systems to unikernels, serverless platforms and, for the last few years, Solana.
+I build crypto infrastructure on Solana. I'm at the Solana Foundation, where I work on the systems the ecosystem leans on: token data, transaction relaying with Kora, RPC monitoring and trading infrastructure. Before that I was a founding engineer at Helius, indexing NFTs and tokens and scaling RPC for Solana developers.
 
-**Technology:** Solana, distributed systems, cloud-native services, serverless, systems software, networking  
+That comes on top of 15 years in systems software: WAN acceleration, switch operating systems, unikernels and serverless platforms. Most of what makes a chain usable is unglamorous infrastructure, and that's the part I like building.
+
+**Crypto:** Solana, RPC and indexing, token data, transaction relaying, trading and validator infrastructure  
+**Systems:** distributed systems, cloud-native services, serverless, networking  
 **Languages:** Rust, Go, TypeScript, Python, C/C++  
-**Leadership:** hiring, mentoring, decision making, planning, communication
+**Leadership:** engineering standards, on-call and incident process, hiring, mentoring
 
 ## Solana
 I've been building on Solana full time since 2023.
 
-- **Solana Foundation (May 2026 onwards):** now working on the ecosystem from the Foundation.
+- **Solana Foundation (May 2026 onwards):** modernized Tokens, set up Kora on devnet and mainnet, built the trading infrastructure, and released a public RPC monitoring dashboard.
 - **Helius (2023 to 2026):** I joined as a founding engineer. I indexed compressed NFTs and NFTs as open standards, then regular tokens, token extensions and a new RWA indexer. I also built a global rate limiter and edge cache for RPC traffic, and worked on real-time gRPC and WebSocket streaming.
 - **Indexing:** I designed and wrote up a token transaction history indexer ([problem](/posts/token-history-problem-statement/), [design](/posts/token-history-indexer-design/)), and open-sourced [itihas](https://github.com/niks3089/itihas).
 - **Side projects:** [pillar](https://pillar.niks3089.com) for running validators, a self-custodial [portfolio tracker](https://portfolio.niks3089.com), and [brigade](https://brigade.niks3089.com), a crypto-native social app.
@@ -30,6 +33,11 @@ Tips in SOL or USDC are welcome at `BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe
 
 ## Experience
 ### Solana Foundation (May 2026 - Present)
+- Modernized key products while cutting cost and vendor dependency. Led the Tokens rebuild, set up [Kora](https://github.com/solana-foundation/kora) on devnet and mainnet, and moved Breeze onto standard infrastructure. This cut data-processing costs and gave the Foundation more control over these products.
+- Designed and built the foundation of our trading infrastructure, with multi-region redundancy, monitoring and failover built in from day one.
+- Released a public [RPC monitoring](https://github.com/solana-foundation/rpc-latency-monitor) dashboard for RPC providers.
+- Set up a common engineering operating model: design, release and incident templates, on-call and escalation, and a "How to Build" guide used for onboarding.
+- Added monitoring and on-call coverage for operational gaps across products before they became customer-facing issues.
 
 ### Helius, Bangalore - Founding Engineer/Principal Engineer (March 2023 - May 2026)
 - Led the initial efforts for User Management for the Helius Developer portal, which required a complete revamp of our management system.
