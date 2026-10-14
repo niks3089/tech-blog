@@ -17,7 +17,7 @@ image: "/images/bangalore.jpg"
 ## DESCRIPTION
 Technical leader and software engineer with 13+ years building and owning systems software: WAN acceleration and DDoS mitigation, switch OS features, unikernels, serverless platforms, and, since 2023, Solana infrastructure.
 
-On-chain, that has meant indexing compressed NFTs, tokens, token extensions and RWAs at Helius, building a global rate limiter and edge cache for RPC traffic, and real-time gRPC/WebSocket streaming. Off the clock I build tools for the ecosystem: ops for validator operators, a self-custodial portfolio tracker, and crypto-native social. I also [write](/posts/) about indexers, Rust, and [staking SOL from India](/posts/staking-sol-in-india/).
+On-chain, that has meant indexing compressed NFTs, tokens, token extensions and RWAs at Helius, building a global rate limiter and edge cache for RPC traffic, and real-time gRPC/WebSocket streaming. Since May 2026 I'm at the [Solana Foundation](https://solana.org/). Off the clock I build tools for the ecosystem: ops for validator operators, a self-custodial portfolio tracker, and crypto-native social. I also [write](/posts/) about indexers, Rust, and [staking SOL from India](/posts/staking-sol-in-india/).
 
 ## OPTIONS
 **\-\-stack**
@@ -30,11 +30,13 @@ On-chain, that has meant indexing compressed NFTs, tokens, token extensions and 
 : hiring, mentoring, decision making, planning, communication
 
 ## EXPERIENCE
-### Helius, Bangalore - Founding Engineer/Principal Engineer (March 2023 - Present)
+### Solana Foundation (May 2026 - Present)
+
+### Helius, Bangalore - Founding Engineer/Principal Engineer (March 2023 - May 2026)
 - Led the initial efforts for User Management for the Helius Developer portal, which required a complete revamp of our management system.
 - Worked on indexing Solana’s cNFTs and NFTs as open standards and implemented several features like indexing regular tokens, token extensions and a new RWA indexer.
 - Implemented a global rate limiter and edge caching to rate limit and cache projects across the world.
-- Currently improving gRPC Solana WebSockets.
+- Improved gRPC Solana WebSockets.
 
 ### DigitalOcean, Bangalore - Engineering Manager/Technical Lead (September 2021 - February 2023)
 - Led a team responsible for integrating the Nimbella Serverless Platform into multiple regions as DigitalOcean Cloud Functions after the acquisition.
