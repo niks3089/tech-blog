@@ -3,7 +3,10 @@
     <li>
         <a class="project-name" href="{{ .url | default .repo }}">{{ .name }}</a>
         <span class="project-desc">{{ .desc }}</span>
-        {{ if and .url .repo }}<a class="dim" href="{{ .repo }}">src</a>{{ end }}
+        <span class="project-links">
+            {{ with .post }}<a class="dim" href="{{ . }}">post</a>{{ end }}
+            {{ if and .url .repo }}<a class="dim" href="{{ .repo }}">src</a>{{ end }}
+        </span>
     </li>
 {{ end }}
 </ul>

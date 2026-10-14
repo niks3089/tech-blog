@@ -1,27 +1,32 @@
 # Rendered on the home page and /about via partials/projects.html
 [[project]]
 name = "pillar"
+post = "/posts/pillar/"
 url = "https://pillar.niks3089.com"
 repo = "https://github.com/niks3089/pillar"
 desc = "Ops platform for Solana validators: install, monitor, self-heal, upgrade."
 
 [[project]]
 name = "portfolio"
+post = "/posts/solana-portfolio-tracker/"
 url = "https://portfolio.niks3089.com"
 repo = "https://github.com/niks3089/solana-portfolio-tracker"
 desc = "Self-hosted multi-wallet Solana portfolio tracker with P&L and an encrypted vault."
 
 [[project]]
 name = "brigade"
+post = "/posts/brigade/"
 url = "https://brigade.niks3089.com"
 desc = "Crypto-native social network for Solana."
 
 [[project]]
 name = "techshorts"
+post = "/posts/techshorts/"
 url = "https://techshorts.niks3089.com"
 desc = "Tech news in ~60 words, ingested and summarised in Rust."
 
 [[project]]
 name = "deep-learner"
+post = "/posts/deep-learner/"
 repo = "https://github.com/niks3089/deep-learner"
 desc = "Claude Code plugin that quizzes you on your own codebase."

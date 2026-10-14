@@ -52,6 +52,7 @@ a.dim:hover { color: var(--accent); }
 .projects li:last-child { border-bottom: 0; }
 .project-name { font-weight: 600; text-decoration: none; color: var(--accent); }
 .project-desc { color: var(--fg); }
+.project-links { display: flex; gap: .8rem; white-space: nowrap; }
 
 /* posts & pages: sans for long prose */
 .post .post-content { font-family: var(--sans); font-size: 1.06rem; line-height: 1.75; letter-spacing: 0; }
