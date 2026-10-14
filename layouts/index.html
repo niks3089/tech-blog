@@ -1,71 +1,30 @@
 {{ define "main" }}
 <section class="term">
-<pre class="ascii" aria-label="nikhil">
-███╗   ██╗██╗██╗  ██╗██╗  ██╗██╗██╗
-████╗  ██║██║██║ ██╔╝██║  ██║██║██║
-██╔██╗ ██║██║█████╔╝ ███████║██║██║
-██║╚██╗██║██║██╔═██╗ ██╔══██║██║██║
-██║ ╚████║██║██║  ██╗██║  ██║██║███████╗
-╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚══════╝</pre>
-<p class="dim">Last login: {{ now.Format "Mon Jan 2 15:04" }} on tty1 from 127.0.0.1 &middot; built with hugo</p>
+    <header class="intro">
+        <img src='{{ .Scratch.Get "avatarImgSrc" }}' alt="Illustration of Basavanagudi, Bangalore">
+        <div>
+            <h1>Nikhil Acharya Prakash</h1>
+            <p class="dim"><a href="https://solana.org/">Solana Foundation</a> &middot; Bangalore</p>
+        </div>
+    </header>
 
-<p class="cmd">whoami</p>
-<p><strong>Nikhil Acharya Prakash</strong>. Principal engineer, 13+ years shipping systems software:
-networking, serverless, and since 2023, Solana infra. Rust by default, Go when it's simpler.</p>
+    <p>15 years building systems software: networking, unikernels, serverless, and since 2023, Solana infrastructure. Rust by default. I write about indexers, Rust and crypto, and build tools for the Solana ecosystem on the side.</p>
 
-<p class="cmd">neofetch</p>
-<div class="neofetch">
-    <img src='{{ .Scratch.Get "avatarImgSrc" }}' alt="Illustration of Bangalore: BMS College, Vidyarthi Bhavan, a temple and Lalbagh lake">
-    <dl>
-        <dt>nikhil@blr</dt><dd class="rule">----------</dd>
-        <dt>Host</dt><dd>Bangalore, IN</dd>
-        <dt>Chain</dt><dd>solana mainnet-beta</dd>
-        <dt>Epoch</dt><dd id="sol-epoch">syncing&hellip;</dd>
-        <dt>Slot</dt><dd id="sol-slot">syncing&hellip;</dd>
-        <dt>Shell</dt><dd>rust, go, typescript, c</dd>
-        <dt>Uptime</dt><dd>13+ years in prod</dd>
-        <dt>Now</dt><dd><a href="https://solana.org/">Solana Foundation</a></dd>
-        <dt>Prev</dt><dd>Helius, DigitalOcean, Nimbella, Arista, IBM Research</dd>
-    </dl>
-</div>
+    <h2 class="cmd">ls ~/projects</h2>
+    {{ partial "projects.html" . }}
 
-<p class="cmd">ls -l ~/projects</p>
-{{ partial "projects.html" . }}
+    <h2 class="cmd">ls ~/posts</h2>
+    <ul class="ls">
+    {{ range first 5 (where .Site.RegularPages "Params.type" "post").ByDate.Reverse }}
+        <li><span class="dim">{{ .Date.Format "2006-01-02" }}</span> <a href="{{ .Permalink }}">{{ .Title }}</a></li>
+    {{ end }}
+    </ul>
+    <p><a class="dim" href="/posts/">all posts &rarr;</a></p>
 
-<p class="cmd">ls -lt ~/posts | head -5</p>
-<ul class="ls">
-{{ range first 5 (where .Site.RegularPages "Params.type" "post").ByDate.Reverse }}
-    <li><span class="dim">{{ .Date.Format "Jan 02 2006" }}</span> <a href="{{ .Permalink }}">{{ .File.BaseFileName }}.md</a></li>
-{{ end }}
-</ul>
-
-<p class="cmd">cat ~/.contact</p>
-<ul class="ls">
-{{ range .Site.Params.SocialIcons }}
-    <li><span class="dim">{{ .name }}</span> <a href="{{ .url }}">{{ .url | replaceRE "^(https?://|mailto:)(www\\.)?" "" }}</a></li>
-{{ end }}
-</ul>
-
-<p class="cmd">solana transfer {{ .Site.Params.TipWallet }} 0.1 <span class="dim"># tips in SOL/USDC, gm</span></p>
-<p><a href="{{ .Site.Params.TipURL }}">[ send a tip via tiplink ]</a></p>
-
-<p class="cmd"><span class="cursor">&#9608;</span></p>
+    <h2 class="cmd">cat ~/.contact</h2>
+    <p class="links">
+    {{ range .Site.Params.SocialIcons }}<a href="{{ .url }}">{{ .name }}</a> {{ end }}
+    <a href="{{ .Site.Params.TipURL }}">tip in SOL/USDC</a>
+    </p>
 </section>
-
-<script>
-// ponytail: keyless public RPC (CORS *); if it rate-limits, the fields just say "offline"
-fetch("https://solana-rpc.publicnode.com", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getEpochInfo" })
-}).then(r => r.json()).then(({ result: e }) => {
-    const pct = e.slotIndex / e.slotsInEpoch, n = 20, done = Math.round(pct * n);
-    document.getElementById("sol-epoch").textContent =
-        `${e.epoch} [${"#".repeat(done)}${".".repeat(n - done)}] ${(pct * 100).toFixed(1)}%`;
-    document.getElementById("sol-slot").textContent = e.absoluteSlot.toLocaleString();
-}).catch(() => {
-    document.getElementById("sol-epoch").textContent = "offline";
-    document.getElementById("sol-slot").textContent = "offline";
-});
-</script>
 {{ end }}

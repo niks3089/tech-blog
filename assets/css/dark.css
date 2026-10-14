@@ -1,9 +1,9 @@
-/* Dark pref: Solana-green phosphor. Toggled on/off by main.js. */
+/* Dark terminal palette. Toggled on/off by main.js. */
 :root {
-  --bg: #040805;
-  --bg2: #0a140e;
-  --line: #15402a;
-  --fg: #14f195;
-  --dim: #0e9e63;
-  --hi: #b8ffdf;
+  --bg: #111311;
+  --line: #262a26;
+  --fg: #dfe3de;
+  --dim: #8f978f;
+  --accent: #14f195;
+  --code-bg: #1a1d1a;
 }

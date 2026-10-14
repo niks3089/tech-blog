@@ -11,7 +11,7 @@ pygmentsStyle = "monokai"
 
 [params]
   footer = "The Marauders"
-  description = "Principal engineer in Bangalore. Rust, Solana infra, distributed systems."
+  description = "15 years in systems software, building on Solana. Bangalore."
   avatarURL = "/images/avatar.jpg"
   TipWallet = "BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe"
   TipURL = "https://tiplink.io/blinks/donate?dest=BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe&mint=usdc"

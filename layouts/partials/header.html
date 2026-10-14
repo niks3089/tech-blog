@@ -1,16 +1,8 @@
 <header class="header">
     <nav class="header-nav">
 
-        {{ if isset .Site.Params "avatarurl" }}
-        <div class="avatar">
-            <a href="{{ .Site.BaseURL }}">
-                <img src='{{ .Scratch.Get "avatarImgSrc" }}' alt="{{ .Site.Params.AvatarAltText|default "avatar" }}">
-            </a>
-        </div>
-        {{ end }}
-
         <div class="nav-title">
-            <a class="nav-brand" href="{{ .Site.BaseURL }}"><span class="prompt-user">nikhil@blr</span>:<span class="prompt-path">~</span>$<span class="cursor">&#9608;</span></a>
+            <a class="nav-brand" href="{{ .Site.BaseURL }}"><span class="prompt-user">nikhil@blr</span>:<span class="prompt-path">~</span>$</a>
         </div>
 
         <div class="nav-links">

@@ -1,5 +1,17 @@
 <footer class="footer">
-    <span>-- {{ now.Year }} nikhil@blr &middot; <a href="https://github.com/niks3089/tech-blog">src</a> &middot; gm --</span>
+    <span id="sol-status" class="dim">solana mainnet-beta</span>
+    <span class="dim">&copy; {{ now.Year }} nikhil acharya &middot; <a href="https://github.com/niks3089/tech-blog">source</a></span>
+    <script>
+    // ponytail: keyless public RPC (CORS *); on failure the footer just keeps its static text
+    fetch("https://solana-rpc.publicnode.com", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getEpochInfo" })
+    }).then(r => r.json()).then(({ result: e }) => {
+        document.getElementById("sol-status").textContent =
+            `● solana epoch ${e.epoch} (${(100 * e.slotIndex / e.slotsInEpoch).toFixed(0)}%) · slot ${e.absoluteSlot.toLocaleString()}`;
+    }).catch(() => {});
+    </script>
     {{ if .Site.Params.CustomFooterHTML }}
     {{ .Site.Params.CustomFooterHTML | safeHTML }}
     {{ end }}

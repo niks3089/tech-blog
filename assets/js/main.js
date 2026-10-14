@@ -93,8 +93,7 @@ function toggleHeaderShadow(scrollY) {
 
 function setThemeByUserPref() {
     darkThemeCss = document.getElementById("dark-theme");
-    const savedTheme = localStorage.getItem(THEME_PREF_STORAGE_KEY) ||
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark': 'light');
+    const savedTheme = localStorage.getItem(THEME_PREF_STORAGE_KEY) || 'light';
     const darkThemeToggles = document.querySelectorAll('.dark-theme-toggle');
     setTheme(savedTheme, darkThemeToggles);
     darkThemeToggles.forEach(el => el.addEventListener('click', toggleTheme, {capture: true}))

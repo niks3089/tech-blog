@@ -1,35 +1,34 @@
 ---
-title: "NIKHIL(1)"
-description: "man nikhil: Nikhil Acharya Prakash, principal engineer in Bangalore"
+title: "Nikhil Acharya Prakash"
+description: "Engineer in Bangalore. 15 years in systems software, building on Solana since 2023."
 type: page
 image: "/images/bangalore.jpg"
 ---
 
 ![Illustrated Bangalore: BMS College of Engineering, Vidyarthi Bhavan, Bull Temple, Lalbagh lake and the Glass House](/images/bangalore.jpg)
-*Basavanagudi, more or less. BMSCE, Vidyarthi Bhavan dosa, Bull Temple, Lalbagh. Where I studied, and the city I still call home.*
+*Basavanagudi, more or less. BMSCE, Vidyarthi Bhavan, Bull Temple, Lalbagh. Where I studied, and the city I still call home.*
 
-## NAME
-**nikhil** - Nikhil Acharya Prakash, principal engineer, Bangalore, India
+[Solana Foundation](https://solana.org/) &middot; Bangalore, India &middot; [GitHub](https://github.com/niks3089) &middot; [LinkedIn](https://www.linkedin.com/in/nikhil-acharya-prakash-24a84719/) &middot; [Email](mailto:niks3089@gmail.com)
 
-## SYNOPSIS
-`nikhil [--rust] [--solana] [--distributed-systems] [--lead] [--ship-it]`
+## Summary
+I'm a technical leader and software engineer with 15 years of experience building, owning and shipping systems software, from WAN acceleration and switch operating systems to unikernels, serverless platforms and, for the last few years, Solana.
 
-## DESCRIPTION
-Technical leader and software engineer with 13+ years building and owning systems software: WAN acceleration and DDoS mitigation, switch OS features, unikernels, serverless platforms, and, since 2023, Solana infrastructure.
+**Technology:** Solana, distributed systems, cloud-native services, serverless, systems software, networking  
+**Languages:** Rust, Go, TypeScript, Python, C/C++  
+**Leadership:** hiring, mentoring, decision making, planning, communication
 
-On-chain, that has meant indexing compressed NFTs, tokens, token extensions and RWAs at Helius, building a global rate limiter and edge cache for RPC traffic, and real-time gRPC/WebSocket streaming. Since May 2026 I'm at the [Solana Foundation](https://solana.org/). Off the clock I build tools for the ecosystem: ops for validator operators, a self-custodial portfolio tracker, and crypto-native social. I also [write](/posts/) about indexers, Rust, and [staking SOL from India](/posts/staking-sol-in-india/).
+## Solana
+I've been building on Solana full time since 2023.
 
-## OPTIONS
-**\-\-stack**
-: Solana, distributed systems, cloud-native services, serverless, systems software, networking
+- **Solana Foundation (May 2026 onwards):** now working on the ecosystem from the Foundation.
+- **Helius (2023 to 2026):** I joined as a founding engineer. I indexed compressed NFTs and NFTs as open standards, then regular tokens, token extensions and a new RWA indexer. I also built a global rate limiter and edge cache for RPC traffic, and worked on real-time gRPC and WebSocket streaming.
+- **Indexing:** I designed and wrote up a token transaction history indexer ([problem](/posts/token-history-problem-statement/), [design](/posts/token-history-indexer-design/)), and open-sourced [itihas](https://github.com/niks3089/itihas).
+- **Side projects:** [pillar](https://pillar.niks3089.com) for running validators, a self-custodial [portfolio tracker](https://portfolio.niks3089.com), and [brigade](https://brigade.niks3089.com), a crypto-native social app.
+- **Writing:** [staking SOL from India](/posts/staking-sol-in-india/), and [using unikernels in Solana](/posts/using-unikernels-in-solana/).
 
-**\-\-lang**
-: Rust, Go, TypeScript, Python, C/C++
+Tips in SOL or USDC are welcome at `BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe` or via [tiplink](https://tiplink.io/blinks/donate?dest=BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe&mint=usdc).
 
-**\-\-lead**
-: hiring, mentoring, decision making, planning, communication
-
-## EXPERIENCE
+## Experience
 ### Solana Foundation (May 2026 - Present)
 
 ### Helius, Bangalore - Founding Engineer/Principal Engineer (March 2023 - May 2026)
@@ -61,7 +60,7 @@ On-chain, that has meant indexing compressed NFTs, tokens, token extensions and 
 - Designed and developed features to improve resource utilization, bandwidth and connection throughput of Aryaka Cloud.
 - Developed protocols to support POP level redundancy, rate-limiting control plane packets and DDOS mitigation for IKE-V1.
 
-## PROJECTS
+## Projects
 {{< projects >}}
 
 ### Earlier work
@@ -80,13 +79,7 @@ On-chain, that has meant indexing compressed NFTs, tokens, token extensions and 
 - **CSPerf (2016):** a tool for measuring throughput, bandwidth, latency, RTT and response time.
 - **Android apps (2011):** five educational apps and a trivia app, 100k+ downloads.
 
-## EDUCATION
+## Education
 **BITS Pilani, Bangalore, India - Master of Technology (2012 - 2014)**
 
 **BMSCE, Bangalore, India - Bachelors of Engineering, Computer Science (2007 - 2011)**
-
-## SEE ALSO
-[github(1)](https://github.com/niks3089), [x(1)](https://x.com/niks3089), [linkedin(1)](https://www.linkedin.com/in/nikhil-acharya-prakash-24a84719/), [mail(1)](mailto:niks3089@gmail.com)
-
-## BUGS
-Will mention slot times unprompted. Tips in SOL or USDC to `BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe`, or via [tiplink](https://tiplink.io/blinks/donate?dest=BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe&mint=usdc).
