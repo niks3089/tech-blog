@@ -29,8 +29,6 @@ I've been building on Solana full time since 2023.
 - **Side projects:** [pillar](https://pillar.niks3089.com) for running validators, a self-custodial [portfolio tracker](https://portfolio.niks3089.com), and [brigade](https://brigade.niks3089.com), a crypto-native social app.
 - **Writing:** [staking SOL from India](/posts/staking-sol-in-india/), and [using unikernels in Solana](/posts/using-unikernels-in-solana/).
 
-Tips in SOL or USDC are welcome at `BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe` or via [tiplink](https://tiplink.io/blinks/donate?dest=BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe&mint=usdc).
-
 ## Experience
 ### Solana Foundation (May 2026 - Present)
 - Modernized key products while cutting cost and vendor dependency. Led the Tokens rebuild, set up [Kora](https://github.com/solana-foundation/kora) on devnet and mainnet, and moved Breeze onto standard infrastructure. This cut data-processing costs and gave the Foundation more control over these products.
@@ -81,11 +79,6 @@ Tips in SOL or USDC are welcome at `BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe
 - Implemented a feature to generate a core file when a unikernel application crashes.
 - Improved network bandwidth by 3x using shared memory between the application and the kernel in solo5.
 - Designed a network backend agnostic design where user APIs are agnostic to various network backends such as tap device, DPDK and netmap.
-
-**Hobby projects**
-- **TechShorts (2020):** an app for short technical content and news. Rebuilt in Rust, see above.
-- **CSPerf (2016):** a tool for measuring throughput, bandwidth, latency, RTT and response time.
-- **Android apps (2011):** five educational apps and a trivia app, 100k+ downloads.
 
 ## Education
 **BITS Pilani, Bangalore, India - Master of Technology (2012 - 2014)**
