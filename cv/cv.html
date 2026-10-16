@@ -1,0 +1,106 @@
+<!doctype html>
+<!-- Source for static/nikhil-acharya-prakash-cv.pdf. Regenerate with: make -C cv -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nikhil Acharya Prakash - CV</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+  @page { size: A4; margin: 9mm 13mm; }
+  * { box-sizing: border-box; }
+  body { font: 9pt/1.33 "IBM Plex Sans", system-ui, sans-serif; color: #1a1a1a; margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  h1 { font: 600 20pt/1.1 "IBM Plex Mono", monospace; margin: 0; }
+  .sub { color: #0a7a4b; font: 500 10pt "IBM Plex Mono", monospace; margin: 3px 0 6px; }
+  .contact { color: #555; font-size: 9pt; }
+  .contact span + span::before { content: " · "; }
+  h2 { font: 600 9.5pt "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .06em;
+       color: #0a7a4b; border-bottom: 1px solid #ddd; padding-bottom: 2px; margin: 9px 0 4px; }
+  .job { margin-bottom: 5px; break-inside: avoid; }
+  .job-head { display: flex; justify-content: space-between; gap: 12px; }
+  .job-head b { font-weight: 600; }
+  .when { color: #555; white-space: nowrap; font-size: 9pt; }
+  ul { margin: 2px 0 0; padding-left: 15px; }
+  li { margin: 1px 0; }
+  p { margin: 0 0 4px; }
+  .grid { display: grid; grid-template-columns: 6.5em 1fr; gap: 1px 10px; }
+  .grid b { font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Nikhil Acharya Prakash</h1>
+<div class="sub">Solana &amp; crypto infrastructure · 15 years in systems software</div>
+<div class="contact">
+  <span>Bangalore, India</span><span><a href="mailto:niks3089@gmail.com">niks3089@gmail.com</a></span><span><a href="https://www.niks3089.com">niks3089.com</a></span><span><a href="https://github.com/niks3089">github.com/niks3089</a></span><span><a href="https://www.linkedin.com/in/nikhil-acharya-prakash-24a84719/">linkedin</a></span>
+</div>
+
+<h2>Summary</h2>
+<p>Engineer and technical leader building crypto infrastructure on Solana. Currently at the Solana Foundation working on token data, transaction relaying (Kora), RPC monitoring and trading infrastructure; previously a founding engineer at Helius, indexing NFTs and tokens and scaling RPC. Before crypto: WAN acceleration, switch operating systems, unikernels and serverless platforms.</p>
+
+<h2>Experience</h2>
+<div class="job">
+  <div class="job-head"><span><b>Solana Foundation</b></span><span class="when">May 2026 – Present</span></div>
+  <ul>
+    <li>Modernized key products while cutting cost and vendor dependency: led the Tokens rebuild, set up Kora on devnet and mainnet, and moved Breeze onto standard infrastructure.</li>
+    <li>Designed and built the foundation of the trading infrastructure, with multi-region redundancy, monitoring and failover from day one.</li>
+    <li>Released a public RPC monitoring dashboard for RPC providers.</li>
+    <li>Set up a common engineering operating model: design, release and incident templates, on-call and escalation, and a "How to Build" onboarding guide.</li>
+  </ul>
+</div>
+<div class="job">
+  <div class="job-head"><span><b>Helius</b>, Bangalore · Founding Engineer / Principal Engineer</span><span class="when">Mar 2023 – May 2026</span></div>
+  <ul>
+    <li>Indexed Solana compressed NFTs and NFTs as open standards; added regular tokens, token extensions and a new RWA indexer.</li>
+    <li>Built a global rate limiter and edge caching for RPC traffic worldwide.</li>
+    <li>Led the user-management revamp for the Helius developer portal; improved gRPC-based Solana WebSockets.</li>
+  </ul>
+</div>
+<div class="job">
+  <div class="job-head"><span><b>DigitalOcean</b>, Bangalore · Engineering Manager / Technical Lead</span><span class="when">Sep 2021 – Feb 2023</span></div>
+  <ul>
+    <li>Led the team integrating the Nimbella serverless platform into multiple regions as DigitalOcean Cloud Functions after the acquisition.</li>
+    <li>Built control-plane services and APIs for Cloud Functions; delivered Scheduled Functions and function eventing.</li>
+  </ul>
+</div>
+<div class="job">
+  <div class="job-head"><span><b>Nimbella</b>, Bangalore · Founding Engineer / Technical Lead</span><span class="when">Sep 2019 – Aug 2021</span></div>
+  <ul>
+    <li>Led integrations with Netlify and Postman; managed the team building Commander for Slack and Microsoft Teams.</li>
+    <li>Integrated the OpenWhisk API Gateway into the Nimbella serverless stack.</li>
+  </ul>
+</div>
+<div class="job">
+  <div class="job-head"><span><b>Arista Networks</b>, Bangalore · Member of Technical Staff</span><span class="when">Nov 2017 – Aug 2019</span></div>
+  <ul><li>Wireshark and tcpdump dissectors for Arista's proprietary protocol; VRF and HA for management interfaces on Arista switches.</li></ul>
+</div>
+<div class="job">
+  <div class="job-head"><span><b>IBM Research</b>, New York · Researcher</span><span class="when">Sep 2018 – Dec 2018</span></div>
+  <ul><li>Research on "Unikernels as Processes", published at ACM SoCC 2018; ran Solo5 unikernels as Docker containers, leading to Nabla containers.</li></ul>
+</div>
+<div class="job">
+  <div class="job-head"><span><b>Aryaka Networks</b>, Bangalore · Member of Technical Staff</span><span class="when">Jul 2011 – Sep 2017</span></div>
+  <ul><li>Led the IP Acceleration delivery team; improved resource use, bandwidth and connection throughput of Aryaka's cloud; built POP-level redundancy, control-plane rate limiting and DDoS mitigation for IKEv1.</li></ul>
+</div>
+
+<h2>Projects</h2>
+<ul>
+  <li><b>Pillar</b>: open-source agent and controller for running Solana validators: supervise, self-heal, provision, upgrade (Rust, gRPC). pillar.niks3089.com</li>
+  <li><b>Portfolio</b>: self-hosted multi-wallet Solana tracker with trade-based P&amp;L, XIRR and an end-to-end encrypted vault (TypeScript). portfolio.niks3089.com</li>
+  <li><b>Brigade</b>: crypto-native social network for Solana (Rust, PostgreSQL, NATS JetStream). brigade.niks3089.com</li>
+  <li><b>TechShorts</b>: tech news in 60 words; Rust ingest pipeline with LLM summaries, served as static JSON. techshorts.niks3089.com</li>
+  <li><b>Open source</b>: IncludeOS (IPv6 stack, Node.js and DPDK ports), Solo5 (core dumps, 3x network bandwidth via shared memory).</li>
+</ul>
+
+<h2>Skills</h2>
+<div class="grid">
+  <b>Crypto</b><span>Solana, RPC and indexing, token data, transaction relaying, trading and validator infrastructure</span>
+  <b>Systems</b><span>Distributed systems, cloud-native services, serverless, networking, systems software</span>
+  <b>Languages</b><span>Rust, Go, TypeScript, Python, C/C++</span>
+  <b>Leadership</b><span>Engineering standards, on-call and incident process, hiring, mentoring, planning</span>
+</div>
+
+<h2>Education</h2>
+<div class="job-head"><span><b>BITS Pilani</b>, M.Tech</span><span class="when">2012 – 2014</span></div>
+<div class="job-head"><span><b>BMS College of Engineering</b>, Bangalore · B.E. Computer Science</span><span class="when">2007 – 2011</span></div>
+</body>
+</html>

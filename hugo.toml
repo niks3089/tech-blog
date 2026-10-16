@@ -73,9 +73,14 @@ pygmentsStyle = "monokai"
     weight = 5
 
   [[menu.main]]
+    name = "cv ↓"
+    url = "/nikhil-acharya-prakash-cv.pdf"
+    weight = 6
+
+  [[menu.main]]
     name = "tip ◎"
     url = "https://tiplink.io/blinks/donate?dest=BdZKBB2VHdaomQWb1jc8g65f3GWekxCYUpVbxzNjU8Pe&mint=usdc"
-    weight = 6
+    weight = 7
 
 [markup]
   [markup.tableOfContents]

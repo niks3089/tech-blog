@@ -8,7 +8,7 @@ image: "/images/bangalore.jpg"
 ![Illustrated Bangalore: BMS College of Engineering, Vidyarthi Bhavan, Bull Temple, Lalbagh lake and the Glass House](/images/bangalore.jpg)
 *Basavanagudi, Bangalore: BMSCE, Vidyarthi Bhavan, Bull Temple and Lalbagh.*
 
-[Solana Foundation](https://solana.org/) &middot; Bangalore, India &middot; [GitHub](https://github.com/niks3089) &middot; [LinkedIn](https://www.linkedin.com/in/nikhil-acharya-prakash-24a84719/) &middot; [Email](mailto:niks3089@gmail.com)
+[Solana Foundation](https://solana.org/) &middot; Bangalore, India &middot; [GitHub](https://github.com/niks3089) &middot; [LinkedIn](https://www.linkedin.com/in/nikhil-acharya-prakash-24a84719/) &middot; [Email](mailto:niks3089@gmail.com) &middot; [**Download CV (PDF)**](/nikhil-acharya-prakash-cv.pdf)
 
 ## Summary
 I build crypto infrastructure on Solana. I'm at the Solana Foundation, where I work on the systems the ecosystem leans on: token data, transaction relaying with Kora, RPC monitoring and trading infrastructure. Before that I was a founding engineer at Helius, indexing NFTs and tokens and scaling RPC for Solana developers.
