@@ -1,8 +1,8 @@
 ---
-title: "Rebuilding TechShorts: tech news in 60 words, with Rust and static JSON"
-date: 2026-10-14T13:00:00+05:30
-description: "How I rebuilt my 2020 hobby app as a Rust ingest job that turns 27 tech feeds into 60-word cards, served as static JSON."
-tags: ["rust", "news", "gcp", "projects"]
+title: "TechShorts: Designing a News Product With No Servers to Run"
+date: 2026-10-14T10:00:00+05:30
+description: "The constraints, decisions and tradeoffs behind rebuilding TechShorts: precompute everything, keep one source of truth, and treat the LLM as an untrusted dependency."
+tags: ["architecture", "system-design", "projects"]
 type: post
 weight: 25
 showTableOfContents: true
@@ -10,117 +10,112 @@ showTableOfContents: true
 
 ## The problem
 
-I read a lot of tech news, and most of it is the same story told five times. TechCrunch, The Verge and Ars Technica all cover the same launch. Hacker News links one of them. I wanted one card per story, about 60 words long, with a link to the source if I want more.
+Most tech news is the same story told five times. A launch gets covered by every major outlet, Hacker News links one of them, and you read the same facts again and again. I wanted one card per story, about 60 words, with a link out if I want the full piece.
 
-I built an app called TechShorts in 2020 as a hobby project. This is the rebuild. It's live at [techshorts.niks3089.com](https://techshorts.niks3089.com).
+I first built TechShorts in 2020. This rebuild is live at [techshorts.niks3089.com](https://techshorts.niks3089.com). It pulls from 27 sources every 20 minutes, collapses duplicates, writes a short summary for each story, and publishes feeds across seven topics: AI, crypto, startups, gadgets, dev, security and big tech. The most important stories also go to a Telegram channel and out as push notifications.
 
-Every story is a card: a short headline, a summary of at most 60 words, a source and a link. You swipe through them one at a time. Cards are tagged with seven topics: AI, crypto, startups, gadgets, dev, security and big tech.
+The interesting part isn't the feature list. It's the constraints I designed under, and what they ruled out.
 
-## What it does
+## Constraints first
 
-A Rust job runs every 20 minutes. It pulls RSS and Atom feeds from 27 sources, drops duplicates, has an LLM write the cards, and publishes the results as static JSON files. Each topic gets its own feed, plus one combined feed. The most important stories also go to a Telegram channel and out as push notifications.
+I set three rules before writing any code:
 
-The frontend is an Expo (React Native) app that reads those JSON files. The same codebase builds for iOS, Android and the web.
+1. **Nothing to operate.** One person runs this in spare time. Nothing should need patching, scaling, or waking me up.
+2. **Bounded cost.** The only real variable cost is the LLM. It needs a hard ceiling that doesn't depend on how busy the news is.
+3. **Correct under failure.** Jobs get killed, writes fail and runs overlap. The system has to converge to the right state anyway, without me cleaning up.
 
-## Architecture
+Most of the design follows from taking these seriously.
+
+## Decision 1: precompute everything, serve static files
+
+The key observation: every reader of a topic sees the same feed. There's nothing per-user to compute at request time.
+
+So there's no API. A scheduled batch job does all the work and writes the finished feeds as public files in object storage, with a short cache lifetime. The app reads those files directly. Personalisation ("My Feed") is just the combined feed filtered on the device against the topics you picked.
 
 ```
-Cloud Scheduler (every 20 min)
-        │
-        ▼
-Cloud Run Job: techshorts ingest (one Rust binary)
-  1. lock      lease lock object in GCS, one run at a time
-  2. fetch     27 RSS/Atom feeds from sources.toml, 16 in parallel
-  3. dedupe    canonical URL hash + title similarity over the last 36h
-  4. enrich    fetch the article page if the feed text is too short
-  5. summarize Gemini 2.5 Flash on Vertex AI, structured JSON output
-     market    CoinGecko movers and trending coins, templated, no LLM
-  6. store     state/items.json in GCS, generation-matched write
-  7. publish   feed/all.json, feed/{topic}.json, archive/YYYY-MM-DD.json
-  8. notify    FCM push (top stories) and Telegram (importance >= 9)
-        │
-        ▼
-Expo app (iOS, Android, web) reads the static JSON directly
+scheduler (every 20 min)
+      │
+      ▼
+batch job:  fetch → dedupe → summarise → commit state → publish feeds → notify
+      │
+      ▼
+object storage (public feeds + daily archives)
+      │
+      ▼
+app (iOS, Android, web) reads files directly
 ```
 
-There's no API server. The feed is the same for everyone who reads a given topic, so it can be a public object in a storage bucket with a five-minute cache header. Nothing to cold-start and nothing to scale. I'll add a real API when I need per-user ranking or search, and not before.
+What this buys: no servers to scale, no cold starts, no database, nothing in the request path that can fall over. Read traffic is the storage provider's problem.
 
-## Sources
+What it costs: no per-user ranking, no search, and up to 20 minutes of staleness. For a news digest, all three are fine today. Each has a clear trigger for revisiting. When I want ranking or search, that's when an API earns its place, and not before.
 
-Sources live in `sources.toml`. Each one is a name, a feed URL, a default topic and a priority:
+## Decision 2: one source of truth, no database
 
-```toml
-[[source]]
-name = "CoinDesk"
-url = "https://www.coindesk.com/arc/outboundfeeds/rss/"
-topic = "crypto"
-priority = 9
-```
+All state lives in a single file in object storage. That sounds fragile, so concurrency has two layers:
 
-Adding a source means adding one block. The list mixes general tech sites, AI lab blogs, crypto outlets, Indian startup news, dev sources (including Hacker News front page posts with 200+ points), security and gadget sites.
+- **A lease lock** so only one run executes at a time. The lease outlives the job's hard timeout, so a lock older than that always belongs to a dead run and can be taken over safely.
+- **Conditional writes.** State is only written if nobody else changed it since it was read. A run working from stale state fails instead of overwriting newer data.
 
-The topic is only a hint for the summarizer, which can retag a story. The priority decides who wins when two sources cover the same story.
+The lock handles the normal case and the conditional write catches anything the lock misses. Together they replace a database for a workload with one writer every 20 minutes.
 
-## Dedupe
+## Decision 3: get the ordering right, and failures fix themselves
 
-Dedupe happens in two passes.
+Within each run the order is deliberate:
 
-First, URLs are canonicalized. I strip `utm_*`, `ref`, `fbclid`, `gclid` and similar tracking params, drop the fragment and the trailing slash, then hash the result with FNV-1a to get the card id. I picked FNV-1a over Rust's `DefaultHasher` on purpose: `DefaultHasher` isn't guaranteed stable across builds, and an id that changes on redeploy would bring back every old story.
+1. Commit state.
+2. Publish feeds and archives.
+3. Send Telegram posts and push notifications.
 
-Second, titles are compared. Each title becomes a set of lowercase words of three or more letters, with stopwords removed. Two titles count as the same story if their Dice coefficient is 0.6 or higher. New candidates are compared against each other and against every card from the last 36 hours. Candidates are sorted by source priority before this pass, so the higher-priority source claims the story.
+A story counts as "new" in exactly one committed run, so it's announced at most once, even if a run dies halfway. Feeds are rebuilt from state on every run, so a failed publish repairs itself on the next one. Each stage has a time budget, so slow summarisation can't push the job past its timeout. Whatever doesn't finish is picked up next run.
 
-Word overlap misses rephrased headlines. If duplicates start slipping through, the upgrade is embeddings and cosine similarity.
+Story IDs are derived from a normalised URL, with tracking parameters stripped, using a hash that's stable across builds. An ID that changed on redeploy would quietly bring back every old story. That's the kind of bug no test catches until production.
 
-Two caps sit on top: 6 new items per source per run, so one busy feed can't flood the queue, and 80 per run in total, which caps LLM spend.
+## Decision 4: treat the LLM as an untrusted dependency
 
-## Summarisation
+The model writes the headline, the summary, the topic tags and an importance score. It also flags stories to skip: deals, sponsored posts, podcasts, roundups and opinion pieces.
 
-Many feeds only carry a teaser. If a candidate has less than 400 characters of text, the job fetches the article page and pulls out the paragraph text. That fetch uses a separate HTTP client for untrusted URLs. Its DNS resolver drops private, loopback, link-local and CGNAT addresses, including on redirects, so a feed can't point the job at the cloud metadata server or anything internal. Responses are capped at 5 MB for feeds and 2 MB for pages.
+I don't trust the prompt to do any of that reliably, so the model is treated like any other external input:
 
-The text then goes to Gemini 2.5 Flash on Vertex AI. The prompt asks for a 6 to 10 word headline, a 45 to 55 word factual summary, one or two topics, and an importance score from 1 to 10. The model also returns a `skip` flag for deals, sponsored posts, podcast episodes, newsletter roundups and opinion pieces.
+- **Structured output with a schema**, with topics constrained to a fixed list.
+- **Validation in code.** Headlines and summaries outside the length bounds are rejected, not truncated.
+- **Rejected stories are remembered for 36 hours**, so the system doesn't pay to reject the same article again on the next run.
+- **Retries with backoff** on rate limits and server errors, then give up and try next run.
+- **No API keys.** The job authenticates as its own service identity.
 
-I don't trust the prompt to enforce lengths. The request uses a JSON response schema with the topics as an enum, and the code checks every result: 1 to 12 words for the headline and 20 to 60 for the summary. Anything outside that is rejected. Rejected ids are remembered for 36 hours so the job doesn't pay to reject the same article again on the next run.
+Cost is capped structurally rather than by monitoring: at most 6 new stories per source per run, and 80 per run in total. Whatever the news cycle does, the ceiling holds.
 
-Auth uses the job's service account, so there are no LLM API keys. A 429 or 5xx gets retried with backoff, up to three attempts.
+Market data doesn't go through the LLM at all. The crypto movers card is filled from a template, because numbers are exactly where a model is most likely to be confidently wrong.
 
-Crypto prices skip the LLM. A CoinGecko card with BTC and ETH prices, the biggest movers in the top 100 and trending coins is filled from a template. Its id includes the date and a 6-hour slot, so there's at most one per slot.
+## Decision 5: fetching the open internet safely
 
-## Storage and scheduling
+Many feeds only include a teaser, so for short items the job fetches the article page itself. That means a third party decides which URLs my job requests, which is a textbook SSRF setup.
 
-State is a single JSON file in Google Cloud Storage. No database. Every write is conditional on the object's generation number, so a run that read stale state fails instead of overwriting newer data.
+Fetching for untrusted URLs uses a separate client whose DNS resolution refuses private, loopback, link-local and carrier-grade NAT addresses, including after redirects. Responses are size-capped. A malicious feed can't point the job at the cloud metadata service or anything internal.
 
-On top of that, a lease lock serializes whole runs. The lock is another GCS object that holds the time it was taken. Taking it is a conditional create, or a conditional replace once the lease has expired. The lease is 16 minutes because Cloud Run kills the task at 15, so an older lock belongs to a dead run.
+## Deduplication: good enough, with a known upgrade
 
-Cards are kept for 90 days. Each run rewrites the feeds (latest 200 per topic, 300 combined) and one archive file per UTC day. Since ingest only accepts stories from the last 36 hours, only recent archives can change, so each run rebuilds the last four. That also repairs a write that failed last time. The job deletes archives past 90 days, with a bucket lifecycle rule as a backstop.
+Duplicates are caught in two passes: same normalised URL, or titles with high word overlap within a 36-hour window. When two sources cover the same story, the higher-priority source wins.
 
-Order matters. State is committed first, then feeds and archives, then pushes and Telegram. A card is "new" in exactly one committed run, so it's posted at most once. Summarization gets 8 minutes and Telegram 3, so neither can push the job past its timeout. Whatever didn't finish is picked up next run.
+Word overlap misses headlines that have been heavily reworded. I know that, and I chose not to start with embeddings. The upgrade path is clear: if duplicates start reaching readers, switch to semantic similarity. Until then, the simpler approach is cheaper and easy to reason about.
 
-The image is a multi-stage Docker build that ships the binary on `debian:bookworm-slim` as an unprivileged user. `deploy.sh` is idempotent: IAM, image build, the Cloud Run Job and the 20-minute scheduler trigger.
+## Tuning the signal
 
-## Telegram and push
+The first Telegram threshold was importance 7. That came to roughly 240 posts a day, which is spam. Raising it to 9 brought it to about seven a day. Push notifications use the same bar, with a hard cap of three a day.
 
-Telegram posting is a `sendMessage` call from the same job, so there's no bot server. The first threshold was importance 7, which came to about 240 posts a day. That's spam, so it's now 9, roughly seven a day.
+The lesson is a general one: any threshold on model-generated scores has to be tuned against real output volume, not chosen up front.
 
-Push notifications go through FCM to a `top` topic that the app subscribes to. Same importance bar, capped at three a day. The send times are stored in state to enforce the cap.
+## What I'd revisit, and when
 
-## The app
+| Trigger | Change |
+|---|---|
+| Need per-user ranking or search | Add a small API over the same state |
+| Duplicates reaching readers | Semantic similarity instead of word overlap |
+| More than one writer, or much higher frequency | Move state into a real database |
+| App ships to the stores | Real ad inventory and sponsored cards |
+| Manual deploys become a bottleneck | Deploy on merge |
 
-The app is Expo and React Native, because ads and push are first-class there and not in the Rust mobile options.
+None of these are built, and that's the point. Each one waits for a real signal.
 
-On first launch you pick your interests. "My Feed" is just the combined feed filtered on the device against those interests. One shared file means there's no per-user backend. At the end of the feed, the app walks back through the daily archives, up to 90 days. Responses for a tab you've left are dropped, so a slow request can't overwrite the current screen.
+## Takeaway
 
-On desktop browsers, a wheel or trackpad flick moved less than half a card and snapped back, so the web build turns each gesture into exactly one card.
-
-On iOS and Android there's an ad card after every sixth story. It still uses Google's test ad units, since the AdMob account isn't set up yet.
-
-## What's next
-
-These are plans, not features yet:
-
-- **Store release.** There are EAS build profiles for iOS and Android, but the app isn't on the App Store or Play Store yet.
-- **Real ads and sponsored cards.** Swap the test ad units for real ones, and add direct-sold cards marked "Sponsored" to the feed JSON.
-- **Topic Telegram channels.** Right now everything goes to one channel. Per-topic channels for AI and crypto are already sketched in the config.
-- **Better dedupe** if word overlap stops being good enough.
-- **CI deploys on merge**, replacing a manual `./deploy.sh`.
-
-Most of the work in this rebuild went into the pipeline. Because its output is static JSON, there's still no server to run.
+Most of the engineering here went into deciding what not to build. Precompute when every reader sees the same thing. Let ordering and idempotency do the work a coordinator would otherwise do. Treat the LLM as untrusted input, and cap its cost by design, not by alerts. The result is a news product that runs every 20 minutes and has nothing for me to operate.

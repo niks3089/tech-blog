@@ -1,6 +1,6 @@
 ---
 title: "Building Brigade: A Social Feed for Solana Where Posts Expire"
-date: 2026-10-14T12:00:00+05:30
+date: 2026-09-21T10:00:00+05:30
 description: "How I'm building Brigade, a Solana-native social network, as a Rust modular monolith with PostgreSQL, a transactional outbox and NATS JetStream."
 tags: ["solana", "social", "rust", "projects"]
 type: post

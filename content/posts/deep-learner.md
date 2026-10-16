@@ -1,6 +1,6 @@
 ---
 title: "deep-learner: A Claude Code Plugin That Quizzes You on Your Own Codebase"
-date: 2026-10-14T14:00:00+05:30
+date: 2026-10-01T10:00:00+05:30
 description: "How I built a Claude Code plugin that checks whether I actually understand the code I ship, grading my answers against the real source."
 tags: ["claude-code", "ai", "developer-tools", "projects"]
 type: post

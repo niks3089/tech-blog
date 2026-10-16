@@ -23,7 +23,7 @@ desc = "Crypto-native social network for Solana."
 name = "techshorts"
 post = "/posts/techshorts/"
 url = "https://techshorts.niks3089.com"
-desc = "Tech news in ~60 words, ingested and summarised in Rust."
+desc = "Tech news in ~60 words. A serverless pipeline: deduped, summarised, precomputed."
 
 [[project]]
 name = "deep-learner"

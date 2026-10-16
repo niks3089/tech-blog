@@ -1,6 +1,6 @@
 ---
 title: "Building a Self-Hosted Solana Portfolio Tracker with an Encrypted Vault"
-date: 2026-10-14T11:00:00+05:30
+date: 2026-09-05T10:00:00+05:30
 description: "How I built a multi-wallet Solana tracker that derives cost basis from swap history, computes XIRR, and stores your data encrypted under a key derived from a wallet signature."
 tags: ["solana", "defi", "typescript", "projects"]
 type: post

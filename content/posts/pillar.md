@@ -1,6 +1,6 @@
 ---
 title: "Pillar: An Agent and Controller for Running Solana Validators"
-date: 2026-10-14T10:00:00+05:30
+date: 2026-07-03T10:00:00+05:30
 description: "How I built Pillar, an open-source Rust agent and controller that supervises, heals, provisions and monitors Solana validators."
 tags: ["solana", "rust", "validators", "projects"]
 type: post
