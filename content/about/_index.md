@@ -13,10 +13,10 @@ image: "/images/bangalore.jpg"
 ## Summary
 I build crypto infrastructure on Solana. I'm at the Solana Foundation, where I work on the systems the ecosystem leans on: token data, transaction relaying with Kora, RPC monitoring and trading infrastructure. Before that I was a founding engineer at Helius, indexing NFTs and tokens and scaling RPC for Solana developers.
 
-That comes on top of 15 years in systems software: WAN acceleration, switch operating systems, unikernels and serverless platforms. Most of what makes a chain usable is unglamorous infrastructure, and that's the part I like building.
+That comes on top of 15 years in systems software: WAN acceleration, switch operating systems, unikernels, and cloud and serverless platforms. Most of what makes a chain usable is unglamorous infrastructure, and that's the part I like building.
 
 **Crypto:** Solana, RPC and indexing, token data, transaction relaying, trading and validator infrastructure  
-**Systems:** distributed systems, cloud-native services, serverless, networking  
+**Cloud & systems:** cloud platforms, cloud-native services, serverless, distributed systems, networking  
 **Languages:** Rust, Go, TypeScript, Python, C/C++  
 **Leadership:** engineering standards, on-call and incident process, hiring, mentoring
 
@@ -79,6 +79,9 @@ I've been building on Solana full time since 2023.
 - Implemented a feature to generate a core file when a unikernel application crashes.
 - Improved network bandwidth by 3x using shared memory between the application and the kernel in solo5.
 - Designed a network backend agnostic design where user APIs are agnostic to various network backends such as tap device, DPDK and netmap.
+
+## Outside work
+I follow cricket closely, and I play tennis and chess. I'm also fascinated by history, evolution, math and astronomy.
 
 ## Education
 **BITS Pilani, Bangalore, India - Master of Technology**
