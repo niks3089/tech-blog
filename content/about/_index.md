@@ -81,6 +81,6 @@ I've been building on Solana full time since 2023.
 - Designed a network backend agnostic design where user APIs are agnostic to various network backends such as tap device, DPDK and netmap.
 
 ## Education
-**BITS Pilani, Bangalore, India - Master of Technology (2012 - 2014)**
+**BITS Pilani, Bangalore, India - Master of Technology**
 
-**BMSCE, Bangalore, India - Bachelors of Engineering, Computer Science (2007 - 2011)**
+**BMSCE, Bangalore, India - Bachelors of Engineering, Computer Science**
