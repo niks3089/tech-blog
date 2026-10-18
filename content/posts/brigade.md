@@ -1,113 +1,127 @@
 ---
-title: "Solana Needs a Social Layer for Governance"
+title: "Pitch: A Wallet-Native Social Network for Solana"
 date: 2026-04-21T10:00:00+05:30
-description: "Why governance and community chat on Solana need a wallet-native social layer next to Realms, what that layer has to do, and how I'd architect it."
-tags: ["solana", "governance", "architecture", "projects"]
+description: "A product pitch, not a launch: why Solana needs a social network built around wallets, what the product should be, and how governance with Realms fits in as one feature."
+tags: ["pitch", "solana", "social", "product"]
 type: post
 weight: 25
 showTableOfContents: true
 ---
 
+> **This is a pitch.** Nothing described here is built, launched or in development. It's a product proposal: the problem, the product I think should exist, and how I'd approach it. "Brigade" is just a working name.
+
+## The one-liner
+
+A social network where your wallet is your identity. Solana communities talk, coordinate, act on chain and govern themselves in one place, without leaving the conversation.
+
 ## The problem
 
-On Solana, the vote and the conversation about the vote happen in different places.
+Solana's social life happens on platforms that know nothing about the chain.
 
-[Realms](https://realms.today) and the SPL Governance program cover the on-chain half well: realms, proposals, voting power, vote records, execution. But the discussion that decides how people vote happens somewhere else: a Discord server, a forum thread, a post on X. None of those places know who holds governance power. None of them link a message to the proposal it's about. Most of them can't tell a real token holder from someone with a matching profile picture.
+Market talk happens on X. Community chat is on Discord and Telegram. Governance discussion is in forums, with the votes themselves on [Realms](https://realms.today). Creators get paid somewhere else again. None of these places know who holds what, who is actually a member of a community, or which token a ticker refers to.
 
-The result is familiar to anyone who has sat through a DAO vote:
+What that costs people:
 
-- **Discussion is detached from the decision.** A proposal goes live on-chain while the reasoning is scattered across three apps, and much of it is gone a month later.
-- **Identity is weak.** Anyone can claim to speak for a large holder. Sybil accounts are free.
-- **Participation is low.** Voting means leaving the conversation, finding the proposal, connecting a wallet and then coming back.
-- **Nothing is portable.** A community's history is locked inside whichever chat platform it happened to choose.
+- **Context switching.** Someone posts about a token, a proposal or a mint. To act on it you leave, find the right page, reconnect a wallet and come back. Most people don't.
+- **Impersonation and scams.** Fake tickers, lookalike accounts and drainer links spread in exactly the places where people make on-chain decisions.
+- **Weak identity.** Anyone can claim to be a holder, a team member or a whale. Real stake has no weight in the conversation.
+- **No ownership.** A community's history and relationships are locked inside platforms it doesn't control.
 
-The chain already has the hard part: verifiable identity, verifiable holdings and verifiable votes. What's missing is a social layer that uses them.
+The chain already provides verifiable identity, holdings and actions. The social layer doesn't use any of them.
 
-## What needs to be built
+## Who it's for
 
-Not another chat app. A layer where the wallet is the identity, and governance state is part of the conversation.
+- **Holders and traders** who want market conversation with verified tokens and safe links.
+- **Communities and projects** that want a home where membership, roles and gating come from on-chain state.
+- **Creators** who want to be rewarded directly by their audience, in crypto.
+- **DAOs** that want discussion and voting in the same place as their community.
+- **Developers** who want to put their app in front of an existing social audience.
 
-**Wallet-native identity.** You sign in with a wallet. Your profile can show which realms you're in and how much voting power you have, proven from chain state, not claimed. Linking more wallets uses signed, single-use challenges, so a link can't be replayed.
+## The product
 
-**Realm-scoped spaces.** Each realm gets a space whose membership and roles come from governance state: community token holders, council members, delegates. Gating is computed from chain data, not from a bot assigning roles.
+### Core experience (MVP)
 
-**Proposal-linked threads.** Every proposal gets a discussion thread by default. The thread shows live status (draft, voting, succeeded, executed), the current tally, time remaining and who has voted, all read from chain. Arguments for and against sit next to the result they affected, and they stay there.
+1. **Sign in with your wallet.** Your profile can show verified holdings, communities and roles, proven from chain state, not claimed. New users get an embedded wallet, so no crypto setup is needed to start.
+2. **A public feed** for posts, replies and follows, with market conversation built in.
+3. **Verified tokens, not tickers.** A cashtag resolves to a specific mint from a verified list, with a live price, so `$USDC` can never point to a lookalike.
+4. **Communities.** Spaces for projects and groups, with membership and roles that can be gated by on-chain state, such as holding a token or an NFT.
+5. **Safe links.** Links to on-chain actions are validated before they're shown, and every action is signed in the user's own wallet. The product never holds funds or keys.
 
-**Voting from inside the conversation.** A vote button that builds the governance instruction, shows a human-readable preview, and hands it to your own wallet to sign. The platform never holds a key.
+### Features on top
 
-**Signal weighted by stake.** Optionally sort or filter discussion by verified governance power, so a holder's argument isn't buried under noise. It's a lens, not censorship: everything is still readable.
+- **Governance.** One feature among many, built with Realms. Each proposal gets a discussion thread with live status and tally, and members can vote from the thread with their own wallet.
+- **Creator rewards.** Tips and rewards from followers directly to creators.
+- **Actions in posts.** Solana Actions and Blinks render inline, so you can mint, donate or vote without leaving the feed.
+- **Notifications** for mentions, community activity, proposals closing and actions you took part in.
 
-**Notifications that matter.** A proposal was created in a realm you're in. Voting ends in 24 hours. Your delegate voted. A proposal you discussed was executed.
+### Later
 
-**Moderation owned by the community.** Each realm moderates its own space, with tools that can be delegated to its council, and every enforcement action records a reason code.
+- **Mini-apps.** Third-party apps that run inside communities, such as treasury dashboards, games and tools, in a sandbox with explicit permissions.
+- **Token drops and distributions** for communities, through audited on-chain programs.
+- **Embedded swaps and trading.** These are regulated activities, so they only ship after partner approval and legal review in each market.
 
-## Architecture
+## Why Solana, why now
 
-The shape I'd use is a modular monolith: one codebase, one domain model and one canonical database, deployed as a few separate processes. Splitting it into services early would buy coordination problems before it buys scale.
+- **Wallet onboarding has caught up.** Embedded and mobile wallets make signing in and signing a transaction quick enough for regular users.
+- **Cheap, fast transactions** make on-chain actions from a feed practical. A tip or a vote is a tap, not a fee decision.
+- **Standard building blocks exist:** Actions and Blinks for inline actions, Realms for governance, and token standards for gating and verification.
+
+## How it fits with what exists
+
+| | X | Discord / Telegram | Farcaster | This product |
+|---|---|---|---|---|
+| Public conversation | Yes | Limited | Yes | Yes |
+| Verified holder identity | No | Via bots | Partial | Native |
+| Token-gated communities | No | Via bots | Limited | Native |
+| On-chain actions in context | No | No | Frames | Native, non-custodial |
+| Governance with discussion | No | No | No | Yes, with Realms |
+
+The point isn't to replace any one of these. It's a home where Solana's social activity and on-chain activity finally meet.
+
+## How we'd know it works
+
+- **Activation:** the share of new users who post, follow or join a community in their first week.
+- **Actions from conversation:** on-chain actions started from a post or thread (tips, votes, mints).
+- **Community health:** weekly active members per community, and retention after 30 days.
+- **Trust:** reports of scams and impersonation per thousand users, which should fall as verification improves.
+
+## Go to market
+
+1. **Start with a few active communities** that already feel the pain, and design the MVP with them.
+2. **Lead with verified identity and safe links.** That's where existing platforms fail Solana users most visibly.
+3. **Add features that bring whole communities over,** like gated spaces, governance threads and creator rewards.
+4. **Open the platform** to mini-apps once there's an audience to serve.
+
+**Business model, to be validated:** free for users and communities, with paid tools for community operators (analytics, moderation, custom branding), boosted posts that are clearly labelled, and a revenue share on mini-apps.
+
+## Risks and open questions
+
+- **Network effects.** People are already on X and Discord. The wedge has to be what those platforms can't do: verified on-chain identity and safe actions.
+- **Regulation.** Trading, token distributions and anything resembling financial services need partner approval and legal review in each market. Those features are gated, not assumed.
+- **Sybil resistance has limits.** Verification raises the cost of fake accounts, but it doesn't eliminate them.
+- **Privacy.** Linking wallets to a profile reveals holdings. Linking must be opt-in for each wallet, and holdings should be hidden by default.
+- **Moderation.** Open communities need moderation tools without making the platform a central gatekeeper.
+
+## A sketch of the architecture
+
+This is deliberately high level. At this stage the product matters more than the stack.
 
 ```
-                Solana (SPL Governance, token accounts)
-                      │ account updates
-                      ▼
-            ┌───────────────────────┐
-            │ governance indexer    │  realms, proposals,
-            │ (stream + backfill)   │  vote records, voting power
-            └──────────┬────────────┘
-                       │ one transaction: rows + outbox event
-                       ▼
- web / mobile ──▶ API ──▶ PostgreSQL (canonical) ──▶ outbox relay ──▶ NATS JetStream
-      ▲                                                                    │
-      │ realtime (websocket)                                               ▼
-      └──────────── realtime gateway ◀── workers: feed fanout, notifications,
-                                          thread creation, moderation
+           Solana (tokens, Actions, Realms)
+                     │
+                     ▼
+   chain indexer ──▶ database (single source of truth) ──▶ events ──▶ feeds, notifications,
+         ▲                       │                                   community + governance threads
+         │                       ▼
+  non-custodial actions ◀── app (web + mobile, realtime)
+  (preview, then sign in wallet)
 ```
 
-**PostgreSQL is the source of truth** for users, wallets, spaces, posts and the indexed governance state. Feeds and threads begin as keyset-paginated queries. Read replicas, partitioning and dedicated search each wait for a measured trigger.
+- **Index the on-chain state the product needs** (holdings for gating, verified token mints, governance proposals) into one canonical database.
+- **Drive features from events:** a new post fans out to feeds, a new proposal opens its thread, and an action triggers a notification.
+- **Never custody anything.** Every action is built, checked and simulated, then shown in plain language and signed in the user's wallet. What gets signed must match what was previewed.
+- **Start as one well-structured system,** and split it only when real usage says to.
 
-**A governance indexer** follows the governance program's accounts in real time and backfills history. It turns raw accounts into realms, proposals, vote records and voting power. When it sees a new proposal it writes the proposal row and a `proposal-created` event in the same transaction, so a thread can never exist without its proposal, or the other way round.
+## The ask
 
-**A transactional outbox, not dual writes.** Every domain change writes its event in the same transaction as the data. A relay publishes those events to NATS JetStream, using the event ID to drop duplicates. Workers only consume from NATS, so if the broker loses data, events can be replayed from Postgres.
-
-**Workers turn events into side effects:** create the proposal thread, fan posts out to feeds, send notifications, and run moderation checks. Each is idempotent, so redelivery is harmless.
-
-**A realtime gateway** pushes new messages and tally changes to connected clients. It reads from NATS and holds no state of its own, so it scales horizontally.
-
-**A Solana adapter behind a narrow interface.** RPC, account streaming and price data all go through one boundary, so switching providers doesn't touch the domain code, and provider credentials never reach the browser.
-
-## Non-custodial by construction
-
-Voting, and any other on-chain action, follows one flow:
-
-1. Build the transaction server-side from the governance instruction.
-2. Decode it and check every program and account against an allowlist, then simulate it.
-3. Show the user a human-readable preview: realm, proposal, choice and voting weight.
-4. The user signs in their own wallet.
-5. The signed bytes must match the previewed bytes, or the preview is thrown away.
-
-The platform can propose a transaction but never sign one. That boundary matters more in governance than anywhere else, because a malicious vote, or a disguised token transfer, could decide the outcome.
-
-## Hard problems worth naming
-
-**Voting power isn't just token balance.** It depends on deposits, delegation, council tokens and voter-weight plugins. The indexer has to compute it the way the governance program does, or the UI will show numbers that don't match the vote.
-
-**Sybil resistance has limits.** Wallets are free too. Weighting by governance power helps, and so do gated signup and rate limits, but none of it stops a determined holder from splitting tokens. The goal is to make cheap manipulation expensive, not to claim it's impossible.
-
-**Chain reorgs and lag.** Tallies shown in a thread must say how fresh they are, and the indexer must reconcile against finalized state.
-
-**Privacy.** Linking wallets to a social profile reveals holdings. Linking has to be opt-in for every wallet, and the default view should show governance roles, not balances.
-
-**Moderation versus censorship-resistance.** Communities need moderation, but nobody wants a platform that can quietly remove dissent before a vote. Recording reason codes and keeping governance-related moderation visible in public logs helps keep both.
-
-## Where to start
-
-The order I'd build it in:
-
-1. Wallet sign-in, realm-scoped spaces and proposal-linked threads with live status, read-only from chain.
-2. Voting from the thread through the non-custodial flow.
-3. Notifications and delegate activity.
-4. Stake-weighted views and moderation tools for each realm.
-5. Opening the platform to third-party mini-apps for treasury dashboards, grants and other realm-specific tools.
-
-Each step is useful by itself, and none of them needs the next one to justify it.
-
-I've been prototyping parts of this as [Brigade](https://brigade.niks3089.com). The main argument stands without it, though. Solana already has verifiable identity, holdings and votes. Governance deserves a conversation layer that actually uses them.
+If you run a Solana community, create content in the ecosystem or build apps that could live inside a social feed, I'd like to hear whether this matches what you need, and what's missing.

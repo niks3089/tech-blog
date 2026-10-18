@@ -1,7 +1,7 @@
 <ul class="projects" id="projects">
 {{ range site.Data.projects.project }}
     <li>
-        <a class="project-name" href="{{ .url | default .repo }}">{{ .name }}</a>
+        <a class="project-name" href="{{ .url | default .repo | default .post }}">{{ .name }}</a>
         <span class="project-desc">{{ .desc }}</span>
         <span class="project-links">
             {{ with .post }}<a class="dim" href="{{ . }}">post</a>{{ end }}

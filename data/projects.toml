@@ -16,8 +16,7 @@ desc = "Self-hosted multi-wallet Solana portfolio tracker with P&L and an encryp
 [[project]]
 name = "brigade"
 post = "/posts/brigade/"
-url = "https://brigade.niks3089.com"
-desc = "Social layer for Solana governance and community chat, next to Realms."
+desc = "Pitch, not built: a wallet-native social network for Solana."
 
 [[project]]
 name = "techshorts"
