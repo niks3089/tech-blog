@@ -42,7 +42,7 @@ The chain already provides verifiable identity, holdings and actions. The social
 ### Core experience (MVP)
 
 1. **Sign in with your wallet.** Your profile can show verified holdings, communities and roles, proven from chain state, not claimed. New users get an embedded wallet, so no crypto setup is needed to start.
-2. **A public feed** for posts, replies and follows, with market conversation built in.
+2. **A public feed** for posts, replies and follows, with market conversation built in. Posts expire after 30 days unless someone pays to keep them (more on this below).
 3. **Verified tokens, not tickers.** A cashtag resolves to a specific mint from a verified list, with a live price, so `$USDC` can never point to a lookalike.
 4. **Communities.** Spaces for projects and groups, with membership and roles that can be gated by on-chain state, such as holding a token or an NFT.
 5. **Safe links.** Links to on-chain actions are validated before they're shown, and every action is signed in the user's own wallet. The product never holds funds or keys.
@@ -77,6 +77,29 @@ The chain already provides verifiable identity, holdings and actions. The social
 | Governance with discussion | No | No | No | Yes, with Realms |
 
 The point isn't to replace any one of these. It's a home where Solana's social activity and on-chain activity finally meet.
+
+## Why not just build on Farcaster?
+
+Farcaster proved that decentralized social can work, and that interactive posts drive engagement. But for Solana communities it brings friction they don't need:
+
+- **Identity lives on another chain.** Accounts, keys and storage rights are registered on Optimism. A Solana wallet can be linked, but it's never the core identity.
+- **Paying to exist.** Signing up means a yearly storage fee paid in ETH, plumbing that users resent and that Solana users have to bridge for.
+- **An empty graph.** It's a separate social graph whose most active communities are in the Ethereum and Base ecosystem, not Solana.
+- **Built Ethereum-first.** Frames and the in-app wallet were designed around EVM transactions, and on-chain state like token holdings doesn't natively shape channels or identity.
+
+Here's what I'd do differently. Farcaster made decentralized social feel like infrastructure. This product should make Solana feel like a place.
+
+1. **Posts expire, and permanence is earned.** This is the flagship inversion. Instead of storage rent nobody wants to think about, posts expire after 30 days by default and permanence becomes a social mechanic:
+   - **Pin:** the author pays a little SOL to keep a post.
+   - **Preserve:** anyone pays to keep someone else's post. The fee is shared with the author, and the post shows how many people preserved it, like "Preserved by 214".
+   - **Mint:** the most-preserved posts can become compressed NFTs, which Solana makes almost free.
+2. **Verified trade receipts.** A post can attach a transaction signature that's checked on-chain and stamped *Verified*. The entry and timing are real and the direction is provable, while position size can stay hidden. Add a verified 30-day P&L leaderboard. Crypto Twitter runs on screenshots that anyone can fake, and Farcaster has nothing equivalent.
+3. **Actions and Blinks instead of Frames.** Farcaster had to invent Frames. Solana already has Actions and Blinks, so any post can carry a live price chip, a tip, a drop claim or a one-tap swap without leaving the feed. Signing always happens in the user's own wallet.
+4. **Token-gated communities.** Like Farcaster channels, but with skin in the game: hold a set amount of a token to enter, enforced by a wallet balance check.
+5. **Supporting mechanics:**
+   - **Prediction threads,** play-money only until the regulatory gates clear.
+   - **Images and GIFs only, no video.** Since everything expires anyway, this keeps storage and moderation costs flat.
+   - **Invite scarcity as a growth loop,** the way early Warpcast grew.
 
 ## How we'd know it works
 
