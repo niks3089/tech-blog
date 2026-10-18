@@ -1,8 +1,8 @@
 ---
-title: "Building Brigade: A Social Feed for Solana Where Posts Expire"
+title: "Solana Needs a Social Layer for Governance"
 date: 2026-04-21T10:00:00+05:30
-description: "How I'm building Brigade, a Solana-native social network, as a Rust modular monolith with PostgreSQL, a transactional outbox and NATS JetStream."
-tags: ["solana", "social", "rust", "projects"]
+description: "Why governance and community chat on Solana need a wallet-native social layer next to Realms, what that layer has to do, and how I'd architect it."
+tags: ["solana", "governance", "architecture", "projects"]
 type: post
 weight: 25
 showTableOfContents: true
@@ -10,132 +10,104 @@ showTableOfContents: true
 
 ## The problem
 
-Most crypto discussion happens on X, and X is cut off from the things that discussion leads to. Someone posts about a token. To act on it you leave the conversation, find the right asset (hopefully not the impersonator with the same ticker), make sure the link isn't a drainer, reconnect a wallet, and then come back.
+On Solana, the vote and the conversation about the vote happen in different places.
 
-X also has no idea of wallet identity, token-gated communities or on-chain rewards. Farcaster showed a third-party app ecosystem can work, but its protocol and separate social graph add onboarding friction a first product doesn't need.
+[Realms](https://realms.today) and the SPL Governance program cover the on-chain half well: realms, proposals, voting power, vote records, execution. But the discussion that decides how people vote happens somewhere else: a Discord server, a forum thread, a post on X. None of those places know who holds governance power. None of them link a message to the proposal it's about. Most of them can't tell a real token holder from someone with a matching profile picture.
 
-So I started [Brigade](https://brigade.niks3089.com): a public social network for the Solana ecosystem. The conversation comes first, and the crypto actions sit right next to it. The user signs every action in their own wallet.
+The result is familiar to anyone who has sat through a DAO vote:
 
-## What it does today
+- **Discussion is detached from the decision.** A proposal goes live on-chain while the reasoning is scattered across three apps, and much of it is gone a month later.
+- **Identity is weak.** Anyone can claim to speak for a large holder. Sybil accounts are free.
+- **Participation is low.** Voting means leaving the conversation, finding the proposal, connecting a wallet and then coming back.
+- **Nothing is portable.** A community's history is locked inside whichever chat platform it happened to choose.
 
-Brigade is an early proof of concept. Here is what works right now:
+The chain already has the hard part: verifiable identity, verifiable holdings and verifiable votes. What's missing is a social layer that uses them.
 
-- **Sign-in** with Google or Sign In With Solana. Users without a wallet get a user-controlled embedded Solana wallet. Posting requires a verified Gmail address; a wallet-only identity is read-only.
-- **Gated signup.** You need an invitation and a Cloudflare Turnstile check before an account is created.
-- **Posts, replies, threads, follows**, profiles with avatars, follower and following pages, and a following-scoped home feed with a "Latest" toggle.
-- **Image attachments.** Images and GIFs only, 2 MB cap, no video.
-- **30-day expiry.** Every post expires 30 days after creation unless it is preserved.
-- **Cashtag price chips.** A `$TICKER` in a post renders a live price chip, but only if the ticker maps to a mint on a small verified allowlist.
-- **External wallet linking** through a signed, single-use challenge.
-- **A Jupiter launch endpoint.** It returns a validated external Jupiter link for a mint. It never builds, signs or submits a transaction.
+## What needs to be built
 
-## What is planned, and what is gated
+Not another chat app. A layer where the wallet is the identity, and governance state is part of the conversation.
 
-The full product has a lot more in it, and I want to be precise about it. Trading, prediction markets and token distributions are regulated activities. None of them launch until partner approval and legal review are done in each jurisdiction Brigade serves. Code being finished is not the same as a feature being allowed to ship.
+**Wallet-native identity.** You sign in with a wallet. Your profile can show which realms you're in and how much voting power you have, proven from chain state, not claimed. Linking more wallets uses signed, single-use challenges, so a link can't be replayed.
 
-Here is what's planned, roughly in the roadmap's order:
+**Realm-scoped spaces.** Each realm gets a space whose membership and roles come from governance state: community token holders, council members, delegates. Gating is computed from chain data, not from a bot assigning roles.
 
-- Paid "pin" and "preserve" so a post survives past 30 days, plus trade-receipt posts that show a VERIFIED stamp once the backend has checked the transaction signature on-chain.
-- Solana Actions/Blinks inside posts, and sandboxed third-party mini-apps.
-- Gated money features: embedded swaps, tips in approved assets, token distributions through an audited Merkle distributor program, and x402 paid resources.
-- Later and gated: creator subscriptions, read-only prediction-market cards, and play-money prediction threads until the regulatory gates clear.
+**Proposal-linked threads.** Every proposal gets a discussion thread by default. The thread shows live status (draft, voting, succeeded, executed), the current tally, time remaining and who has voted, all read from chain. Arguments for and against sit next to the result they affected, and they stay there.
 
-The navigation only shows features that work. Nothing in the UI is a disabled button promising something that isn't there.
+**Voting from inside the conversation.** A vote button that builds the governance instruction, shows a human-readable preview, and hands it to your own wallet to sign. The platform never holds a key.
+
+**Signal weighted by stake.** Optionally sort or filter discussion by verified governance power, so a holder's argument isn't buried under noise. It's a lens, not censorship: everything is still readable.
+
+**Notifications that matter.** A proposal was created in a realm you're in. Voting ends in 24 hours. Your delegate voted. A proposal you discussed was executed.
+
+**Moderation owned by the community.** Each realm moderates its own space, with tools that can be delegated to its council, and every enforcement action records a reason code.
 
 ## Architecture
 
-The backend is a Rust modular monolith. That means one workspace, one domain model and one canonical database. The plan is to run it as separate processes (API, realtime, outbox relay, workers, Solana indexer, scheduler), but there are no network calls between made-up microservices.
+The shape I'd use is a modular monolith: one codebase, one domain model and one canonical database, deployed as a few separate processes. Splitting it into services early would buy coordination problems before it buys scale.
 
-```text
-  Browser (Next.js on Vercel)
-        |  REST /v1, cookie session
-        v
-  +-----------------------------+        +----------------------+
-  | Rust API (Axum + Tokio)     |------->| Solana adapter       |
-  |  identity, posts, graph,    |        |  RPC / DAS, behind   |
-  |  feed, wallets, trading     |        |  a narrow interface  |
-  +-----------------------------+        +----------------------+
-     |  one transaction:        \
-     |  domain row + outbox row  \--> Redis (rate limits, caches;
-     v                                 disposable)
-  +-----------------------------+
-  | PostgreSQL (canonical)      |
-  +-----------------------------+
-     |  relay claims due rows
-     |  (FOR UPDATE SKIP LOCKED)
-     v
-  NATS JetStream  --> workers: feed fanout, notifications,
-                      moderation (planned)
+```
+                Solana (SPL Governance, token accounts)
+                      │ account updates
+                      ▼
+            ┌───────────────────────┐
+            │ governance indexer    │  realms, proposals,
+            │ (stream + backfill)   │  vote records, voting power
+            └──────────┬────────────┘
+                       │ one transaction: rows + outbox event
+                       ▼
+ web / mobile ──▶ API ──▶ PostgreSQL (canonical) ──▶ outbox relay ──▶ NATS JetStream
+      ▲                                                                    │
+      │ realtime (websocket)                                               ▼
+      └──────────── realtime gateway ◀── workers: feed fanout, notifications,
+                                          thread creation, moderation
 ```
 
-The pieces:
+**PostgreSQL is the source of truth** for users, wallets, spaces, posts and the indexed governance state. Feeds and threads begin as keyset-paginated queries. Read replicas, partitioning and dedicated search each wait for a measured trigger.
 
-- **PostgreSQL** is the source of truth for users, handles, wallets, posts, follows, invitations and the outbox. All access goes through SQLx with explicit SQL, and there's no ORM. I'd rather see the query plans for feed and graph queries than fight an abstraction over them.
-- **Redis** holds rate limits and short-lived caches. Nothing in it is canonical, so losing it means rebuilding, not losing data.
-- **NATS JetStream** is the only message broker. I'm not running Kafka next to it or using a database polling queue.
-- **The frontend** is Next.js with TypeScript on Vercel. Vercel only serves presentation code. It's not the system of record and doesn't run workers.
+**A governance indexer** follows the governance program's accounts in real time and backfills history. It turns raw accounts into realms, proposals, vote records and voting power. When it sees a new proposal it writes the proposal row and a `proposal-created` event in the same transaction, so a thread can never exist without its proposal, or the other way round.
 
-## Decisions and tradeoffs
+**A transactional outbox, not dual writes.** Every domain change writes its event in the same transaction as the data. A relay publishes those events to NATS JetStream, using the event ID to drop duplicates. Workers only consume from NATS, so if the broker loses data, events can be replayed from Postgres.
 
-### A transactional outbox instead of dual writes
+**Workers turn events into side effects:** create the proposal thread, fan posts out to feeds, send notifications, and run moderation checks. Each is idempotent, so redelivery is harmless.
 
-When a post, follow or account is created, the domain row and an outbox event are written in the same PostgreSQL transaction. A relay loop claims due rows with `FOR UPDATE SKIP LOCKED` and publishes each one to JetStream, using the event's stable ID as the NATS message ID so JetStream can drop duplicates. A row is marked published only after JetStream acknowledges it. Failures back off up to a bounded delay. Subjects are versioned, like `brigade.events.content.post-created.v1`.
+**A realtime gateway** pushes new messages and tally changes to connected clients. It reads from NATS and holds no state of its own, so it scales horizontally.
 
-The outbox is a bridge, not a second queue. Workers only consume from NATS. If NATS loses data, the canonical events can be republished from PostgreSQL. Right now the relay runs inside the API process. The feed and notification consumers on the other side are the next piece.
+**A Solana adapter behind a narrow interface.** RPC, account streaming and price data all go through one boundary, so switching providers doesn't touch the domain code, and provider credentials never reach the browser.
 
-### Expiry as a read-time filter
+## Non-custodial by construction
 
-The 30-day expiry is a nullable `expires_at` column with a 30-day default. `NULL` means preserved, which is the hook for paid pinning later. Every read path filters out expired posts, including the parent and root lookups in a thread, so expiry is enforced at query time and doesn't depend on a deletion job running.
+Voting, and any other on-chain action, follows one flow:
 
-An hourly task deletes media bytes for expired posts. The post rows stay because they're tiny and already invisible. This keeps storage roughly flat without a complicated cleanup pipeline.
+1. Build the transaction server-side from the governance instruction.
+2. Decode it and check every program and account against an allowlist, then simulate it.
+3. Show the user a human-readable preview: realm, proposal, choice and voting weight.
+4. The user signs in their own wallet.
+5. The signed bytes must match the previewed bytes, or the preview is thrown away.
 
-One honest shortcut: POC images live in PostgreSQL as size-checked `BYTEA`. The architecture calls for off-host object storage behind a CDN. With a 2 MB cap and 30-day expiry, the database is fine for now. That changes before real scale.
+The platform can propose a transaction but never sign one. That boundary matters more in governance than anywhere else, because a malicious vote, or a disguised token transfer, could decide the outcome.
 
-### Fail closed on anti-abuse
+## Hard problems worth naming
 
-Signup is the first thing a bot farm attacks, so every check fails closed:
+**Voting power isn't just token balance.** It depends on deposits, delegation, council tokens and voter-weight plugins. The indexer has to compute it the way the governance program does, or the UI will show numbers that don't match the vote.
 
-- The Turnstile token is validated server-side against the expected hostname, action and maximum age.
-- Invitations are stored hashed and consumed atomically with account creation.
-- Posting limits use a Redis script with both a burst window and a sustained window.
-- If Redis errors out or returns something unexpected, the post is refused, not let through.
-- Quotas come from server-verified state, never from a client-supplied wallet header.
+**Sybil resistance has limits.** Wallets are free too. Weighting by governance power helps, and so do gated signup and rate limits, but none of it stops a determined holder from splitting tokens. The goal is to make cheap manipulation expensive, not to claim it's impossible.
 
-No spec can stop a determined human-assisted bot. The goal is that commodity automation can't get in, and that operators can contain abuse without a release.
+**Chain reorgs and lag.** Tallies shown in a thread must say how fresh they are, and the indexer must reconcile against finalized state.
 
-### Wallet linking without replay
+**Privacy.** Linking wallets to a social profile reveals holdings. Linking has to be opt-in for every wallet, and the default view should show governance roles, not balances.
 
-Linking an external wallet means signing a domain-separated message with a 32-byte random nonce. The server stores only the nonce's hash, along with the origin and an expiry. It checks all three and marks the challenge consumed. A timestamp-only scheme can be replayed inside its validity window, and a consumed nonce in the database closes that hole.
+**Moderation versus censorship-resistance.** Communities need moderation, but nobody wants a platform that can quietly remove dissent before a vote. Recording reason codes and keeping governance-related moderation visible in public logs helps keep both.
 
-### Tokens are mints, not tickers
+## Where to start
 
-Token identity is always chain plus mint address. The cashtag chips only render for tickers on a verified mint allowlist, so `$USDC` can never quietly resolve to a lookalike token. Prices come from a server-side endpoint. The Solana provider's credentials never reach the browser.
+The order I'd build it in:
 
-### Non-custodial by construction
+1. Wallet sign-in, realm-scoped spaces and proposal-linked threads with live status, read-only from chain.
+2. Voting from the thread through the non-custodial flow.
+3. Notifications and delegate activity.
+4. Stake-weighted views and moderation tools for each realm.
+5. Opening the platform to third-party mini-apps for treasury dashboards, grants and other realm-specific tools.
 
-Brigade never holds a private key. The planned transaction flow treats every financial action as an immutable, expiring intent:
+Each step is useful by itself, and none of them needs the next one to justify it.
 
-1. The provider builds the transaction.
-2. Brigade decodes and allowlist-checks the programs and accounts, then simulates it.
-3. The user sees a human-readable preview.
-4. After signing, the signed bytes must match the previewed bytes, or the preview is invalidated.
-
-Today's Jupiter integration stops well short of that. It hands back a link and a response that explicitly says the user's wallet has to approve and that Brigade holds no funds.
-
-### Don't build distributed systems early
-
-X's Manhattan and Meta's TAO exist because of scale and team sizes Brigade doesn't have. So the feed starts as PostgreSQL keyset pagination on `(created_at, id)` with an opaque cursor. Read replicas, partitioning, ClickHouse, dedicated search and hybrid fanout each have an explicit trigger in the scaling plan, and each waits until measurements say the simpler setup can't hold its targets.
-
-## What's next
-
-The next milestones from the roadmap:
-
-- NATS consumers for feed projection and notifications, then a simple versioned For You ranker next to the chronological feed.
-- Moderation: reports, a review console and enforcement actions with reason codes.
-- Market-aware social: mint-resolved token cards with freshness labels, verified terminal deep links, and search.
-- Paid preserve and verified trade receipts.
-- The mini-app sandbox: a separate origin, capability grants and a kill switch.
-
-The money features come after that. Each one ships separately and only after its own security review, partner authorization and legal sign-off.
-
-If you want to see where it is today, the POC is live at [brigade.niks3089.com](https://brigade.niks3089.com).
+I've been prototyping parts of this as [Brigade](https://brigade.niks3089.com). The main argument stands without it, though. Solana already has verifiable identity, holdings and votes. Governance deserves a conversation layer that actually uses them.
