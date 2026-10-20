@@ -1,150 +1,140 @@
 ---
-title: "Pitch: A Wallet-Native Social Network for Solana"
-date: 2026-04-21T10:00:00+05:30
-description: "A product pitch, not a launch: why Solana needs a social network built around wallets, what the product should be, and how governance with Realms fits in as one feature."
-tags: ["pitch", "solana", "social", "product"]
+title: "Brigade: A Social Network on Solana and Tapedrive"
+date: 2026-10-21T01:00:00+05:30
+description: "How Brigade puts identity and ordering on Solana and content on Tapedrive: a native program for accounts and keys, signed posts with no wallet popups, batch commits, hourly checkpoints, and content that expires in 3 to 6 months."
+tags: ["solana", "social", "architecture", "projects"]
 type: post
 weight: 25
 showTableOfContents: true
 ---
 
-> **This is a pitch.** Nothing described here is built, launched or in development. It's a product proposal: the problem, the product I think should exist, and how I'd approach it. "Brigade" is just a working name.
+> **Status:** running on Solana devnet. Tapedrive hasn't launched on mainnet yet, so neither has Brigade. Everything stored so far is test data and may be reset.
 
-## The one-liner
+## What Brigade is
 
-A social network where your wallet is your identity. Solana communities talk, coordinate, act on chain and govern themselves in one place, without leaving the conversation.
+Brigade is a social network for the Solana ecosystem: a public feed with market context, built around wallets. I first wrote this up as a pitch. Since then it's been built, and the architecture has moved a long way from that pitch.
 
-## The problem
+The original plan was a conventional stack: Postgres as the source of truth, with the chain used for money. The design I ended up with is different:
 
-Solana's social life happens on platforms that know nothing about the chain.
+- **Identity and ordering live on Solana.** Accounts, handles, posting keys and the order of posts are recorded by a small native program.
+- **Content lives on Tapedrive.** Every post is a signed message stored as its own object, with its media next to it.
+- **Postgres is just an index.** It makes feeds and search fast, and the goal is that it can be thrown away and rebuilt from Solana and Tapedrive.
 
-Market talk happens on X. Community chat is on Discord and Telegram. Governance discussion is in forums, with the votes themselves on [Realms](https://realms.today). Creators get paid somewhere else again. None of these places know who holds what, who is actually a member of a community, or which token a ticker refers to.
+The rest of this post covers why, how the pieces fit, what happens when you post, and what isn't done yet.
 
-What that costs people:
+## Why put social on Solana
 
-- **Context switching.** Someone posts about a token, a proposal or a mint. To act on it you leave, find the right page, reconnect a wallet and come back. Most people don't.
-- **Impersonation and scams.** Fake tickers, lookalike accounts and drainer links spread in exactly the places where people make on-chain decisions.
-- **Weak identity.** Anyone can claim to be a holder, a team member or a whale. Real stake has no weight in the conversation.
-- **No ownership.** A community's history and relationships are locked inside platforms it doesn't control.
+A social network's real assets are who you are, who said what, and when. On a normal platform all three sit in one company's database. If the company changes the rules, shuts down or quietly edits history, you can't check.
 
-The chain already provides verifiable identity, holdings and actions. The social layer doesn't use any of them.
+Putting those on a chain changes what users can verify:
 
-## Who it's for
+- **Your account belongs to your wallet.** The handle is registered on-chain and owned by your wallet, not by a row Brigade can reassign.
+- **Every post is signed by you.** Anyone can check that a post came from a key your wallet approved, without trusting Brigade's server.
+- **The order is public.** Posts are committed to Solana in batches with a gapless sequence number, so the server can't silently insert, drop or reorder history.
+- **Money is native.** Tips, swaps and token drops are Solana transactions anyway, so they sit next to the identity that makes them meaningful.
 
-- **Holders and traders** who want market conversation with verified tokens and safe links.
-- **Communities and projects** that want a home where membership, roles and gating come from on-chain state.
-- **Creators** who want to be rewarded directly by their audience, in crypto.
-- **DAOs** that want discussion and voting in the same place as their community.
-- **Developers** who want to put their app in front of an existing social audience.
+What doesn't belong on a chain is the content itself. Posts and images are large and mostly short-lived, and paying chain storage for a "gm" makes no sense. So Solana holds hashes, and the bytes go to storage built for bytes.
 
-## The product
+## Design decisions
 
-### Core experience (MVP)
+### Decision 1: content never goes in Solana state
 
-1. **Sign in with your wallet.** Your profile can show verified holdings, communities and roles, proven from chain state, not claimed. New users get an embedded wallet, so no crypto setup is needed to start.
-2. **A public feed** for posts, replies and follows, with market conversation built in. Posts expire after 30 days unless someone pays to keep them (more on this below).
-3. **Verified tokens, not tickers.** A cashtag resolves to a specific mint from a verified list, with a live price, so `$USDC` can never point to a lookalike.
-4. **Communities.** Spaces for projects and groups, with membership and roles that can be gated by on-chain state, such as holding a token or an NFT.
-5. **Safe links.** Links to on-chain actions are validated before they're shown, and every action is signed in the user's own wallet. The product never holds funds or keys.
+Solana stores identity accounts and a batch log of Merkle roots. Post bodies and media never sit in account state or transaction data. Only their hashes do.
 
-### Features on top
+That keeps on-chain cost proportional to the number of batches, not the number of posts, and it means moderation can remove content without fighting the chain (more on that below).
 
-- **Governance.** One feature among many, built with Realms. Each proposal gets a discussion thread with live status and tally, and members can vote from the thread with their own wallet.
-- **Creator rewards.** Tips and rewards from followers directly to creators.
-- **Actions in posts.** Solana Actions and Blinks render inline, so you can mint, donate or vote without leaving the feed.
-- **Notifications** for mentions, community activity, proposals closing and actions you took part in.
+### Decision 2: one native program for identity and ordering
 
-### Later
+The program, `brigade-chain`, is a native Solana program with fixed byte layouts. It has a handful of account types:
 
-- **Mini-apps.** Third-party apps that run inside communities, such as treasury dashboards, games and tools, in a sandbox with explicit permissions.
-- **Token drops and distributions** for communities, through audited on-chain programs.
-- **Embedded swaps and trading.** These are regulated activities, so they only ship after partner approval and legal review in each market.
+| Account | Holds |
+|---|---|
+| Account | the owner wallet and the handle |
+| Handle | a reverse lookup, so each handle maps to exactly one account |
+| App key | a posting key the owner approved, with its expiry |
+| Log | the batch sequence number and the last Merkle root |
+| Checkpoint | the latest snapshot number, its hash, and where it's stored |
 
-## Why Solana, why now
+The program enforces the rules that matter: one account per wallet, one account per handle, handles limited to lowercase letters, digits and underscores, only the owner can add or revoke keys, and each batch's sequence number must be exactly one more than the last.
 
-- **Wallet onboarding has caught up.** Embedded and mobile wallets make signing in and signing a transaction quick enough for regular users.
-- **Cheap, fast transactions** make on-chain actions from a feed practical. A tip or a vote is a tap, not a fee decision.
-- **Standard building blocks exist:** Actions and Blinks for inline actions, Realms for governance, and token standards for gating and verification.
+Brigade pays the rent and fees as payer. The user's wallet signs as owner. The backend never holds a user's key.
 
-## How it fits with what exists
+### Decision 3: no wallet popup per post
 
-| | X | Discord / Telegram | Farcaster | This product |
-|---|---|---|---|---|
-| Public conversation | Yes | Limited | Yes | Yes |
-| Verified holder identity | No | Via bots | Partial | Native |
-| Token-gated communities | No | Via bots | Limited | Native |
-| On-chain actions in context | No | No | Frames | Native, non-custodial |
-| Governance with discussion | No | No | No | Yes, with Realms |
+Asking a wallet to sign every post would kill the product. Instead, the browser generates its own Ed25519 key, and the user's wallet approves it once on-chain as an app key. After that, every post is signed by the browser key, silently.
 
-The point isn't to replace any one of these. It's a home where Solana's social activity and on-chain activity finally meet.
+With the embedded wallet this is automatic: when you sign in, Brigade registers your account and approves your browser key in one sponsored transaction. You never see a fee or a popup.
 
-## Why not just build on Farcaster?
+The signed message is a small JSON envelope:
 
-Farcaster proved that decentralized social can work, and that interactive posts drive engagement. But for Solana communities it brings friction they don't need:
-
-- **Identity lives on another chain.** Accounts, keys and storage rights are registered on Optimism. A Solana wallet can be linked, but it's never the core identity.
-- **Paying to exist.** Signing up means a yearly storage fee paid in ETH, plumbing that users resent and that Solana users have to bridge for.
-- **An empty graph.** It's a separate social graph whose most active communities are in the Ethereum and Base ecosystem, not Solana.
-- **Built Ethereum-first.** Frames and the in-app wallet were designed around EVM transactions, and on-chain state like token holdings doesn't natively shape channels or identity.
-
-Here's what I'd do differently. Farcaster made decentralized social feel like infrastructure. This product should make Solana feel like a place.
-
-1. **Posts expire, and permanence is earned.** This is the flagship inversion. Instead of storage rent nobody wants to think about, posts expire after 30 days by default and permanence becomes a social mechanic:
-   - **Pin:** the author pays a little SOL to keep a post.
-   - **Preserve:** anyone pays to keep someone else's post. The fee is shared with the author, and the post shows how many people preserved it, like "Preserved by 214".
-   - **Mint:** the most-preserved posts can become compressed NFTs, which Solana makes almost free.
-2. **Verified trade receipts.** A post can attach a transaction signature that's checked on-chain and stamped *Verified*. The entry and timing are real and the direction is provable, while position size can stay hidden. Add a verified 30-day P&L leaderboard. Crypto Twitter runs on screenshots that anyone can fake, and Farcaster has nothing equivalent.
-3. **Actions and Blinks instead of Frames.** Farcaster had to invent Frames. Solana already has Actions and Blinks, so any post can carry a live price chip, a tip, a drop claim or a one-tap swap without leaving the feed. Signing always happens in the user's own wallet.
-4. **Token-gated communities.** Like Farcaster channels, but with skin in the game: hold a set amount of a token to enter, enforced by a wallet balance check.
-5. **Supporting mechanics:**
-   - **Prediction threads,** play-money only until the regulatory gates clear.
-   - **Images and GIFs only, no video.** Since everything expires anyway, this keeps storage and moderation costs flat.
-   - **Invite scarcity as a growth loop,** the way early Warpcast grew.
-
-## How we'd know it works
-
-- **Activation:** the share of new users who post, follow or join a community in their first week.
-- **Actions from conversation:** on-chain actions started from a post or thread (tips, votes, mints).
-- **Community health:** weekly active members per community, and retention after 30 days.
-- **Trust:** reports of scams and impersonation per thousand users, which should fall as verification improves.
-
-## Go to market
-
-1. **Start with a few active communities** that already feel the pain, and design the MVP with them.
-2. **Lead with verified identity and safe links.** That's where existing platforms fail Solana users most visibly.
-3. **Add features that bring whole communities over,** like gated spaces, governance threads and creator rewards.
-4. **Open the platform** to mini-apps once there's an audience to serve.
-
-**Business model, to be validated:** free for users and communities, with paid tools for community operators (analytics, moderation, custom branding), boosted posts that are clearly labelled, and a revenue share on mini-apps.
-
-## Risks and open questions
-
-- **Network effects.** People are already on X and Discord. The wedge has to be what those platforms can't do: verified on-chain identity and safe actions.
-- **Regulation.** Trading, token distributions and anything resembling financial services need partner approval and legal review in each market. Those features are gated, not assumed.
-- **Sybil resistance has limits.** Verification raises the cost of fake accounts, but it doesn't eliminate them.
-- **Privacy.** Linking wallets to a profile reveals holdings. Linking must be opt-in for each wallet, and holdings should be hidden by default.
-- **Moderation.** Open communities need moderation tools without making the platform a central gatekeeper.
-
-## A sketch of the architecture
-
-This is deliberately high level. At this stage the product matters more than the stack.
-
-```
-           Solana (tokens, Actions, Realms)
-                     │
-                     ▼
-   chain indexer ──▶ database (single source of truth) ──▶ events ──▶ feeds, notifications,
-         ▲                       │                                   community + governance threads
-         │                       ▼
-  non-custodial actions ◀── app (web + mobile, realtime)
-  (preview, then sign in wallet)
+```json
+{"v":1,"net":"devnet","account":"<account address>","kind":"post","body":"gm","parent":null,"media":null,"ts":1792500000000}
 ```
 
-- **Index the on-chain state the product needs** (holdings for gating, verified token mints, governance proposals) into one canonical database.
-- **Drive features from events:** a new post fans out to feeds, a new proposal opens its thread, and an action triggers a notification.
-- **Never custody anything.** Every action is built, checked and simulated, then shown in plain language and signed in the user's wallet. What gets signed must match what was previewed.
-- **Start as one well-structured system,** and split it only when real usage says to.
+The signature covers a fixed prefix plus the exact envelope bytes, and the message ID is the SHA-256 of those bytes. The server stores exactly what it received and never re-serializes it, so the signature always checks out against the stored copy.
 
-## The ask
+### Decision 4: content expires, by design
 
-If you run a Solana community, create content in the ecosystem or build apps that could live inside a social feed, I'd like to hear whether this matches what you need, and what's missing.
+Retention is 3 to 6 months, and it isn't enforced by a delete job. It falls out of how storage is organised.
+
+Brigade writes to a tape on Tapedrive for 3 months, then rotates to a new one. Each tape expires 6 months after it was created. So every object lives between 3 and 6 months, and expiry is the storage layer's job, not mine.
+
+This is a deliberate product choice. The feed stays current, storage and moderation costs stay flat, and nobody's five-year-old post comes back to haunt them.
+
+### Decision 5: batches and checkpoints instead of one transaction per post
+
+Committing every post as its own transaction would be slow and expensive. Instead, an archiver collects posts and commits them in batches:
+
+- **Every few seconds** it builds a Merkle tree over the new message IDs, writes a manifest listing them to Tapedrive, and commits the root and count to Solana.
+- **Every hour** it writes a checkpoint snapshot to Tapedrive and records its hash on Solana. The snapshot lists accounts, active keys, every committed batch, and where every live message is stored.
+
+The checkpoint exists so a new reader doesn't have to replay the whole log from the start. It fetches the latest checkpoint, checks the hash against Solana, and replays only the batches after it.
+
+## Architecture
+
+```
+            browser
+   (embedded wallet + app key)
+               │  signed message
+               ▼
+          Brigade API ───────────────▶ Postgres
+   (verify signature + key)       (fast index for feeds)
+               │
+               ▼
+            archiver
+     │                    │
+     │ messages, media,   │ batch roots (every few seconds)
+     │ manifests,         │ checkpoint hash (hourly)
+     │ checkpoints        │
+     ▼                    ▼
+ Tapedrive            Solana: brigade-chain
+ (expires in        (accounts, handles, app keys,
+  3–6 months)        batch log, checkpoints)
+```
+
+Solana orders things and Tapedrive stores things. Brigade runs no consensus of its own. Because the log is keyed by its authority, anyone could run their own relay and log, and readers choose which one to trust.
+
+## What happens when you post
+
+1. **Sign in.** You sign in and get an embedded Solana wallet. On first sign-in, Brigade builds a transaction that registers your account and handle and approves your browser's app key. Brigade pays the fees, and the embedded wallet signs it as the owner without a prompt.
+2. **Write a post.** The browser builds the envelope and signs it with the app key. No popup.
+3. **The API checks it.** It verifies the signature and checks that the key is approved for your account on-chain, then indexes the post in Postgres so it shows up in feeds right away.
+4. **The archiver stores it.** The signed message goes to Tapedrive as its own object, and any image goes next to it, addressed by its hash.
+5. **The batch lands on Solana.** Within a few seconds the post's ID is part of a Merkle root committed to the batch log.
+6. **The links appear.** Each archived post links to its Tapedrive object and to the Solana transaction that committed it, and your profile links to your on-chain account. Anyone can follow those links and check the post without trusting Brigade.
+
+## What isn't done yet
+
+These are in progress, not shipped:
+
+- **Rebuilding from the chain alone.** Filling an empty Postgres purely from Solana and Tapedrive, verifying every signature and Merkle root. Key validity has to come from history, not current state, because a revoked key's account can be recreated later. Until this rebuild passes, Postgres is still the practical source of truth.
+- **Signed deletes and moderation takedowns.** A delete is a signed message that removes the content from Tapedrive. The hash on Solana stays, so the record shows that something existed, but not what it said.
+- **Governance articles.** Long-form posts that mirror Solana governance proposals (SIMDs), with sentiment from verified validators.
+- **Receiving tokens on profiles.**
+- **A developer API**, where third-party apps get delegated keys the same way the browser does.
+- **Operational hardening** of the archiver and relay.
+- **Mainnet.** That waits for Tapedrive to launch on mainnet.
+
+## Takeaway
+
+The interesting decision was where each kind of data belongs. Identity and ordering need to be verifiable and permanent, so they go on Solana. Content is big and should fade, so it goes on Tapedrive with a built-in expiry. Everything fast and queryable is an index that should be rebuildable from the other two. The pieces for that are running on devnet today. Proving the rebuild end to end is the next milestone.
