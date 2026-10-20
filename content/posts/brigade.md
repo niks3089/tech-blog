@@ -1,6 +1,6 @@
 ---
 title: "Brigade: Designing a Social Network on Solana and Tapedrive"
-date: 2026-10-21T01:00:00+05:30
+date: 2026-04-21T10:00:00+05:30
 description: "A design for a social network that keeps identity and ordering on Solana and content on Tapedrive: a native program for accounts and keys, signed posts with no wallet popups, batch commits, hourly checkpoints, and content that expires in 3 to 6 months."
 tags: ["solana", "social", "architecture", "projects"]
 type: post
